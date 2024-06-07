@@ -1,27 +1,42 @@
-import React from 'react'
+import React from "react";
 import { Link } from "react-router-dom";
-import { UserImg } from '../../assets';
-import {TextCarousel, ServicesYearlyChart, ValueYearlyChart} from "../../Components";
+import { UserImg } from "../../assets";
+import {
+  TextCarousel,
+  ServicesYearlyChart,
+  ValueYearlyChart,
+} from "../../Components";
 import "./Dashboard.css";
 
-export const Dashboard= () => {
-  const userName = "Nombre del Usuario"; 
+export const Dashboard = () => {
+  const userDoc="1562489996"
+  const userName = "Admin";
+  const userEmail='usuariodeprueba@gmail.com';
+  const userRole='Administrador';
 
   return (
     <div className="panel-container">
-    
-      <div className="user-profile">
-      <img src={UserImg} alt="User" />
-        <div className="user-info">
-          <h2>{userName}</h2>
-          <Link to="/boreal/editar-perfil">Editar Perfil</Link>
-        </div>
-      </div>
+      <h3>¡Bienvenido, {userName}!</h3>
+<div className="section1">
       <div className="welcome-message">
-        <h3>Bienvenido, {userName}</h3>
+        <img
+          src="https://img.freepik.com/vector-premium/icono-circulo-usuario-anonimo-ilustracion-vector-estilo-plano-sombra_520826-1931.jpg"
+          alt="Bienvenido"
+          className="welcome-image"
+        />
+        <div className="user-info">
+
+          <h3>{userName}</h3>
+          <p>{userDoc}</p>
+          <p>{userEmail}</p>
+          <p>{userRole}</p>
+        </div>
+        <Link to="/boreal/editar-perfil">Editar Perfil</Link>
       </div>
+
       <div className="text-carousel">
         <TextCarousel />
+      </div>
       </div>
       <div className="charts">
         <div className="chart">
@@ -36,4 +51,3 @@ export const Dashboard= () => {
     </div>
   );
 };
-
