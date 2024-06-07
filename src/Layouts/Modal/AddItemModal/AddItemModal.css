@@ -1,0 +1,103 @@
+#root {
+    --MainBlue: #1C68C6;
+    --MainHover:#00EFE6;
+    --MainWhite:  #ffffff;
+    --MainActive:  #021b35;
+    --SecondBlue: #00ABEF;
+    --DarkBlue: #0048BA;
+  
+  }
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .modalContent {
+    z-index: 10000;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 25em;
+    max-width: 100%;
+  }
+
+  .modalContent h2{
+    font-weight: lighter;
+    color: var(--MainBlue);
+  }
+  
+  .formGroup {
+    margin-bottom: 15px;
+  }
+  
+  .formGroup label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: lighter;
+    text-align: left;
+  }
+  
+  .formGroup input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+  }
+  
+  .formActions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .formActions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .formActions button[type="submit"] {
+     background-color: #77df8b;
+    border-radius: 1.25em;
+    border: none;
+    cursor: pointer; 
+    font-size: 1em;
+    padding: 0.5em 1.875em; 
+    height: 2.5em; 
+    margin-left: 0.625em;
+    color: var(--MainWhite);
+  }
+
+  .formActions button:hover[type="submit"] {
+    background-color: #05861f;
+    color: var(--MainWhite);
+ }
+  
+  .formActions button[type="button"] {
+    color: var(--MainWhite);  
+    border: none; 
+    cursor: pointer; 
+    font-weight: lighter;
+    background-color: #ef6868;
+    border-radius: 1.25em; 
+    font-size: 1em;
+    padding: 0.5em 1.875em; 
+    height: 2.5em; 
+  }
+
+  .formActions button:hover[type="button"] {
+    background-color: #eb1616;
+    color: var(--MainWhite);
+  }
+  

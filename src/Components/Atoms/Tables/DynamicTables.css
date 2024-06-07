@@ -1,0 +1,175 @@
+#root {
+  --MainBlue: #1C68C6;
+  --MainHover: #00EFE6;
+  --MainWhite: #ffffff;
+  --MainActive: #021b35;
+  --SecondBlue: #00ABEF;
+  --DarkBlue: #0048BA;
+}
+
+.dynamicTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.dynamicTable th,
+.dynamicTable td {
+  border: none;
+  padding: 12px 15px;
+}
+
+.dynamicTable th {
+  background-color: #d2cfcf;
+  color: var(--MainActive);
+  font-weight: lighter;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.dynamicTable tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+.dynamicTable tbody tr:hover {
+  color: var(--MainBlue);
+}
+
+.dynamicTable td {
+  background-color: #f8f8f8;
+}
+
+.dynamicTable td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.dynamicTable td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.dynamicTable th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.dynamicTable th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.actionIcon {
+  cursor: pointer;
+  margin: 0 5px;
+  transition: color 0.3s ease;
+  font-size: 20px;
+}
+
+.editIcon {
+  color: #e67c11;
+}
+
+.deleteIcon {
+  color: red;
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 1em;
+  border: 1px solid #ccc;
+  border-radius: 1em;
+}
+
+.paginationLink,
+.paginationLinkActive,
+.paginationLinkDisabled {
+  padding: 8px 12px;
+  margin: 0 2px;
+  border: 1px solid #ccc;
+  border-radius: 1em;
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.paginationLink:hover {
+  background-color: var(--MainHover);
+  color: #fff;
+  border-color: var(--MainHover);
+}
+
+.paginationLinkActive {
+  background-color: var(--MainBlue);
+  color: #fff;
+}
+
+.paginationLinkDisabled {
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+.recordsPerPage {
+  display: flex;
+  align-items: center;
+}
+
+.recordsPerPage select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  appearance: none;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.recordsPerPage select:hover {
+  border-color: var(--MainBlue);
+}
+
+.recordsPerPage select:focus {
+  outline: none;
+  border-color: var(--MainBlue);
+}
+
+.dynamicTable th {
+  position: relative;
+}
+
+.searchIcon {
+  margin-left: 1em;
+  cursor: pointer;
+  color: var(--MainBlue);
+}
+
+.searchInput {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 1em;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--MainBlue);
+}

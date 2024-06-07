@@ -1,0 +1,333 @@
+#root {
+  --MainBlue: #1C68C6;
+  --MainHover:#00EFE6;
+  --MainWhite:  #ffffff;
+  --MainActive:  #021b35;
+  --SecondBlue: #00ABEF;
+  --DarkBlue: #0048BA;
+  
+}
+  body {
+    margin: 0;
+    overflow-x: hidden; 
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: lighter;
+  }
+  
+  .main_background {
+    background-image: url('../../assets/Images/BorealBackgroundLogin.png');
+    background-position: center;
+    height:100vh;
+    width: 100vw;
+    display: grid;
+    place-items: center;
+    background-attachment: fixed;
+    overflow: hidden; 
+  }
+  
+.main_section {
+  background-color: #ffffffcc; 
+  padding: 20px;
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 20px; 
+  height: 70vh;
+  width: 80vw;
+  align-items: center;
+}
+
+.main_figure {
+  grid-column: 1 / 2; 
+}
+
+.main_container {
+  grid-column: 2 / 3; 
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  width: 30vw;
+  height: 50vh;
+}
+
+.main_img {
+  max-width: 100%;
+}
+
+.main_title {
+  text-align: center;
+  margin-bottom: 40px;
+  color: var(--MainBlue);
+  font-size: 37px;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: lighter;
+}
+
+.main_form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.main_input {
+  padding: 10px;
+  margin-bottom: 30px;
+  border-radius: 30px;
+  font-size: 16px;
+  width: 350px;
+  height: 20px; 
+  background-color: var(--MainWhite);
+  border: 1px solid var(--MainBlue);
+  transition: border-color 0.3s ; 
+  color: var(--MainActive);
+}
+
+.password-input-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 33%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--MainBlue);
+}
+
+.pass{
+  color: var(--MainBlue);
+  font-size: 17px;
+  margin-top: -5px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+
+  .main_section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .main_title {
+    text-align: center;
+    font-size: 24px;
+    margin-top: -27px
+  }
+
+  .main_input,
+  .password-input-container {
+    width: 22em;
+    font-size: 14px;
+    margin-top: -10px;
+  }
+
+  .password-toggle {
+margin-left: 1em;
+  }
+
+  .password-input-container{
+    width: 22em;
+    font-size: 14px;
+    margin-left: -16px;
+  }
+
+  .main_img {
+    width: 70%;
+  }
+
+  .logo {
+    width: 100%;
+    height: auto;
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .main_section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+  }
+
+  .main_title {
+    text-align: center;
+    font-size: 24px;
+  
+    margin-left: -45px;
+  }
+
+  .main_input,
+  .password-input-container {
+    width: 17em;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-left: -50px;
+  }
+
+  .password-toggle {
+    margin-top: -6px;
+    margin-right: 25px;
+  }
+
+  .password-input-container{
+    width: 17em;
+    font-size: 14px;
+    margin-right: -80px;
+  }
+
+  .main_img {
+    width: 70%;
+  }
+
+  .logo {
+    width: 300px;
+    height: auto;
+    margin-left: -90px;
+
+  }
+
+
+}
+
+
+@media (max-width: 640px) {
+
+  .main_section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+  }
+
+  .main_title {
+    text-align: center;
+    font-size: 24px;
+    margin-top: -27px
+  }
+
+  .main_input,
+  .password-input-container {
+    width: 17em;
+    font-size: 14px;
+    margin-top: -10px;
+  }
+
+  .password-toggle {
+margin-top: -6px;
+margin-right: 90px;
+  }
+
+  .password-input-container{
+    width: 22em;
+    font-size: 14px;
+    margin-left: 20px;
+  }
+
+  .main_img {
+    width: 70%;
+  }
+
+  .logo {
+    width: 70%;
+    height: auto;
+    margin-left: 60px;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .main_section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .main_title {
+    text-align: center;
+    font-size: 24px;
+    margin-top: -27px
+  }
+
+  .main_input,
+  .password-input-container {
+    width: 22em;
+    font-size: 14px;
+    margin-top: -10px;
+  }
+
+  .password-toggle {
+margin-left: 1em;
+  }
+
+  .password-input-container{
+    width: 22em;
+    font-size: 14px;
+    margin-left: -16px;
+  }
+
+  .main_img {
+    width: 70%;
+  }
+
+  .logo {
+    width: 100%;
+    height: auto;
+  }
+}
+
+
+@media (max-width: 300px) {
+
+  .main_section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+  }
+
+  .main_title {
+    text-align: center;
+    font-size: 22px;
+    margin-top: -35px;
+    margin-right: -45px;
+  }
+
+  .main_input,
+  .password-input-container {
+    width: 15em;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-right: -47px;
+  }
+
+  .password-toggle {
+margin-right: 120px;
+margin-top: -6px;
+  }
+
+  .password-input-container{
+    width: 22em;
+    font-size: 14px;
+    margin-right: -185px;
+  }
+
+  .main_img {
+    width: 70%;
+  }
+
+  .logo {
+    width: 250px;
+    height: auto;
+    margin-left: 10px;
+
+  }
+
+}

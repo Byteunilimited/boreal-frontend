@@ -1,0 +1,114 @@
+#root {
+  --MainBlue: #1C68C6;
+  --MainHover: #00EFE6;
+  --MainWhite: #ffffff;
+  --MainActive: #021b35;
+  --SecondBlue: #00ABEF;
+  --DarkBlue: #0048BA;
+  --AlternateMainBlue: #92AAC7;
+  --AlternateMainHover: #ACE7E4;
+  --AlternateSecondBlue: #94CCE2;
+  --AlternateDarkBlue: #5881C3;
+}
+
+.sidebar {
+  background-color: var(--DarkBlue);
+  color: var(--MainWhite);
+  height: 100vh;
+  width: 18%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: hidden;
+  transition: box-shadow 0.3s;
+}
+
+.sidebar h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.sidebar li {
+  margin-bottom: 0.5rem;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  position: relative;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem; 
+  color: var(--MainWhite);
+  text-decoration: none;
+  transition: color 0.3s, background-color 0.3s, border-radius 0.3s;
+}
+
+.sidebar a .icon {
+  margin-right: 0.5rem;
+  align-items: center;
+  font-size: 1.2em;
+}
+
+.sidebar a:hover {
+  color: var(--DarkBlue);
+  background-color: var(--MainWhite);
+  border-radius: 1.5rem; 
+}
+
+.img_logo {
+  width: 13em;
+  justify-content: center;
+  margin: 1em auto;
+  margin-bottom: -1em;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.submenu {
+  max-height: 200px; 
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--MainHover) var(--DarkBlue);
+}
+
+.submenu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.submenu::-webkit-scrollbar-track {
+  background: var(--DarkBlue);
+  border-radius: 20px;
+}
+
+.submenu::-webkit-scrollbar-thumb {
+  background-color: var(--MainHover);
+  border-radius: 20px;
+  border: 2px solid var(--DarkBlue);
+}
+
+.itemSub {
+  margin-left: 1em;
+}
+
+.itemSub a {
+  margin-left: 1em;
+  
+}
+
+.itemSub a:hover {
+  color: var(--DarkBlue);
+  background-color: var(--MainWhite);
+  border-radius: 1.5rem; 
+}
+

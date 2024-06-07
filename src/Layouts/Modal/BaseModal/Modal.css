@@ -1,0 +1,67 @@
+#root {
+  --MainBlue: #1C68C6;
+  --MainHover:#00EFE6;
+  --MainWhite:  #ffffff;
+  --MainActive:  #021b35;
+  --SecondBlue: #00ABEF;
+  --DarkBlue: #0048BA;
+
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #00000080;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+
+  }
+  
+  .modalContent {
+    background-color: var(--MainWhite);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px #00000033;
+    font-weight: lighter;
+    color: var(--MainActive);
+  }
+  
+  .modalTitle {
+    font-weight: lighter;
+    color: var(--MainBlue);
+    margin-top: -10px;
+    margin-bottom: -5px;
+  }
+  
+  .modalCloseBtn {
+    color: var(--MainWhite);  
+    border: none; 
+    cursor: pointer; 
+    font-weight: lighter;
+    background-color: #ef6868;
+    border-radius: 1.25em; 
+    font-size: 1em;
+    padding: 0.5em 1.875em; 
+    height: 2.5em; 
+  }
+  
+  .modalCloseBtn:hover {
+    background-color: #eb1616;
+    color: var(--MainWhite);
+  }
+
+  .modalCloseBtn:active{
+    background-color: #a30707;
+    color: var(--MainWhite);
+  }
+
+  .modalIcon{
+    width: 30%;
+  }
+  
