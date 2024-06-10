@@ -5,16 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "build": "env-cmd -f ./envs/.env.testing vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.7",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
+    "env-cmd": "^10.1.0",
     "file-saver": "^2.0.5",
+    "gh-pages": "^6.1.1",
     "jwt-decode": "^4.0.0",
     "my-library": "^1.0.0",
     "prop-types": "^15.8.1",
