@@ -3,12 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://byteunilimited.github.io/boreal-frontend",
   "scripts": {
     "dev": "vite",
+    "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "build": "env-cmd -f ./envs/.env.testing vite build",
+    "build:testing": "env-cmd -f ./envs/.env.testing vite build",
     "preview": "vite preview",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
