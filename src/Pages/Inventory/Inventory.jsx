@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
-import {DynamicTable, Button} from "../../Components";
+import { DynamicTable, Button } from "../../Components";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
-import '../Inventory/Inventory.css'
+import "../Inventory/Inventory.css";
 import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
-import {AddItemModal} from "../../Layouts";
+import { AddItemModal } from "../../Layouts";
+import { BulkUpload } from "../../Layouts/BulkUpload/BulkUpload";
 
 export const Inventory = () => {
+  const [dateTo, setDateTo] = useState(new Date().toISOString().split("T")[0]);
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState({ Código: "", Nombre: "" });
   const [itemType, setItemType] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [dateFrom, setDateFrom] = useState(new Date().toISOString().split("T")[0]);
   const [showModal, setShowModal] = useState(false);
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   useEffect(() => {
     const dummyData = [
       {
@@ -228,11 +230,13 @@ export const Inventory = () => {
     setFilteredData(filtered);
   };
 
+
   const handleRefresh = () => {
+    const today = new Date();
     setSearchTerm({ Código: "", Nombre: "" });
     setItemType("");
-    setDateFrom("");
-    setDateTo("");
+    setDateFrom(today.toISOString().split('T')[0]);;
+    setDateTo(today.toISOString().split('T')[0]);;
     setFilteredData(data);
   };
 
@@ -267,10 +271,16 @@ export const Inventory = () => {
     setData([...data, newItem]);
     setFilteredData([...data, newItem]);
   };
+
+  const handleBulkUploadSuccess = (newData) => {
+    setData([...data, ...newData]);
+    setFilteredData([...data, ...newData]);
+  };
+
   return (
     <>
-      <div >
-        <div >
+      <div>
+        <div>
           <div className="inventory">
             <h1>Inventario</h1>
             <div className="filtersContainer">
@@ -297,6 +307,7 @@ export const Inventory = () => {
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
                   className="date"
+                  max={new Date().toISOString().split("T")[0]}
                 />
                 <label htmlFor="dateTo">Fecha final:</label>
                 <input
@@ -305,22 +316,22 @@ export const Inventory = () => {
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
                   className="date"
+                  max={new Date().toISOString().split("T")[0]}
                 />
               </div>
               <div className="actions">
                 <button onClick={handleRefresh} className="iconRefresh">
                   <FaSyncAlt />
                 </button>
-                <Button
-                  onClick={() => setShowModal(true)}
-                  text="Añadir"
-                />
+                <Button onClick={() => setShowModal(true)} text="Añadir" />
                 <button onClick={handleExport} className="exportButton">
                   <RiFileExcel2Line className="ExportIcon" />
                   Exportar a excel
                 </button>
-                <button  className="exportButton">
-                  
+                <button
+                  onClick={() => setShowBulkUploadModal(true)}
+                  className="exportButton"
+                >
                   Cargue masivo
                 </button>
               </div>
@@ -332,10 +343,15 @@ export const Inventory = () => {
               onDelete={handleDelete}
               onFilter={handleFilter}
             />
-            <AddItemModal 
-              show={showModal} 
-              onClose={() => setShowModal(false)} 
-              onSave={handleSave} 
+            <AddItemModal
+              show={showModal}
+              onClose={() => setShowModal(false)}
+              onSave={handleSave}
+            />
+            <BulkUpload
+              show={showBulkUploadModal}
+              onClose={() => setShowBulkUploadModal(false)}
+              onUploadSuccess={handleBulkUploadSuccess}
             />
           </div>
         </div>
@@ -343,4 +359,3 @@ export const Inventory = () => {
     </>
   );
 };
-

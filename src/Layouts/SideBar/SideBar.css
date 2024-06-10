@@ -59,11 +59,14 @@
   font-size: 1.2em;
 }
 
-.sidebar a:hover {
+.sidebar a:hover,
+.sidebar a:active {
   color: var(--DarkBlue);
   background-color: var(--MainWhite);
-  border-radius: 1.5rem; 
+  border-radius: 1.5rem;
 }
+
+
 
 .img_logo {
   width: 13em;

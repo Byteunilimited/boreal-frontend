@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { FaAngleLeft, FaAngleRight, FaSearch } from "react-icons/fa";
-import ReactPaginate from "react-paginate";
+import { FaSearch } from "react-icons/fa";
 import { RiDeleteBin6Line, RiEditBoxLine } from "react-icons/ri";
+import Pagination from "react-bootstrap/Pagination";
 import "./DynamicTables.css";
+import Table from "react-bootstrap/Table";
 
-export const DynamicTable  = ({ columns, data, onEdit, onDelete}) => {
+export const DynamicTable = ({ columns, data, onEdit, onDelete }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState({ Código: "", Nombre: "" });
-  const [showSearch, setShowSearch] = useState({ Código: false, Nombre: false });
+  const [showSearch, setShowSearch] = useState({
+    Código: false,
+    Nombre: false,
+  });
 
   const pagesVisited = pageNumber * recordsPerPage;
   const pageCount = Math.ceil(data.length / recordsPerPage);
 
-  const changePage = ({ selected }) => {
-    setPageNumber(selected);
+  const changePage = (pageNumber) => {
+    setPageNumber(pageNumber);
   };
 
   const handleRecordsPerPageChange = (e) => {
@@ -39,17 +43,76 @@ export const DynamicTable  = ({ columns, data, onEdit, onDelete}) => {
     );
   });
 
+  const renderPaginationItems = () => {
+    let items = [];
+
+    if (pageCount <= 5) {
+      for (let i = 1; i <= pageCount; i++) {
+        items.push(
+          <Pagination.Item
+            key={i}
+            active={i === pageNumber + 1}
+            onClick={() => changePage(i - 1)}
+          >
+            {i}
+          </Pagination.Item>
+        );
+      }
+    } else {
+      if (pageNumber > 2) {
+        items.push(
+          <Pagination.Item key={1} onClick={() => changePage(0)}>
+            1
+          </Pagination.Item>,
+          <Pagination.Ellipsis key="start-ellipsis" />
+        );
+      }
+
+      const startPage = Math.max(pageNumber - 2, 1);
+      const endPage = Math.min(pageNumber + 2, pageCount);
+
+      for (let i = startPage; i <= endPage; i++) {
+        items.push(
+          <Pagination.Item
+            key={i}
+            active={i === pageNumber + 1}
+            onClick={() => changePage(i - 1)}
+          >
+            {i}
+          </Pagination.Item>
+        );
+      }
+
+      if (pageNumber < pageCount - 3) {
+        items.push(
+          <Pagination.Ellipsis key="end-ellipsis" />,
+          <Pagination.Item
+            key={pageCount}
+            onClick={() => changePage(pageCount - 1)}
+          >
+            {pageCount}
+          </Pagination.Item>
+        );
+      }
+    }
+
+    return items;
+  };
+
   return (
     <div className="tableContainer">
-      <table className="dynamicTable">
+      <Table striped className="dynamicTable">
         <thead>
           <tr>
             {columns.map((column, index) => (
-              <th key={index}>
+              <th key={index} className="bg-blue">
                 {column}
                 {["Código", "Nombre"].includes(column) && (
                   <>
-                    <FaSearch onClick={() => handleSearchIconClick(column)} className="searchIcon" />
+                    <FaSearch
+                      onClick={() => handleSearchIconClick(column)}
+                      className="searchIcon"
+                    />
                     {showSearch[column] && (
                       <input
                         type="text"
@@ -86,19 +149,19 @@ export const DynamicTable  = ({ columns, data, onEdit, onDelete}) => {
               </tr>
             ))}
         </tbody>
-      </table>
+      </Table>
       <div className="paginationContainer">
-        <ReactPaginate
-          previousLabel={<FaAngleLeft />}
-          nextLabel={<FaAngleRight />}
-          pageCount={pageCount}
-          onPageChange={changePage}
-          containerClassName={"pagination"}
-          previousLinkClassName={"paginationLink"}
-          nextLinkClassName={"paginationLink"}
-          disabledClassName={"paginationLinkDisabled"}
-          activeClassName={"paginationLinkActive"}
-        />
+        <Pagination className="border-radius.sm">
+          <Pagination.First onClick={() => changePage(0)} />
+          <Pagination.Prev
+            onClick={() => changePage(Math.max(pageNumber - 1, 0))}
+          />
+          {renderPaginationItems()}
+          <Pagination.Next
+            onClick={() => changePage(Math.min(pageNumber + 1, pageCount - 1))}
+          />
+          <Pagination.Last onClick={() => changePage(pageCount - 1)} />
+        </Pagination>
         <div className="recordsPerPage">
           <select
             id="recordsPerPage"

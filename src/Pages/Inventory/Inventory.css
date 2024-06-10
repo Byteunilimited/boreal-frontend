@@ -83,15 +83,45 @@ body {
   padding: 10px;
   border: 1px solid #aab7da;
   border-radius: 20px;
-  width: 141px;
+  width: 155px;
   cursor: pointer;
+}
+
+.filters .filter:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.filters .filter option {
+  padding: 10px;
+  background-color: #fff;
+  color: #333;
+}
+
+.filters .filter option:hover {
+  background-color: #f1f1f1;
+}
+
+.filters .filter select {
+  width: 100%; 
+  border: none;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 14px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+}
+
+.filters .filter select:focus {
+  outline: none;
+  border-color: #007bff;
 }
 
 .date {
   padding: 10px;
   border: 1px solid #aab7da;
   border-radius: 20px;
-  width: 141px;
+  width: 155px;
 }
 
 .actions {

@@ -84,7 +84,7 @@ export const Sidebar = () => {
                     <ul className="submenu">
                       {item.submenu.map((subitem, subindex) => (
                         <li className="itemSub" key={subindex}>
-                          <Link to={subitem.path}>
+                          <Link to={subitem.path} activeClassName="active">
                             <span className="icon">{subitem.icon}</span>
                             {subitem.label}
                           </Link>
@@ -94,7 +94,7 @@ export const Sidebar = () => {
                   )}
                 </>
               ) : (
-                <Link to={item.path} className="menuItem">
+                <Link to={item.path} className="menuItem" activeClassName="active">
                   <span className="icon">{item.icon}</span>
                   {item.label}
                 </Link>

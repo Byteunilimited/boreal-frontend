@@ -1,51 +1,54 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { UserImg } from "../../assets";
-import {
-  TextCarousel,
-  ServicesYearlyChart,
-  ValueYearlyChart,
-} from "../../Components";
+import { TextCarousel, ServicesYearlyChart, ValueYearlyChart, Button } from "../../Components";
 import "./Dashboard.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export const Dashboard = () => {
-  const userDoc="1562489996"
+  const userDoc = "1562489996";
   const userName = "Admin";
-  const userEmail='usuariodeprueba@gmail.com';
-  const userRole='Administrador';
+  const userEmail = 'usuariodeprueba@gmail.com';
+  const userRole = 'Administrador';
 
   return (
-    <div className="panel-container">
-      <h3>¡Bienvenido, {userName}!</h3>
-<div className="section1">
-      <div className="welcome-message">
-        <img
-          src="https://img.freepik.com/vector-premium/icono-circulo-usuario-anonimo-ilustracion-vector-estilo-plano-sombra_520826-1931.jpg"
-          alt="Bienvenido"
-          className="welcome-image"
-        />
-        <div className="user-info">
-
-          <h3>{userName}</h3>
-          <p>{userDoc}</p>
-          <p>{userEmail}</p>
-          <p>{userRole}</p>
+    <div className="contentMain">
+      <div className="container bg-light-gray p-10 my-3 rounded-3">
+        <div className="row">
+          <div className="col-lg-6 mb-3">
+            <div className="welcome-message bg-light-blue rounded-3 shadow-sm p-3">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/6326/6326055.png"
+                alt="Bienvenido"
+                className="welcome-image"
+              />
+              <div className="user-info">
+                <h3>{userName}</h3>
+                <p>{userDoc}</p>
+                <p>{userEmail}</p>
+                <p>{userRole}</p>
+                <Button text="Editar"/>
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-6 mb-3">
+            <div className="text-carousel bg-light-blue rounded shadow-sm p-3">
+              <TextCarousel />
+            </div>
+          </div>
         </div>
-        <Link to="/boreal/editar-perfil">Editar Perfil</Link>
-      </div>
-
-      <div className="text-carousel">
-        <TextCarousel />
-      </div>
-      </div>
-      <div className="charts">
-        <div className="chart">
-          <h3>Servicios al Año</h3>
-          <ServicesYearlyChart />
-        </div>
-        <div className="chart">
-          <h3>Valor al Año</h3>
-          <ValueYearlyChart />
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <div className="chart bg-light-blue rounded shadow-sm p-3">
+              <h3>Servicios al Año</h3>
+              <ServicesYearlyChart />
+            </div>
+          </div>
+          <div className="col-md-6 mb-3">
+            <div className="chart bg-light-blue rounded shadow-sm p-3">
+              <h3>Valor al Año</h3>
+              <ValueYearlyChart />
+            </div>
+          </div>
         </div>
       </div>
     </div>

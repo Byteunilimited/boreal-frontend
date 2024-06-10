@@ -24,7 +24,7 @@
 }
 
 .dynamicTable th {
-  background-color: #d2cfcf;
+  background-color: #cfd0d2;
   color: var(--MainActive);
   font-weight: lighter;
   text-align: left;
@@ -35,6 +35,12 @@
 
 .dynamicTable tbody tr {
   transition: background-color 0.3s ease;
+  
+}
+
+.bg-blue{
+  background-color: #c6d9ef;
+  color: #007bff;
 }
 
 .dynamicTable tbody tr:hover {
@@ -96,34 +102,6 @@
   border-radius: 1em;
 }
 
-.paginationLink,
-.paginationLinkActive,
-.paginationLinkDisabled {
-  padding: 8px 12px;
-  margin: 0 2px;
-  border: 1px solid #ccc;
-  border-radius: 1em;
-  cursor: pointer;
-  background-color: #fff;
-  color: #000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.paginationLink:hover {
-  background-color: var(--MainHover);
-  color: #fff;
-  border-color: var(--MainHover);
-}
-
-.paginationLinkActive {
-  background-color: var(--MainBlue);
-  color: #fff;
-}
-
-.paginationLinkDisabled {
-  cursor: not-allowed;
-  color: #ccc;
-}
 
 .recordsPerPage {
   display: flex;
@@ -138,6 +116,7 @@
   background-color: #fff;
   cursor: pointer;
   transition: border-color 0.3s;
+  color: #007bff;
 }
 
 .recordsPerPage select:hover {
@@ -149,9 +128,6 @@
   border-color: var(--MainBlue);
 }
 
-.dynamicTable th {
-  position: relative;
-}
 
 .searchIcon {
   margin-left: 1em;
@@ -172,4 +148,31 @@
 .searchInput:focus {
   outline: none;
   border-color: var(--MainBlue);
+}
+
+.custom-pagination-item {
+  border-radius: 1em;
+  margin: 0 2px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-pagination-item:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #007bff;
+  border-color:#007bff;
+  color: white;
+}
+
+.pagination .page-link {
+  border-radius: 1em !important;
+}
+
+.pagination .page-item.disabled .page-link {
+  border-radius: 1em !important;
+  background-color: #e9ecef;
+  color: #6c757d;
 }
