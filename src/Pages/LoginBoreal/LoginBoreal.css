@@ -14,7 +14,7 @@
     font-weight: lighter;
   }
   
-  .main_background {
+  .mainBackground {
     background-image: url('../../assets/Images/BorealBackgroundLogin.png');
     background-position: center;
     height:100vh;
@@ -25,73 +25,72 @@
     overflow: hidden; 
   }
   
-.main_section {
+.mainSection {
   background-color: #ffffffcc; 
-  padding: 20px;
-  border-radius: 20px;
+  padding: 1em;
+  border-radius: 2em;
   display: grid;
-  grid-template-columns: 1fr 1fr; 
-  gap: 20px; 
+  gap: 1em; 
   height: 70vh;
   width: 80vw;
   align-items: center;
 }
 
-.main_figure {
-  grid-column: 1 / 2; 
-}
-
-.main_container {
-  grid-column: 2 / 3; 
-}
-
-.logo {
+.mainFigure {
   display: flex;
-  justify-content: center;
-  width: 30vw;
-  height: 50vh;
+  justify-content: center; 
+  align-items: center;   
+  grid-column: 1 / 2; 
+  height: 100%; 
+  margin: 0;
 }
 
-.main_img {
-  max-width: 100%;
+.mainImg {
+  max-width: 70%; 
+  height: auto;
 }
 
-.main_title {
+.mainContainer {
+  grid-column: 2 / 2; 
+}
+
+
+.mainTitle {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom:  1em;
   color: var(--MainBlue);
-  font-size: 37px;
+  font-size: 2.2em;
   font-family:Verdana, Geneva, Tahoma, sans-serif;
   font-weight: lighter;
 }
 
-.main_form {
+.mainForm {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.main_input {
-  padding: 10px;
-  margin-bottom: 30px;
-  border-radius: 30px;
-  font-size: 16px;
-  width: 350px;
-  height: 45px; 
+.mainInput {
+  padding: 0.5em;
+  margin-bottom: 1.5em;
+  border-radius: 2em;
+  font-size: 1em;
+  width: 24em;
+  height: 2.7em; 
   background-color: var(--MainWhite);
   border: 1px solid var(--MainBlue);
   transition: border-color 0.3s ; 
   color: var(--MainActive);
 }
 
-.password-input-container {
+.inputLoginContainer {
   position: relative;
 }
 
-.password-toggle {
+.passwordToggle {
   position: absolute;
-  top: 33%;
-  right: 15px;
+  top: 30%;
+  right: 1em;
   transform: translateY(-50%);
   cursor: pointer;
   color: var(--MainBlue);
@@ -99,235 +98,89 @@
 
 .pass{
   color: var(--MainBlue);
-  font-size: 17px;
+  font-size: 1.2em;
   margin-top: -5px;
   cursor: pointer;
 }
 
-@media (max-width: 480px) {
 
-  .main_section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+@media (max-width: 900px) {
 
-  .main_title {
-    text-align: center;
-    font-size: 24px;
-    margin-top: -27px
-  }
-
-  .main_input,
-  .password-input-container {
-    width: 22em;
-    font-size: 14px;
-    margin-top: -10px;
-  }
-
-  .password-toggle {
-margin-left: 1em;
-  }
-
-  .password-input-container{
-    width: 22em;
-    font-size: 14px;
-    margin-left: -16px;
-  }
-
-  .main_img {
-    width: 70%;
-  }
-
-  .logo {
-    width: 100%;
-    height: auto;
-  }
-
-}
-
-
-@media (max-width: 700px) {
-
-  .main_section {
-    display: flex;
+  
+  .mainSection {
+    display: grid;
     flex-direction: row;
     align-items: center;
-
   }
 
-  .main_title {
+  .mainTitle {
     text-align: center;
     font-size: 24px;
-  
-    margin-left: -45px;
   }
 
-  .main_input,
-  .password-input-container {
+  .mainInput,
+  .inputLoginContainer {
     width: 17em;
     font-size: 14px;
     margin-top: -10px;
     margin-left: -50px;
   }
 
-  .password-toggle {
+  .passwordToggle {
     margin-top: -6px;
     margin-right: 25px;
   }
 
-  .password-input-container{
+  .inputLoginContainer{
     width: 17em;
     font-size: 14px;
     margin-right: -80px;
   }
 
-  .main_img {
-    width: 70%;
-  }
-
-  .logo {
-    width: 300px;
-    height: auto;
-    margin-left: -90px;
-
-  }
-
-
-}
-
-
-@media (max-width: 640px) {
-
-  .main_section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-  }
-
-  .main_title {
-    text-align: center;
-    font-size: 24px;
-    margin-top: -27px
-  }
-
-  .main_input,
-  .password-input-container {
-    width: 17em;
-    font-size: 14px;
-    margin-top: -10px;
-  }
-
-  .password-toggle {
-margin-top: -6px;
-margin-right: 90px;
-  }
-
-  .password-input-container{
-    width: 22em;
-    font-size: 14px;
-    margin-left: 20px;
-  }
-
-  .main_img {
-    width: 70%;
-  }
-
-  .logo {
+  .mainImg {
     width: 70%;
     height: auto;
-    margin-left: 60px;
   }
 }
 
 
 @media (max-width: 480px) {
 
-  .main_section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .main_title {
-    text-align: center;
-    font-size: 24px;
-    margin-top: -27px
-  }
-
-  .main_input,
-  .password-input-container {
-    width: 22em;
-    font-size: 14px;
-    margin-top: -10px;
-  }
-
-  .password-toggle {
-margin-left: 1em;
-  }
-
-  .password-input-container{
-    width: 22em;
-    font-size: 14px;
-    margin-left: -16px;
-  }
-
-  .main_img {
-    width: 70%;
-  }
-
-  .logo {
-    width: 100%;
-    height: auto;
-  }
-}
-
-
-@media (max-width: 300px) {
-
-  .main_section {
+  .mainSection {
     display: flex;
     flex-direction: column;
     align-items: center;
 
   }
 
-  .main_title {
+  .mainTitle {
     text-align: center;
     font-size: 22px;
     margin-top: -35px;
     margin-right: -45px;
   }
 
-  .main_input,
-  .password-input-container {
-    width: 15em;
+  .mainInput,
+  .inputLoginContainer {
+    width: 90%;
     font-size: 14px;
     margin-top: -10px;
     margin-right: -47px;
   }
 
-  .password-toggle {
-margin-right: 120px;
-margin-top: -6px;
+  .passwordToggle {
+    margin-right: 120px;
+    margin-top: -6px;
   }
 
-  .password-input-container{
+  .inputLoginContainer{
     width: 22em;
     font-size: 14px;
     margin-right: -185px;
   }
 
-  .main_img {
-    width: 70%;
+  .mainImg {
+    width: 100%;
   }
-
-  .logo {
-    width: 250px;
-    height: auto;
-    margin-left: 10px;
-
-  }
-
 }
+

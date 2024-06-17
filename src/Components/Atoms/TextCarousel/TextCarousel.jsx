@@ -28,7 +28,7 @@ export const TextCarousel = () => {
   };
 
   return (
-    <div className="carousel-container">
+    <div className="carouselContainer">
       <Carousel
         responsive={responsive}
         autoPlay={true}
@@ -36,7 +36,7 @@ export const TextCarousel = () => {
         infinite={true} 
       >
         {textItems.map((text, index) => (
-          <div className="carousel-item" key={index}>
+          <div className="carouselItem" key={index}>
             {text}
           </div>
         ))}

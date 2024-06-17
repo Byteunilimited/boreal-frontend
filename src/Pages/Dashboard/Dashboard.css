@@ -11,21 +11,23 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between; 
+
 }
 
-.welcome-image {
+.welcomeImage {
   width: 30%;
   border-radius: 10px;
-  margin-bottom: 20px;
 }
 
-.welcome-message{
+.welcomeMessage{
   align-items: center;
   justify-content: center;
   text-align: center;
+  width: 100%;
+  height: 100%;
 }
 
-.welcome-message h3 {
+.welcomeMessage h4 {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-weight: lighter;
   color: var(--MainBlue);
@@ -33,7 +35,7 @@
   text-transform: uppercase;
 }
 
-.welcome-message p {
+.welcomeMessage p {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-weight: lighter;
   color: #333;
@@ -47,18 +49,15 @@
   justify-content: space-between; 
 }
 
-.bg-light-gray {
-  background-color: #e6e2e2;
-}
-
 .bg-light-blue {
-  background-color: #ccd5e1;
+  background-color: #e2e8f0;
+  border-radius: 2em;
 }
 
 .chart {
-  background-color: #ccd5e1;
+  background-color: #e2e8f0;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 2em;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
   flex: 1; 

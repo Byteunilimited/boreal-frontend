@@ -1,17 +1,22 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Eye, EyeOff} from "react-feather";
+import { Eye, EyeOff } from "react-feather";
 import "./LoginBoreal.css";
 import { postLogin } from "../../Services/login";
-import {ModalIconMistake, ModalIconCorrect, ModalIconWarning, BorealLogo} from "../../assets";
-import {PasswordRecoveryModal, Modal} from "../../Layouts";
+import {
+  ModalIconMistake,
+  ModalIconCorrect,
+  ModalIconWarning,
+  BorealLogo,
+} from "../../assets";
+import { PasswordRecoveryModal, Modal } from "../../Layouts";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Components";
 import { useForm } from "../../hooks";
 import { useAuth } from "../../Contexts";
 //import FormText from 'react-bootstrap/FormText'
 
-export const LoginBoreal = () => { 
+export const LoginBoreal = () => {
   const { serialize } = useForm();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -45,7 +50,8 @@ export const LoginBoreal = () => {
   const testLoginData = {
     username: "usuarioprueba@gmail.com",
     password: "87654321",
-    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzdWFyaW9wcnVlYmFAZ21haWwuY29tIiwiaWF0IjoxNjI0MzM3MTI0LCJleHAiOjE2MjQzMzcyMjR9.YTqDQ4WbB3WXyoXdC2PvQJcUNa9cpd-w8CcnMk6TD1Y"
+    token:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzdWFyaW9wcnVlYmFAZ21haWwuY29tIiwiaWF0IjoxNjI0MzM3MTI0LCJleHAiOjE2MjQzMzcyMjR9.YTqDQ4WbB3WXyoXdC2PvQJcUNa9cpd-w8CcnMk6TD1Y",
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -61,16 +67,15 @@ export const LoginBoreal = () => {
     e.preventDefault();
     setError(null);
 
-      if (!username || !password) {
-        setShowItemsErrorModal(true);
-        return;
-      }
-  
-      if (!validateEmail(username)) {
-        setShowErrorModalEmail(true);
-        return;
-      }
-  
+    if (!username || !password) {
+      setShowItemsErrorModal(true);
+      return;
+    }
+
+    if (!validateEmail(username)) {
+      setShowErrorModalEmail(true);
+      return;
+    }
 
     try {
       if (
@@ -80,14 +85,14 @@ export const LoginBoreal = () => {
         const userData = {
           username: testLoginData.username,
           token: testLoginData.token,
-          expiresAt: Date.now() + (3600 * 1000) 
+          expiresAt: Date.now() + 3600 * 1000,
         };
         Login(userData);
         localStorage.setItem("token", testLoginData.token);
         setShowSuccessModal(true);
         setTimeout(() => {
           navigate("/boreal/panel");
-        }, 3000); 
+        }, 3000);
       } else {
         setShowErrorModal(true);
       }
@@ -121,37 +126,37 @@ export const LoginBoreal = () => {
 */
 
   return (
-    <div className="main_background">
-      <section className="main_section">
-        <figure className="main_figure">
-          <div className="logo">
-            <img src={BorealLogo} className="main_img" alt="Logo_boreal" />
-          </div>
+    <div className="mainBackground">
+      <section className="mainSection">
+        <figure className="mainFigure">
+          <img src={BorealLogo} className="mainImg" alt="Logo boreal" />
         </figure>
-        <div className="main_container">
-          <h2 className="main_title">Inicio de sesión</h2>
-          <form className="main_form" onSubmit={handleSubmit}>
-            <input
-              name="username"
-              type="email"
-              className="main_input"
-              id="username"
-              placeholder="Ingrese su usuario*"
-              value={username}
-              onChange={handleUsernameChange}
-            />
-            <div className="password-input-container">
+        <div className="mainContainer">
+          <h2 className="mainTitle">Inicio de sesión</h2>
+          <form className="mainForm" onSubmit={handleSubmit}>
+            <div className="inputLoginContainer">
+              <input
+                name="username"
+                type="email"
+                className="mainInput"
+                id="username"
+                placeholder="Ingrese su usuario*"
+                value={username}
+                onChange={handleUsernameChange}
+              />
+            </div>
+            <div className="inputLoginContainer">
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="contrasenia"
-                className="main_input"
+                className="mainInput"
                 id="password"
                 placeholder="Ingrese su contraseña*"
                 value={password}
                 onChange={handlePasswordChange}
               />
               <span
-                className="password-toggle"
+                className="passwordToggle"
                 onClick={toggleShowConfirmPassword}
               >
                 {showConfirmPassword ? (
@@ -202,11 +207,15 @@ export const LoginBoreal = () => {
             {showRecoveryModal && (
               <PasswordRecoveryModal onClose={handleCloseModal} />
             )}
-            <Button text="Ingresar" type="submit" className="buttonMain" onClick={handleSubmit}/>
+            <Button
+              text="Ingresar"
+              type="submit"
+              className="buttonMain"
+              onClick={handleSubmit}
+            />
           </form>
         </div>
       </section>
     </div>
   );
 };
-

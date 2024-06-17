@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DynamicTable, Button } from "../../Components";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
+import axios from "axios";
 import "../Inventory/Inventory.css";
 import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
@@ -14,7 +15,9 @@ export const Inventory = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState({ Código: "", Nombre: "" });
   const [itemType, setItemType] = useState("");
-  const [dateFrom, setDateFrom] = useState(new Date().toISOString().split("T")[0]);
+  const [dateFrom, setDateFrom] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [showModal, setShowModal] = useState(false);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   useEffect(() => {
@@ -191,7 +194,26 @@ export const Inventory = () => {
     setData(dummyData);
     setFilteredData(dummyData);
   }, []);
-
+  /*
+  useEffect(() => {
+    axios.get('API_ENDPOINT', { headers: { 'x-custom-header': 'Boreal Api' } })
+      .then(response => {
+        const apiData = response.data.result.Spare;
+        const transformedData = {
+          Código: apiData.id,
+          Nombre: apiData.description,
+          Tipo: "Spare",
+          Fecha: new Date().toISOString().split("T")[0],
+          Existencias: apiData.stock,
+        };
+        setData([transformedData]);
+        setFilteredData([transformedData]);
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+  */
   useEffect(() => {
     filterData();
   }, [searchTerm, itemType, dateFrom, dateTo]);
@@ -230,13 +252,12 @@ export const Inventory = () => {
     setFilteredData(filtered);
   };
 
-
   const handleRefresh = () => {
     const today = new Date();
     setSearchTerm({ Código: "", Nombre: "" });
     setItemType("");
-    setDateFrom(today.toISOString().split('T')[0]);;
-    setDateTo(today.toISOString().split('T')[0]);;
+    setDateFrom(today.toISOString().split("T")[0]);
+    setDateTo(today.toISOString().split("T")[0]);
     setFilteredData(data);
   };
 

@@ -68,7 +68,7 @@ export const Sidebar = () => {
     <div className="sidebar">
       <div >
       <Link to="/boreal/panel">
-          <img src={BorealLogo} alt="" className="img_logo" />
+          <img src={BorealLogo} alt="" className="imgLogo" />
         </Link>
         <ul >
           {sideBarItems.map((item, index) => (

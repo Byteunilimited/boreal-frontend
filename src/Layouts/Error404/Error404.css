@@ -1,4 +1,4 @@
-.error-container {
+.errorContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -8,19 +8,19 @@
     background-color: #f8f8f8;
   }
   
-  .error-image {
+  .errorImage {
     max-width: 20%;
     height: auto;
 
   }
   
-  .error-title {
+  .errorTitle {
     font-size: 2.5rem;
     color: #333;
     margin-bottom: 10px;
   }
   
-  .error-message {
+  .errorMessage {
     font-size: 1.2rem;
     color: #666;
   }

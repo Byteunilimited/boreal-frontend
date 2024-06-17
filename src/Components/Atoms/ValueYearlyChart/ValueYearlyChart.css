@@ -1,11 +1,11 @@
-.chart-container {
+.chartContainer {
    
-    height: 300px; /* Altura fija para el contenedor del gráfico */
-    background-color: #dbd9d9; /* Fondo gris claro */
-    padding: 20px; /* Espaciado interno */
-    border-radius:1em; /* Bordes redondeados */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un efecto moderno */
-    margin: 0 auto; /* Centra el contenedor horizontalmente */
+    height: 300px; 
+    background-color: #fdfdfd;
+    padding: 20px; 
+    border-radius:2em; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;

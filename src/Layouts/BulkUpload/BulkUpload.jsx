@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import * as XLSX from "xlsx";
 import axios from "axios";
 import { RiUploadCloudLine } from "react-icons/ri";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./BulkUpload.css";
 import { Button } from "../../Components";
 
@@ -40,7 +39,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
       axios
-        .post("https://tu-api.com/endpoint", jsonData)
+        .post("https://api", jsonData)
         .then((response) => {
           alert("Datos enviados exitosamente.");
           onUploadSuccess(response.data);
@@ -56,7 +55,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Código", "Nombre", "Tipo", "Fecha", "Cantidad"], 
+      ["Código", "Nombre", "Tipo", "Fecha", "Cantidad"],
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
@@ -68,49 +67,45 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   }
 
   return (
-    <div className="modal show d-block" tabIndex="-1">
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h2 className="modal-title">Cargue masivo</h2>
-          </div>
-          <div className="modal-body">
-            <Button
-              onClick={handleDownloadTemplate}
-              className="ButtonTemplate"
-              text='Descargar plantilla'
+    <div className="modal">
+      <div className="modalContent">
+        <h2 className="modalTitle">Cargue masivo</h2>
+        <div className="modalBody">
+          <Button
+            onClick={handleDownloadTemplate}
+            className="ButtonTemplate"
+            text="Descargar plantilla"
+          />
+          <div
+            className="dropzone"
+            onClick={() => fileInputRef.current.click()}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
+            <RiUploadCloudLine className="dropzoneIcon" />
+            <p className="dropzoneText">
+              Haz clic o arrastra el archivo a esta área para cargarlo
+            </p>
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleFileChange}
+              className="hiddenInput"
+              ref={fileInputRef}
             />
-            <div
-              className="dropzone"
-              onClick={() => fileInputRef.current.click()}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-            >
-              <RiUploadCloudLine className="dropzone-icon" />
-              <p className="dropzone-text">
-                Haz clic o arrastra el archivo a esta área para cargarlo
-              </p>
-              <input
-                type="file"
-                accept=".xlsx, .xls"
-                onChange={handleFileChange}
-                className="hidden-input"
-                ref={fileInputRef}
-              />
-            </div>
           </div>
-          <div className="modal-footer">
-            <button
-              onClick={handleUpload}
-              disabled={!file}
-              className="ModalButtonSend"
-            >
-              Cargar
-            </button>
-            <button onClick={onClose} className="ModalButtonClose">
-              Cancelar
-            </button>
-          </div>
+        </div>
+        <div className="modalFooter">
+          <button
+            onClick={handleUpload}
+            disabled={!file}
+            className="ModalButtonSend"
+          >
+            Cargar
+          </button>
+          <button onClick={onClose} className="ModalButtonClose">
+            Cancelar
+          </button>
         </div>
       </div>
     </div>

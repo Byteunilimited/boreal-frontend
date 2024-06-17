@@ -1,19 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import "./AddItemModal.css";
 
 export const AddItemModal = ({ show, onClose, onSave }) => {
-  const localDate = new Date();
-  const utcOffset = localDate.getTimezoneOffset() * 60000; // En milisegundos
-  const adjustedDate = new Date(localDate.getTime() - utcOffset);
-
   const [formData, setFormData] = useState({
     Código: "",
     Nombre: "",
     Tipo: "",
-    Fecha: adjustedDate.toISOString().substr(0, 10),
+    Fecha: "",
     Cantidad: 0,
   });
+
+  useEffect(() => {
+    if (show) {
+      const localDate = new Date();
+      const utcOffset = localDate.getTimezoneOffset() * 60000; // En milisegundos
+      const adjustedDate = new Date(localDate.getTime() - utcOffset);
+      setFormData((prev) => ({
+        ...prev,
+        Fecha: adjustedDate.toISOString().substr(0, 10),
+      }));
+    }
+  }, [show]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,7 +84,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               name="Fecha"
               value={formData.Fecha}
               onChange={handleChange}
-              
               required
             />
           </div>
@@ -108,4 +115,3 @@ AddItemModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 };
-
