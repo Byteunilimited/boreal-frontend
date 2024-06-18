@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../Components";
 import { useForm } from "../../hooks";
 import { useAuth } from "../../Contexts";
-//import FormText from 'react-bootstrap/FormText'
+import endPoints from "../../Services";
 
 export const LoginBoreal = () => {
   const { serialize } = useForm();
@@ -63,8 +63,9 @@ export const LoginBoreal = () => {
     return emailRegex.test(email) && email.endsWith(".com");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (ev) => {
+    ev.preventDefault();
+    const formData = serialize(ev.target);
     setError(null);
 
     if (!username || !password) {
@@ -77,7 +78,7 @@ export const LoginBoreal = () => {
       return;
     }
 
-    try {
+    /*try {
       if (
         username === testLoginData.username &&
         password === testLoginData.password
@@ -101,29 +102,46 @@ export const LoginBoreal = () => {
       setShowErrorModal(true);
     }
   };
-
-  /*    
+*/
 
     try {
-      const response = await axios.post(postLogin, { username, password });
-
-      if (response.status === 201) {
-        const { token, expiresAt } = response.data;
-        Login({ token, expiresAt }); 
-        localStorage.setItem("token", Login.token);
+      const apiUrl = `http://192.168.101.15:8080/boreal/user/login`;
+      const {data} = await axios.post(apiUrl, formData);
+      if (data.status === 200){
+        Login(data);
         setShowSuccessModal(true);
         setTimeout(() => {
           navigate("/boreal/inventario");
-        }, 3000); 
+        }, 3000);
       } else {
         setShowErrorModal(true);
       }
     } catch (error) {
+      console.log(error);
       setError(error.message);
       setShowErrorModal(true);
     }
+    /*
+      const apiUrl = `http://192.168.101.15:8080/boreal/user/login`;
+      const response = await axios.post(apiUrl, formData);
+      console.log(response)
+      if (response.status === 202) {
+        const { token, expiresAt } = response.data;
+        Login({ token, expiresAt });
+        localStorage.setItem("token", Login.token);
+        setShowSuccessModal(true);
+        setTimeout(() => {
+          navigate("/boreal/inventario");
+        }, 3000);
+      } else {
+        setShowErrorModal(true);
+      }
+    } catch (error) {
+      console.log(error);
+      setError(error.message);
+      setShowErrorModal(true);
+    }*/
   };
-*/
 
   return (
     <div className="mainBackground">
@@ -136,10 +154,10 @@ export const LoginBoreal = () => {
           <form className="mainForm" onSubmit={handleSubmit}>
             <div className="inputLoginContainer">
               <input
-                name="username"
+                name="email"
                 type="email"
                 className="mainInput"
-                id="username"
+                id="email"
                 placeholder="Ingrese su usuario*"
                 value={username}
                 onChange={handleUsernameChange}
@@ -148,7 +166,7 @@ export const LoginBoreal = () => {
             <div className="inputLoginContainer">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                name="contrasenia"
+                name="password"
                 className="mainInput"
                 id="password"
                 placeholder="Ingrese su contraseña*"
@@ -207,12 +225,7 @@ export const LoginBoreal = () => {
             {showRecoveryModal && (
               <PasswordRecoveryModal onClose={handleCloseModal} />
             )}
-            <Button
-              text="Ingresar"
-              type="submit"
-              className="buttonMain"
-              onClick={handleSubmit}
-            />
+            <Button text="Ingresar" type="submit" className="buttonMain" />
           </form>
         </div>
       </section>

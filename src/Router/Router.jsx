@@ -17,7 +17,7 @@ export const Router = () => {
 
   return (
     <BrowserRouter>
-      <Routes path="/boreal">
+      <Routes>
         <Route path="/" element={<Navigate to="/boreal/login" />} />
         <Route path="/boreal/login" element={<LoginBoreal />} />
         <Route path="/boreal/panel">
