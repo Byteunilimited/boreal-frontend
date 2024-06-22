@@ -1,0 +1,59 @@
+#root {
+    --MainBlue: #1C68C6;
+    --MainHover:#00EFE6;
+    --MainWhite:  #ffffff;
+    --MainActive:  #021b35;
+    --SecondBlue: #00ABEF;
+    --DarkBlue: #0048BA; 
+  }
+  
+.navBarContainer {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profileContainer {
+    display: flex;
+    align-items: end;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .profileImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .userName {
+    margin-left: 10px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .dropdownMenu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 1em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  
+  .dropdownMenu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .dropdownMenu li {
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .dropdownMenu li:hover {
+    background-color: #f0f0f0;
+  }
+  

@@ -66,8 +66,8 @@ export const Sidebar = () => {
 
   return (
     <div className="sidebar">
-      <div >
-      <Link to="/boreal/panel">
+
+        <Link to="/boreal/panel" className="containLogo">
           <img src={BorealLogo} alt="" className="imgLogo" />
         </Link>
         <ul >
@@ -110,7 +110,7 @@ export const Sidebar = () => {
             </Link>
           </li>
         </ul>
-      </div>
+
     </div>
   );
 };

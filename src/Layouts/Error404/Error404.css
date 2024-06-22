@@ -1,4 +1,13 @@
-.errorContainer {
+#root {
+  --MainBlue: #1C68C6;
+  --MainHover:#00EFE6;
+  --MainWhite:  #ffffff;
+  --MainActive:  #021b35;
+  --SecondBlue: #00ABEF;
+  --DarkBlue: #0048BA; 
+}
+
+.errorContainer404 {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -8,20 +17,15 @@
     background-color: #f8f8f8;
   }
   
-  .errorImage {
-    max-width: 20%;
-    height: auto;
-
-  }
   
-  .errorTitle {
+  .errorTitle404 {
     font-size: 2.5rem;
-    color: #333;
+    color: var(--MainBlue);
     margin-bottom: 10px;
   }
   
-  .errorMessage {
+  .errorMessage404 {
     font-size: 1.2rem;
-    color: #666;
+    color: var(--MainActive);
   }
   

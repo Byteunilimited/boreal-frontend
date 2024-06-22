@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DynamicTable, Button } from "../../Components";
+import { DynamicTable, Button, EditElementInventory } from "../../Components";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import axios from "axios";
@@ -9,6 +9,7 @@ import { RiFileExcel2Line } from "react-icons/ri";
 import { AddItemModal } from "../../Layouts";
 import { BulkUpload } from "../../Layouts/BulkUpload/BulkUpload";
 import { useAxios } from "../../Contexts";
+import { createSearchParams } from "react-router-dom";
 
 export const Inventory = () => {
   const { privateFetch } = useAxios();
@@ -17,12 +18,14 @@ export const Inventory = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState({ Código: "", Nombre: "" });
   const [itemType, setItemType] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
   const [dateFrom, setDateFrom] = useState(
     new Date().toISOString().split("T")[0]
   );
   const [showModal, setShowModal] = useState(false);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
-  const apiUrl = "http://192.168.101.15:8080/boreal/spare/all";
+
+  const apiUrl = 'https://boreal-api.onrender.com/boreal/inventory/all';
 
   useEffect(() => {
     getData();
@@ -33,9 +36,8 @@ export const Inventory = () => {
   }, [searchTerm, itemType, dateFrom, dateTo]);
 
   const getData = async () => {
-    const {data} = await privateFetch.get(apiUrl);
-    console.log(data.result.Spare)
-    setData(data.result.Spare)
+    const { data } = await privateFetch.get(apiUrl);
+    setData(data.result.Inventory);
   };
   const filterData = () => {
     let filtered = data;
@@ -141,7 +143,6 @@ export const Inventory = () => {
                     )
                   )}
                 </select>
-                
               </div>
               <div className="actions">
                 <button onClick={handleRefresh} className="iconRefresh">
@@ -167,16 +168,22 @@ export const Inventory = () => {
               onDelete={handleDelete}
               onFilter={handleFilter}
             />
-            <AddItemModal
-              show={showModal}
-              onClose={() => setShowModal(false)}
-              onSave={handleSave}
-            />
+            {showModal && (
+              <AddItemModal
+                show={showModal}
+                onClose={() => {
+                  setShowModal(false);
+                }}
+                onSave={handleSave}
+              />
+            )}
+            {showBulkUploadModal && (
             <BulkUpload
               show={showBulkUploadModal}
               onClose={() => setShowBulkUploadModal(false)}
               onUploadSuccess={handleBulkUploadSuccess}
             />
+            )}
           </div>
         </div>
       </div>

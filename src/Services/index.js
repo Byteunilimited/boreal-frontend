@@ -2,10 +2,12 @@ const API = import.meta.env.REACT_APP_API_URL;
 
 const endPoints = {
   autentication: {
-    postLogin:`${API}/boreal/user/login`,
+    postLogin:`${API}/user/login`,
   },
   administrator:{
-    getInventory:`${API}/boreal/spare/all`,
+    getInventory:`${API}/inventory/all`,
+    getUserAndRoles:`${API}`,
+    postAddElementInventory:` ${API}/inventory/create`,
   }
 };
 

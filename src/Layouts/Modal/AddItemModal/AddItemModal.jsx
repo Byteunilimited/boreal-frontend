@@ -31,7 +31,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
     ev.preventDefault();
     const formData = serialize(ev.target);
     try {
-      const apiUrl = `http://192.168.101.15:8080/boreal/spare/create`;
+      const apiUrl = `http://192.168.101.15:8080/boreal/inventory/create`;
       const data = await axios.post(apiUrl, formData);
       if (data.status === 200){
         console.log("exito");
@@ -45,7 +45,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
   };
 
 
-
   return (
     <div className="modalOverlay">
       <div className="modalContent">
@@ -57,7 +56,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               placeholder="Código elemento"
               type="text"
               name="id"
-              value={formData.Código}
               onChange={handleChange}
               required
             />
@@ -78,16 +76,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               placeholder="Tipo elemento"
               type="text"
               name="Tipo"
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="formGroup">
-            <label>Fecha:</label>
-            <input
-              placeholder="Fecha ingreso"
-              type="date"
-              name="Fecha"
               onChange={handleChange}
               required
             />
@@ -118,6 +106,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
 
 AddItemModal.propTypes = {
   show: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  //onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 };

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff } from "react-feather";
 import "./LoginBoreal.css";
-import { postLogin } from "../../Services/login";
 import {
   ModalIconMistake,
   ModalIconCorrect,
@@ -15,6 +14,7 @@ import { Button } from "../../Components";
 import { useForm } from "../../hooks";
 import { useAuth } from "../../Contexts";
 import endPoints from "../../Services";
+
 
 export const LoginBoreal = () => {
   const { serialize } = useForm();
@@ -105,13 +105,13 @@ export const LoginBoreal = () => {
 */
 
     try {
-      const apiUrl = `http://192.168.101.15:8080/boreal/user/login`;
+      const apiUrl = `https://boreal-api.onrender.com/boreal/user/login`;
       const {data} = await axios.post(apiUrl, formData);
       if (data.status === 200){
         Login(data);
         setShowSuccessModal(true);
         setTimeout(() => {
-          navigate("/boreal/inventario");
+          navigate("/boreal/panel");
         }, 3000);
       } else {
         setShowErrorModal(true);
