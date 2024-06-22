@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://byteunilimited.github.io/boreal-frontend",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -24,7 +23,7 @@
     "my-library": "^1.0.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.10.2",
+    "react-bootstrap": "^2.10.3",
     "react-cookie": "^7.1.4",
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
