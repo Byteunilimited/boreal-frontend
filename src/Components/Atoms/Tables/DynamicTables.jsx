@@ -36,12 +36,12 @@ export const DynamicTable = ({ columns, data, onEdit, onDelete }) => {
     setPageNumber(0);
   };
 
-  const filteredData = data.filter((item) => {
+  /*const filteredData = data.filter((item) => {
     return (
       item.Código.includes(searchTerm.Código) &&
       item.Nombre.toLowerCase().includes(searchTerm.Nombre.toLowerCase())
     );
-  });
+  });*/
 
   const renderPaginationItems = () => {
     let items = [];
@@ -129,7 +129,7 @@ export const DynamicTable = ({ columns, data, onEdit, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredData
+          {data
             .slice(pagesVisited, pagesVisited + recordsPerPage)
             .map((row, rowIndex) => (
               <tr key={rowIndex} className="tableRow">

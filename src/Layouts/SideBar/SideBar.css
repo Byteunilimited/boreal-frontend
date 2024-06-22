@@ -66,13 +66,9 @@
   border-radius: 1.5rem;
 }
 
-
-
 .imgLogo {
   width: 13em;
   justify-content: center;
-  margin: 1em auto;
-  margin-bottom: -1em;
   align-items: center;
   display: flex;
   flex-direction: column;

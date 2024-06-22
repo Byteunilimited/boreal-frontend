@@ -66,8 +66,8 @@ export const Sidebar = () => {
 
   return (
     <div className="sidebar">
-      <div >
-      <Link to="/boreal/panel">
+
+        <Link to="/boreal/panel" className="containLogo">
           <img src={BorealLogo} alt="" className="imgLogo" />
         </Link>
         <ul >
@@ -84,7 +84,11 @@ export const Sidebar = () => {
                     <ul className="submenu">
                       {item.submenu.map((subitem, subindex) => (
                         <li className="itemSub" key={subindex}>
+<<<<<<< HEAD
                           <Link to={subitem.path} active className="active">
+=======
+                          <Link to={subitem.path} className="active">
+>>>>>>> f55b4b464ed50b17d65764bf3376da6b73bc02fb
                             <span className="icon">{subitem.icon}</span>
                             {subitem.label}
                           </Link>
@@ -94,7 +98,11 @@ export const Sidebar = () => {
                   )}
                 </>
               ) : (
+<<<<<<< HEAD
                 <Link to={item.path} className="menuItem active">
+=======
+                <Link to={item.path} className="menuItem">
+>>>>>>> f55b4b464ed50b17d65764bf3376da6b73bc02fb
                   <span className="icon">{item.icon}</span>
                   {item.label}
                 </Link>
@@ -110,7 +118,7 @@ export const Sidebar = () => {
             </Link>
           </li>
         </ul>
-      </div>
+
     </div>
   );
 };

@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import "./AddItemModal.css";
+import axios from "axios";
+import { useForm } from "../../../hooks";
+
 
 export const AddItemModal = ({ show, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    Código: "",
-    Nombre: "",
-    Tipo: "",
-    Fecha: "",
-    Cantidad: 0,
-  });
+  const [error, setError] = useState(null);
+  const { serialize } = useForm();
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     if (show) {
       const localDate = new Date();
-      const utcOffset = localDate.getTimezoneOffset() * 60000; // En milisegundos
+      const utcOffset = localDate.getTimezoneOffset() * 60000; 
       const adjustedDate = new Date(localDate.getTime() - utcOffset);
       setFormData((prev) => ({
         ...prev,
@@ -28,15 +27,23 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(formData);
-    onClose();
+  const handleSubmit = async (ev) => {
+    ev.preventDefault();
+    const formData = serialize(ev.target);
+    try {
+      const apiUrl = `http://192.168.101.15:8080/boreal/inventory/create`;
+      const data = await axios.post(apiUrl, formData);
+      if (data.status === 200){
+        console.log("exito");
+      } else {
+        console.log(data);
+      }
+    } catch (error) {
+      console.log(error);
+      setError(error.message);
+    }
   };
 
-  if (!show) {
-    return null;
-  }
 
   return (
     <div className="modalOverlay">
@@ -48,8 +55,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
             <input
               placeholder="Código elemento"
               type="text"
-              name="Código"
-              value={formData.Código}
+              name="id"
               onChange={handleChange}
               required
             />
@@ -59,8 +65,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
             <input
               placeholder="Nombre elemento"
               type="text"
-              name="Nombre"
-              value={formData.Nombre}
+              name="description"
               onChange={handleChange}
               required
             />
@@ -71,18 +76,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               placeholder="Tipo elemento"
               type="text"
               name="Tipo"
-              value={formData.Tipo}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="formGroup">
-            <label>Fecha:</label>
-            <input
-              placeholder="Fecha ingreso"
-              type="date"
-              name="Fecha"
-              value={formData.Fecha}
               onChange={handleChange}
               required
             />
@@ -92,8 +85,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
             <input
               placeholder="Cantidad existente"
               type="number"
-              name="Cantidad"
-              value={formData.Cantidad}
+              name="stock"
               onChange={handleChange}
               required
             />
@@ -108,10 +100,12 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
       </div>
     </div>
   );
+
 };
+
 
 AddItemModal.propTypes = {
   show: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  //onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 };
