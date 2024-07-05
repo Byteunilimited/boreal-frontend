@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAxios } from "../../../Contexts";
+import { Modal } from "../BaseModal";
+import { ModalIconCorrect, ModalIconMistake } from "../../../assets";
+import "./AddItemModal.css";
 
 export const AddItemModal = ({ show, onClose, onSave }) => {
   const { privateFetch } = useAxios();
@@ -8,6 +11,8 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [isSuccessful, setIsSuccessful] = useState(false);
+  const [offices, setOffices] = useState([]);
+  const [selectedOffice, setSelectedOffice] = useState("");
 
   useEffect(() => {
     if (show) {
@@ -18,12 +23,32 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         ...prev,
         Fecha: adjustedDate.toISOString().substr(0, 10),
       }));
+
+      fetchOffices();
     }
   }, [show]);
 
+  const fetchOffices = async () => {
+    try {
+      const response = await privateFetch.get("/office/all");
+      if (response.status === 200) {
+        setOffices(response.data.result.office);
+      }
+    } catch (error) {
+      console.log(error);
+      setError("Ocurrió un error al obtener las oficinas.");
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Field: ${name}, Value: ${value}`)
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOfficeChange = (e) => {
+    setSelectedOffice(e.target.value);
+    setFormData((prev) => ({ ...prev, officeId: e.target.value }));
   };
 
   const closeModal = () => {
@@ -35,31 +60,47 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     try {
-      const response = await privateFetch.post("/inventory/create", formData);
+      const requestData = {
+        ...formData,
+        stock: Number(formData.stock),
+      };
+      console.log('Request Data:', requestData);
+      const response = await privateFetch.post("/inventory/item/create", requestData);
       console.log({ response });
       if (response.status === 200) {
-        closeModal();
         setIsSuccessful(true);
         setConfirmationMessage("El elemento fue añadido exitosamente.");
         setShowConfirmationModal(true);
-        setTimeout(() => {
-          setShowConfirmationModal(false);
-        }, 3000);
         onSave(response.data);
+        onClose(); // Cerrar el modal de creación
       }
     } catch (error) {
       console.log(error);
       setIsSuccessful(false);
-      if (error.response && error.response.status === 422) {
-        setError("El código debe tener al menos 6 caracteres.");
-      } else if (error.response && error.response.status === 409) {
-        setError("El código ya existe.");
+      if (error.response) {
+        switch (response.status) {
+          case 422:
+            setError("El código debe tener al menos 6 caracteres.");
+            break;
+          case 409:
+            setError("El código ya existe.");
+            break;
+          default:
+            setError("Ocurrió un error inesperado.");
+        }
       } else {
         setError("Ocurrió un error inesperado.");
       }
       setShowConfirmationModal(true);
+      setTimeout(() => {
+        setShowConfirmationModal(false);
+        setTimeout(() => {
+          onClose(false); // Reabrir el modal de creación después de 5 segundos
+        }, 0);
+      }, 5000);
     }
   };
+
 
   return (
     <div className="modalOverlay">
@@ -92,7 +133,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               name="isEnable"
               onChange={handleChange}
               required
-              className="select"
+              className="selects"
             >
               <option value="">Seleccionar estado</option>
               <option value="true">Activo</option>
@@ -116,11 +157,28 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               name="inventoryTypeId"
               onChange={handleChange}
               required
-              className="select"
+              className="selects"
             >
               <option value="">Seleccionar tipo</option>
               <option value="1">Repuesto</option>
               <option value="2">Producto</option>
+            </select>
+          </div>
+          <div className="formGroup">
+            <label>Sucursal:</label>
+            <select
+              name="officeId"
+              value={selectedOffice}
+              onChange={handleOfficeChange}
+              required
+              className="selects"
+            >
+              <option value="">Seleccionar sucursal</option>
+              {offices.map((office) => (
+                <option key={office.id} value={office.id}>
+                  {office.description}
+                </option>
+              ))}
             </select>
           </div>
 

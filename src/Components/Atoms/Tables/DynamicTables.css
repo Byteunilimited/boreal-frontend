@@ -69,6 +69,7 @@
 
 .editIcon {
   color: #e67c11;
+  font-size: 1.5em;
 }
 
 .deleteIcon {
@@ -187,9 +188,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #6e6c6c;
   transition: 0.4s;
   border-radius: 34px;
+  width: 6em;
 }
 
 .slider:before {
@@ -205,7 +207,7 @@
 }
 
 input:checked + .slider {
-  background-color: #4ef235;
+  background-color: #1ea809;
 }
 
 input:checked + .slider:before {
@@ -227,9 +229,10 @@ input:checked + .slider:before {
   position: absolute;
   transform: translate(-50%, -50%);
   top: 50%;
-  left: 75%;
+  left: 65%;
   font-size: 14px;
 }
+
 
 input:checked + .slider::after {
   content: 'Activo';

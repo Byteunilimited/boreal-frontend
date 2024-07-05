@@ -69,31 +69,42 @@ export const LoginBoreal = () => {
     setError(null);
 
     if (!username || !password) {
-      setShowItemsErrorModal(true);
-      return;
+        setShowItemsErrorModal(true);
+        setIsLoading(false);
+        return;
     }
 
     if (!validateEmail(username)) {
-      setShowErrorModalEmail(true);
-      return;
+        setShowErrorModalEmail(true);
+        setIsLoading(false);
+        return;
     }
+
     try {
-      const { data } = await privateFetch.post("user/login", formData);
-      if (data.status === 200) {
-        Login(data);
-        setShowSuccessModal(true);
-        setTimeout(() => {
-          navigate("/boreal/panel");
-        }, 3000);
-      } else {
-        setShowErrorModal(true);
-      }
+        const response = await privateFetch.post("user/login", formData);
+        if (response && response.data) {
+            const data = response.data;
+            if (data.status === 200) {
+                Login(data);
+                setShowSuccessModal(true);
+                setTimeout(() => {
+                    navigate("/boreal/panel");
+                }, 3000);
+            } else {
+                setShowErrorModal(true);
+            }
+        } else {
+            setShowErrorModal(true);
+        }
     } catch (error) {
-      console.log(error);
-      setError(error.message);
-      setShowErrorModal(true);
+        console.log(error);
+        setError(error.message);
+        setShowErrorModal(true);
+    } finally {
+        setIsLoading(false);
     }
-  };
+};
+
 
   return !isAutenticated() ? (
     <div className="mainBackground">
@@ -170,9 +181,9 @@ export const LoginBoreal = () => {
                 showCloseButton={true}
               />
             )}
-            <p className="pass" onClick={handlePasswordRecovery}>
+            {/* <p className="pass" onClick={handlePasswordRecovery}>
               ¿Olvidó su contraseña?
-            </p>
+            </p> */}
 
             {showRecoveryModal && (
               <PasswordRecoveryModal onClose={handleCloseModal} />

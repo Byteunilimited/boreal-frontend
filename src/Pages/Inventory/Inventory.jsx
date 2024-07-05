@@ -5,11 +5,12 @@ import * as XLSX from "xlsx";
 import "../Inventory/Inventory.css";
 import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { AddItemModal, ConfirmationModal } from "../../Layouts";
+import { AddItemModal, ConfirmationModal, Modal } from "../../Layouts";
 import { BulkUpload } from "../../Layouts/BulkUpload/BulkUpload";
 import { useAxios } from "../../Contexts";
 import { createSearchParams } from "react-router-dom";
 import { Tab, Tabs } from "react-bootstrap";
+
 export const Inventory = () => {
   const [key, setKey] = useState("actives");
   const { privateFetch } = useAxios();
@@ -25,10 +26,12 @@ export const Inventory = () => {
     useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
-
+  const [sucursal, setSucursal] = useState("");
+  const [itemToActivate, setItemToActivate] = useState(null);
+  const [itemToDeactivate, setItemToDeactivate] = useState(null);
   useEffect(() => {
     document.title = "Inventario";
-}, []);
+  }, []);
 
   useEffect(() => {
     getData();
@@ -55,12 +58,13 @@ export const Inventory = () => {
           : item.isEnable === false
           ? "Inactivo"
           : "Desconocido",
+      Sucursal: item.office.description,
     }));
   };
 
   const getData = async () => {
     try {
-      const response = await privateFetch.get("/inventory/all");
+      const response = await privateFetch.get("/inventory/item/all");
       if (response && response.data) {
         console.log("API response data:", response.data.result.Inventory);
         const translatedData = translateFields(response.data.result.Inventory);
@@ -83,21 +87,27 @@ export const Inventory = () => {
   const filterData = () => {
     let filtered = data;
 
-
     if (searchTerm) {
-      filtered = filtered.filter((item) =>
-        item.Código.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.Nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (item) =>
+          item.Código.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.Nombre.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (itemType) {
       filtered = filtered.filter((item) => item.Tipo === itemType);
     }
+    if (sucursal) {
+      filtered = filtered.filter((item) => item.Sucursal === sucursal);
+    }
 
     setFilteredData(filtered);
   };
 
+  const handleSucursalChange = (e) => {
+    setSucursal(e.target.value);
+  };
   const handleRefresh = () => {
     getData();
     setSearchTerm("");
@@ -133,49 +143,54 @@ export const Inventory = () => {
     setShowConfirmationModal(true);
   };
 
-  const confirmDelete = async () => {
-    try {
-      await privateFetch.delete(
-        `https://boreal-api.onrender.com/boreal/inventory/delete?id=${itemToDelete.Código}`
-      );
-      const updatedData = data.filter((d) => d.Código !== itemToDelete.Código);
-      setData(updatedData);
-      setFilteredData(updatedData);
-    } catch (error) {
-      console.error("Error al eliminar el item:", error);
-      alert("Hubo un error al eliminar el item.");
-    } finally {
-      setShowConfirmationModal(false);
-      setItemToDelete(null);
-    }
-  };
-
-  const handleToggle = async (item) => {
-    const isEnabling = item.Estado === "Inactivo";
-    const apiUrl = isEnabling
-      ? `https://boreal-api.onrender.com/boreal/inventory/item/enable?id=${item.Código}`
-      : `https://boreal-api.onrender.com/boreal/inventory/item/disable?id=${item.Código}`;
   
+
+  const handleActivate = async (item) => {
     try {
-      const response = await privateFetch.put(apiUrl);
-      console.log("API response:", response);
+      const response = await privateFetch.put(
+        `https://boreal-api.onrender.com/boreal/inventory/item/enable?id=${item.Código}`
+      );
   
       if (response.status === 200) {
-        console.log("Estado actualizado con éxito");
+        console.log("Ítem activado con éxito");
         const updatedData = data.map((d) =>
-          d.Código === item.Código ? { ...d, Estado: isEnabling ? "Activo" : "Inactivo" } : d
+          d.Código === item.Código ? { ...d, Estado: "Activo" } : d
         );
+        setItemToActivate(item);
+        setShowConfirmationModal(true);
         setData(updatedData);
         setFilteredData(updatedData);
       } else {
-        console.error("Ocurrió un error inesperado.");
+        console.error("Ocurrió un error al activar el ítem.");
       }
     } catch (error) {
-      console.error("Error al actualizar el estado del ítem:", error);
-      alert("Hubo un error al actualizar el estado del ítem.");
+      console.error("Error al activar el ítem:", error);
+      alert("Hubo un error al activar el ítem.");
     }
   };
+  const handleDeactivate = async (item) => {
+    try {
+      const response = await privateFetch.delete(
+        `https://boreal-api.onrender.com/boreal/inventory/item/disable?id=${item.Código}`
+      );
   
+      if (response.status === 200) {
+        console.log("Ítem desactivado con éxito");
+        const updatedData = data.map((d) =>
+          d.Código === item.Código ? { ...d, Estado: "Inactivo" } : d
+        );
+        setItemToDeactivate(item);
+        setShowConfirmationModal(true);
+        setData(updatedData);
+        setFilteredData(updatedData);
+      } else {
+        console.error("Ocurrió un error al desactivar el ítem.");
+      }
+    } catch (error) {
+      console.error("Error al desactivar el ítem:", error);
+      alert("Hubo un error al desactivar el ítem.");
+    }
+  };
 
   const handleFilter = (value, column) => {
     setSearchTerm((prev) => ({ ...prev, [column]: value }));
@@ -226,15 +241,27 @@ export const Inventory = () => {
                           </option>
                         ))}
                     </select>
-                  </div>
-                  <div className="search">
+                    <label>Sucursal:</label>
+                    <select
+                      value={sucursal}
+                      onChange={handleSucursalChange}
+                      className="filterOffice"
+                    >
+                      {[...new Set(data.map((item) => item.Sucursal))]
+                        .filter(Boolean)
+                        .map((Sucursal, index) => (
+                          <option key={index} value={Sucursal}>
+                            {Sucursal}
+                          </option>
+                        ))}
+                    </select>
                     <label>Buscar:</label>
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => handleSearch(e.target.value)}
-                      placeholder="Buscar por Código o Nombre"
-                      className="filter"
+                      placeholder="Código o Nombre"
+                      className="filterSearch"
                     />
                   </div>
                   <div className="actions">
@@ -260,13 +287,14 @@ export const Inventory = () => {
                     "Nombre",
                     "Tipo",
                     "Existencias",
+                    "Sucursal",
                     "Estado",
                   ]}
                   data={activeItems}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   onFilter={handleFilter}
-                  onToggle={handleToggle}
+                  onToggle={handleDeactivate}
                   hideDeleteIcon={true}
                 />
               </Tab>
@@ -287,23 +315,46 @@ export const Inventory = () => {
                         )
                       )}
                     </select>
-                  </div>
-                  <div className="actions">
-                    <button onClick={handleRefresh} className="iconRefresh">
-                      <FaSyncAlt />
-                    </button>
-                    <Button onClick={() => setShowModal(true)} text="Añadir" />
-                    <button onClick={handleExport} className="exportButton">
-                      <RiFileExcel2Line className="ExportIcon" />
-                      Exportar
-                    </button>
-                    <button
-                      onClick={() => setShowBulkUploadModal(true)}
-                      className="exportButton"
+                    
+                    <label>Sucursal:</label>
+                    <select
+                      value={sucursal}
+                      onChange={handleSucursalChange} 
+                      className="filterOffice"
                     >
-                      Cargue masivo
-                    </button>
+                      {[...new Set(data.map((item) => item.Sucursal))]
+                        .filter(Boolean)
+                        .map((Sucursal, index) => (
+                          <option key={index} value={Sucursal}>
+                            {Sucursal}
+                          </option>
+                        ))}
+                    </select>
+                    <label>Buscar:</label>
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      placeholder="Código o Nombre"
+                      className="filterSearch"
+                    />
                   </div>
+                </div>
+                <div className="actions">
+                  <button onClick={handleRefresh} className="iconRefresh">
+                    <FaSyncAlt />
+                  </button>
+                  <Button onClick={() => setShowModal(true)} text="Añadir" />
+                  <button onClick={handleExport} className="exportButton">
+                    <RiFileExcel2Line className="ExportIcon" />
+                    Exportar
+                  </button>
+                  <button
+                    onClick={() => setShowBulkUploadModal(true)}
+                    className="exportButton"
+                  >
+                    Cargue masivo
+                  </button>
                 </div>
                 <DynamicTable
                   columns={[
@@ -311,13 +362,14 @@ export const Inventory = () => {
                     "Nombre",
                     "Tipo",
                     "Existencias",
+                    "Sucursal",
                     "Estado",
                   ]}
                   data={inactiveItems}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   onFilter={handleFilter}
-                  onToggle={handleToggle}
+                  onToggle={handleActivate}
                   hideDeleteIcon={true}
                 />
               </Tab>
@@ -338,14 +390,7 @@ export const Inventory = () => {
                 onUploadSuccess={handleBulkUploadSuccess}
               />
             )}
-            {showConfirmationModal && (
-              <ConfirmationModal
-                show={showConfirmationModal}
-                onClose={() => setShowConfirmationModal(false)}
-                onConfirm={confirmDelete}
-                message={`¿Estás seguro de que deseas eliminar el item ${itemToDelete?.Nombre}?`}
-              />
-            )}
+
             {showEditElementInventory && (
               <EditElementInventory
                 show={showEditElementInventory}
@@ -356,6 +401,22 @@ export const Inventory = () => {
                 onSave={handleSave}
               />
             )}
+            <ConfirmationModal
+              show={showConfirmationModal}
+              onClose={() => setShowConfirmationModal(false)}
+              onConfirm={() => {
+                if (itemToDelete) {
+                  console.log("Deleting item:", itemToDelete);
+                }
+                if (itemToActivate) {
+                  handleActivate(itemToActivate);
+                }
+                if (itemToDeactivate) {
+                  handleDeactivate(itemToDeactivate);
+                }
+                setShowConfirmationModal(false);
+              }}
+            />
           </div>
         </div>
       </div>

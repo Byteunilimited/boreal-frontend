@@ -7,7 +7,6 @@ const data = [
   { año: "2022", valor: 15000 },
   { año: "2023", valor: 20000 },
   { año: "2024", valor: 18000 },
-  { año: "2025", valor: 25000 },
 ];
 
 export const ValueYearlyChart = () => {

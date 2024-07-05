@@ -83,10 +83,25 @@ body {
   padding: 10px;
   border: 1px solid #aab7da;
   border-radius: 20px;
-  width: 155px;
+  width: 3em;
   cursor: pointer;
 }
 
+.filterSearch{
+  padding: 10px;
+  border: 1px solid #aab7da;
+  border-radius: 20px;
+  width: 12em;
+  cursor: pointer;
+}
+
+.filterOffice{
+  padding: 10px;
+  border: 1px solid #aab7da;
+  border-radius: 20px;
+  width: 12em;
+  cursor: pointer;
+}
 .filters .filter:focus {
   outline: none;
   border-color: #007bff;

@@ -9,7 +9,7 @@ export const ConfirmationModal = ({ show, onClose, onConfirm }) => {
   return (
     <div className="confirmationModalOverlay">
       <div className="confirmationModal">
-        <h2>¿Estás seguro de realizar esta acción?</h2>
+        <h4>¿Estás seguro de realizar esta acción?</h4>
         <div className="confirmationModalButtons">
           <button className="confirmButton" onClick={onConfirm}>Confirmar</button>
           <button className="cancelButton" onClick={onClose}>Cancelar</button>
