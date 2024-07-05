@@ -3,7 +3,6 @@ import {LoginBoreal, Inventory, UserAndRols, Dashboard, DepartmentsAndCities, Wi
 import { BaseSideBar, Error404 } from "../Layouts";
 import { useAuth } from "../Contexts";
 
-
 export const Router = () => {
   const { isAutenticated } = useAuth();
   const Protected = ({ element }) => {

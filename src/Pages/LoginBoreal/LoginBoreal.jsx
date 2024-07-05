@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff } from "react-feather";
 import "./LoginBoreal.css";
@@ -12,14 +12,14 @@ import { PasswordRecoveryModal, Modal } from "../../Layouts";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Components";
 import { useForm } from "../../hooks";
-import { useAuth } from "../../Contexts";
-import endPoints from "../../Services";
-
+import { useAuth, useAxios } from "../../Contexts";
+import { Navigate } from 'react-router-dom';
 
 export const LoginBoreal = () => {
   const { serialize } = useForm();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const {privateFetch} = useAxios();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [error, setError] = useState(null);
@@ -27,7 +27,13 @@ export const LoginBoreal = () => {
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const [showErrorModalEmail, setShowErrorModalEmail] = useState(false);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const { Login } = useAuth();
+  const { isAutenticated } = useAuth();
+
+  useEffect(() => {
+      document.title = "Login";
+  }, []);
 
   const handlePasswordRecovery = () => {
     setShowRecoveryModal(true);
@@ -47,13 +53,6 @@ export const LoginBoreal = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const testLoginData = {
-    username: "usuarioprueba@gmail.com",
-    password: "87654321",
-    token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzdWFyaW9wcnVlYmFAZ21haWwuY29tIiwiaWF0IjoxNjI0MzM3MTI0LCJleHAiOjE2MjQzMzcyMjR9.YTqDQ4WbB3WXyoXdC2PvQJcUNa9cpd-w8CcnMk6TD1Y",
-  };
-
   const [showPassword, setShowPassword] = useState(false);
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
@@ -64,6 +63,7 @@ export const LoginBoreal = () => {
   };
 
   const handleSubmit = async (ev) => {
+    setIsLoading(true);
     ev.preventDefault();
     const formData = serialize(ev.target);
     setError(null);
@@ -77,37 +77,9 @@ export const LoginBoreal = () => {
       setShowErrorModalEmail(true);
       return;
     }
-
-    /*try {
-      if (
-        username === testLoginData.username &&
-        password === testLoginData.password
-      ) {
-        const userData = {
-          username: testLoginData.username,
-          token: testLoginData.token,
-          expiresAt: Date.now() + 3600 * 1000,
-        };
-        Login(userData);
-        localStorage.setItem("token", testLoginData.token);
-        setShowSuccessModal(true);
-        setTimeout(() => {
-          navigate("/boreal/panel");
-        }, 3000);
-      } else {
-        setShowErrorModal(true);
-      }
-    } catch (error) {
-      setError(error.message);
-      setShowErrorModal(true);
-    }
-  };
-*/
-
     try {
-      const apiUrl = `https://boreal-api.onrender.com/boreal/user/login`;
-      const {data} = await axios.post(apiUrl, formData);
-      if (data.status === 200){
+      const { data } = await privateFetch.post("user/login", formData);
+      if (data.status === 200) {
         Login(data);
         setShowSuccessModal(true);
         setTimeout(() => {
@@ -121,29 +93,9 @@ export const LoginBoreal = () => {
       setError(error.message);
       setShowErrorModal(true);
     }
-    /*
-      const apiUrl = `http://192.168.101.15:8080/boreal/user/login`;
-      const response = await axios.post(apiUrl, formData);
-      console.log(response)
-      if (response.status === 202) {
-        const { token, expiresAt } = response.data;
-        Login({ token, expiresAt });
-        localStorage.setItem("token", Login.token);
-        setShowSuccessModal(true);
-        setTimeout(() => {
-          navigate("/boreal/inventario");
-        }, 3000);
-      } else {
-        setShowErrorModal(true);
-      }
-    } catch (error) {
-      console.log(error);
-      setError(error.message);
-      setShowErrorModal(true);
-    }*/
   };
 
-  return (
+  return !isAutenticated() ? (
     <div className="mainBackground">
       <section className="mainSection">
         <figure className="mainFigure">
@@ -225,10 +177,12 @@ export const LoginBoreal = () => {
             {showRecoveryModal && (
               <PasswordRecoveryModal onClose={handleCloseModal} />
             )}
-            <Button text="Ingresar" type="submit" className="buttonMain" />
+            <Button  loading={isLoading} text="Ingresar" type="submit" className="buttonMain"/>
           </form>
         </div>
       </section>
     </div>
-  );
+    ) : (
+      <Navigate to='/boreal/panel' />
+  )
 };

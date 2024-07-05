@@ -75,7 +75,7 @@
 }
 
 .submenu {
-  max-height: 200px; 
+  max-height: 350px; 
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--MainHover) var(--DarkBlue);

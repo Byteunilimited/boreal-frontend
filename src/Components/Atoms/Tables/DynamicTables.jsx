@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { FaSearch } from "react-icons/fa";
-import { RiDeleteBin6Line, RiEditBoxLine } from "react-icons/ri";
+import { RiEdit2Line, RiCloseFill } from "react-icons/ri";
 import Pagination from "react-bootstrap/Pagination";
-import "./DynamicTables.css";
 import Table from "react-bootstrap/Table";
+import "./DynamicTables.css";
 
-export const DynamicTable = ({ columns, data, onEdit, onDelete }) => {
+export const DynamicTable = ({
+  columns,
+  data,
+  onEdit,
+  onDelete,
+  onToggle,
+  showToggle,
+  hideDeleteIcon,
+}) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState({ Código: "", Nombre: "" });
-  const [showSearch, setShowSearch] = useState({
-    Código: false,
-    Nombre: false,
-  });
 
   const pagesVisited = pageNumber * recordsPerPage;
   const pageCount = Math.ceil(data.length / recordsPerPage);
@@ -23,25 +25,9 @@ export const DynamicTable = ({ columns, data, onEdit, onDelete }) => {
   };
 
   const handleRecordsPerPageChange = (e) => {
-    setRecordsPerPage(parseInt(e.target.value));
+    setRecordsPerPage(parseInt(e.target.value, 10));
     setPageNumber(0);
   };
-
-  const handleSearchIconClick = (column) => {
-    setShowSearch((prev) => ({ ...prev, [column]: !prev[column] }));
-  };
-
-  const handleFilter = (value, column) => {
-    setSearchTerm((prev) => ({ ...prev, [column]: value }));
-    setPageNumber(0);
-  };
-
-  /*const filteredData = data.filter((item) => {
-    return (
-      item.Código.includes(searchTerm.Código) &&
-      item.Nombre.toLowerCase().includes(searchTerm.Nombre.toLowerCase())
-    );
-  });*/
 
   const renderPaginationItems = () => {
     let items = [];
@@ -107,25 +93,9 @@ export const DynamicTable = ({ columns, data, onEdit, onDelete }) => {
             {columns.map((column, index) => (
               <th key={index} className="bg-blue">
                 {column}
-                {["Código", "Nombre"].includes(column) && (
-                  <>
-                    <FaSearch
-                      onClick={() => handleSearchIconClick(column)}
-                      className="searchIcon"
-                    />
-                    {showSearch[column] && (
-                      <input
-                        type="text"
-                        placeholder={`Buscar ${column}`}
-                        onChange={(e) => handleFilter(e.target.value, column)}
-                        className="searchInput"
-                      />
-                    )}
-                  </>
-                )}
               </th>
             ))}
-            <th>Acciones</th>
+            {showToggle && <th>Acciones</th>}
           </tr>
         </thead>
         <tbody>
@@ -134,18 +104,35 @@ export const DynamicTable = ({ columns, data, onEdit, onDelete }) => {
             .map((row, rowIndex) => (
               <tr key={rowIndex} className="tableRow">
                 {columns.map((column, colIndex) => (
-                  <td key={colIndex}>{row[column]}</td>
+                  <td key={colIndex}>
+                    {column === "Estado" && showToggle ? (
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          checked={row[column] === "Activo"}
+                          onChange={() => onToggle(row)}
+                        />
+                        <span className="slider round"></span>
+                      </label>
+                    ) : (
+                      row[column]
+                    )}
+                  </td>
                 ))}
-                <td>
-                  <RiEditBoxLine
-                    className="actionIcon editIcon"
-                    onClick={() => onEdit(row)}
-                  />
-                  <RiDeleteBin6Line
-                    className="actionIcon deleteIcon"
-                    onClick={() => onDelete(row)}
-                  />
-                </td>
+                {showToggle && (
+                  <td>
+                    <RiEdit2Line
+                      className="actionIcon editIcon"
+                      onClick={() => onEdit(row)}
+                    />
+                    {!hideDeleteIcon && (
+                      <RiCloseFill
+                        className="actionIcon deleteIcon"
+                        onClick={() => onDelete(row)}
+                      />
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
         </tbody>
@@ -184,4 +171,12 @@ DynamicTable.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onToggle: PropTypes.func.isRequired,
+  showToggle: PropTypes.bool,
+  hideDeleteIcon: PropTypes.bool,
+};
+
+DynamicTable.defaultProps = {
+  showToggle: true,
+  hideDeleteIcon: false,
 };

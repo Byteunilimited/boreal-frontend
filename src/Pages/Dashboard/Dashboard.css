@@ -1,12 +1,3 @@
-#root {
-  --MainBlue: #1C68C6;
-  --MainHover:#00EFE6;
-  --MainWhite:  #ffffff;
-  --MainActive:  #021b35;
-  --SecondBlue: #00ABEF;
-  --DarkBlue: #0048BA; 
-}
-
 .charts {
   display: flex;
   flex-direction: row;

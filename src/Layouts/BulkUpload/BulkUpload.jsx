@@ -39,7 +39,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
       axios
-        .post("https://api", jsonData)
+        .post("https://boreal-api.onrender.com/boreal/inventory/item/upload/csv", jsonData)
         .then((response) => {
           alert("Datos enviados exitosamente.");
           onUploadSuccess(response.data);
@@ -55,7 +55,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Código", "Nombre", "Tipo", "Fecha", "Cantidad"],
+      ["id", "description",  "isEnable", "stock","inventoryTypeId",],
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
@@ -67,7 +67,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   }
 
   return (
-    <div className="modal">
+    <div className="modalOverlay">
       <div className="modalContent">
         <h2 className="modalTitle">Cargue masivo</h2>
         <div className="modalBody">

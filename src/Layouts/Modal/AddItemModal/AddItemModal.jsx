@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import "./AddItemModal.css";
-import axios from "axios";
-import { useForm } from "../../../hooks";
-
+import { useEffect, useState } from "react";
+import { useAxios } from "../../../Contexts";
 
 export const AddItemModal = ({ show, onClose, onSave }) => {
+  const { privateFetch } = useAxios();
   const [error, setError] = useState(null);
-  const { serialize } = useForm();
   const [formData, setFormData] = useState({});
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [isSuccessful, setIsSuccessful] = useState(false);
 
   useEffect(() => {
     if (show) {
       const localDate = new Date();
-      const utcOffset = localDate.getTimezoneOffset() * 60000; 
+      const utcOffset = localDate.getTimezoneOffset() * 60000;
       const adjustedDate = new Date(localDate.getTime() - utcOffset);
       setFormData((prev) => ({
         ...prev,
@@ -27,23 +26,40 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const closeModal = () => {
+    setShowConfirmationModal(false);
+    setError(null);
+    onClose();
+  };
+
   const handleSubmit = async (ev) => {
     ev.preventDefault();
-    const formData = serialize(ev.target);
     try {
-      const apiUrl = `http://192.168.101.15:8080/boreal/inventory/create`;
-      const data = await axios.post(apiUrl, formData);
-      if (data.status === 200){
-        console.log("exito");
-      } else {
-        console.log(data);
+      const response = await privateFetch.post("/inventory/create", formData);
+      console.log({ response });
+      if (response.status === 200) {
+        closeModal();
+        setIsSuccessful(true);
+        setConfirmationMessage("El elemento fue añadido exitosamente.");
+        setShowConfirmationModal(true);
+        setTimeout(() => {
+          setShowConfirmationModal(false);
+        }, 3000);
+        onSave(response.data);
       }
     } catch (error) {
       console.log(error);
-      setError(error.message);
+      setIsSuccessful(false);
+      if (error.response && error.response.status === 422) {
+        setError("El código debe tener al menos 6 caracteres.");
+      } else if (error.response && error.response.status === 409) {
+        setError("El código ya existe.");
+      } else {
+        setError("Ocurrió un error inesperado.");
+      }
+      setShowConfirmationModal(true);
     }
   };
-
 
   return (
     <div className="modalOverlay">
@@ -71,15 +87,19 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
             />
           </div>
           <div className="formGroup">
-            <label>Tipo:</label>
-            <input
-              placeholder="Tipo elemento"
-              type="text"
-              name="Tipo"
+            <label>Estado:</label>
+            <select
+              name="isEnable"
               onChange={handleChange}
               required
-            />
+              className="select"
+            >
+              <option value="">Seleccionar estado</option>
+              <option value="true">Activo</option>
+              <option value="false">Inactivo</option>
+            </select>
           </div>
+
           <div className="formGroup">
             <label>Cantidad:</label>
             <input
@@ -90,6 +110,20 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               required
             />
           </div>
+          <div className="formGroup">
+            <label>Tipo:</label>
+            <select
+              name="inventoryTypeId"
+              onChange={handleChange}
+              required
+              className="select"
+            >
+              <option value="">Seleccionar tipo</option>
+              <option value="1">Repuesto</option>
+              <option value="2">Producto</option>
+            </select>
+          </div>
+
           <div className="formActions">
             <button type="submit">Guardar</button>
             <button type="button" onClick={onClose}>
@@ -98,14 +132,15 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
           </div>
         </form>
       </div>
+      {showConfirmationModal && (
+        <Modal
+          title={isSuccessful ? "Éxito" : "Error"}
+          text={isSuccessful ? confirmationMessage : error}
+          onClose={closeModal}
+          modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
+          showCloseButton
+        />
+      )}
     </div>
   );
-
-};
-
-
-AddItemModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  //onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
 };
