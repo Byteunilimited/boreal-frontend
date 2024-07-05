@@ -35,14 +35,12 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         setOffices(response.data.result.office);
       }
     } catch (error) {
-      console.log(error);
       setError("Ocurrió un error al obtener las oficinas.");
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Field: ${name}, Value: ${value}`)
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -64,43 +62,30 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         ...formData,
         stock: Number(formData.stock),
       };
-      console.log('Request Data:', requestData);
       const response = await privateFetch.post("/inventory/item/create", requestData);
-      console.log({ response });
       if (response.status === 200) {
         setIsSuccessful(true);
         setConfirmationMessage("El elemento fue añadido exitosamente.");
         setShowConfirmationModal(true);
         onSave(response.data);
-        onClose(); // Cerrar el modal de creación
       }
     } catch (error) {
-      console.log(error);
       setIsSuccessful(false);
       if (error.response) {
-        switch (response.status) {
-          case 422:
-            setError("El código debe tener al menos 6 caracteres.");
-            break;
-          case 409:
-            setError("El código ya existe.");
-            break;
-          default:
-            setError("Ocurrió un error inesperado.");
+        const status = error.response.status;
+        if (status === 422) {
+          setError("El código debe tener al menos 6 caracteres.");
+        } else if (status === 409) {
+          setError("El código ya existe.");
+        } else {
+          setError("Ocurrió un error inesperado.");
         }
       } else {
         setError("Ocurrió un error inesperado.");
       }
       setShowConfirmationModal(true);
-      setTimeout(() => {
-        setShowConfirmationModal(false);
-        setTimeout(() => {
-          onClose(false); // Reabrir el modal de creación después de 5 segundos
-        }, 0);
-      }, 5000);
     }
   };
-
 
   return (
     <div className="modalOverlay">

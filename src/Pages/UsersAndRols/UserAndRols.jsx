@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { DynamicTable } from "../../Components";
-import { saveAs } from "file-saver";
-import * as XLSX from "xlsx";
+import { useEffect, useState } from "react";
 import "./UserAndRols.css";
 import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
@@ -20,6 +17,7 @@ import {
 import { Row, Col, Container } from "react-bootstrap";
 import { MOCK_DATA } from "../../util";
 import { usersMock } from "../../FalseData";
+import { DynamicTable } from "../../Components";
 
 export const UserAndRols = () => {
   const [showAddUser, setSHowAddUser] = useState(false);
@@ -34,7 +32,7 @@ export const UserAndRols = () => {
 
   useEffect(() => {
     document.title = "Usuarios y roles";
-}, []);
+  }, []);
 
   const [showModal, setShowModal] = useState(false);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
@@ -89,6 +87,7 @@ export const UserAndRols = () => {
     setData([...data, ...newData]);
     //setFilteredData([...data, ...newData]);
   };
+
 
   return (
     <>

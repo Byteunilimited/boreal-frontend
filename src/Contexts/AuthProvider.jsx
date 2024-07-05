@@ -52,6 +52,7 @@ export function AuthProvider({ children }) {
     }
     const Login = (data) => {
         localStorage.setItem("token", data.token);
+        localStorage.setItem('userId', data.id);
         setUser(savedUser(data.token));
         setToken(data.token);
         setExpiration(data.expiresAt);

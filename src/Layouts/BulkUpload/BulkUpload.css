@@ -26,6 +26,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
+  align-content: center;
   max-height: 80%;
   overflow-y: auto;
 }
@@ -36,6 +38,7 @@
   padding: 20px;
   text-align: center;
   cursor: pointer;
+  margin-top: 1em;
 }
 
 .dropzoneBulk:hover {
@@ -45,6 +48,7 @@
 .dropzoneIconBulk {
   font-size: 40px;
   color: #668fbb;
+
 }
 
 .dropzoneTextBulk {

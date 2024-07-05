@@ -64,7 +64,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
         "https://boreal-api.onrender.com/boreal/inventory/item/update";
       const response = await axios.put(apiUrl, {
         ...formData,
-        isEnable: formData.isEnable === "true" ? true : false,
+        isEnable: formData.isEnable, 
         inventoryTypeId: Number(formData.inventoryTypeId),
         officeId: Number(formData.officeId),
       });

@@ -90,7 +90,7 @@ export const DynamicTable = ({
       <Table striped className="dynamicTable">
         <thead>
           <tr>
-            {columns.map((column, index) => (
+            {columns?.map((column, index) =>  (
               <th key={index} className="bg-blue">
                 {column}
               </th>
