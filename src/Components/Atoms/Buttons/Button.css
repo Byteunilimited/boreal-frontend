@@ -1,4 +1,4 @@
-#root {
+/* #root {
   --MainBlue: #1C68C6;
   --MainHover:#00EFE6;
   --MainWhite:  #ffffff;
@@ -9,7 +9,7 @@
   --AlternateMainHover: #ACE7E4;
   --AlternateSecondBlue: #94CCE2;
   --AlternateDarkBlue: #5881C3;
-}
+} */
 
 .MainButton {
     background-color: var(--MainBlue); 

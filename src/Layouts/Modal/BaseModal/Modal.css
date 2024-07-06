@@ -1,14 +1,5 @@
-#root {
-  --MainBlue: #1C68C6;
-  --MainHover:#00EFE6;
-  --MainWhite:  #ffffff;
-  --MainActive:  #021b35;
-  --SecondBlue: #00ABEF;
-  --DarkBlue: #0048BA;
 
-}
-
-.modalOverlay {
+.modalOverlay1 {
     position: fixed;
     top: 0;
     left: 0;
@@ -20,10 +11,11 @@
     align-items: center;
     text-align: center;
     font-family:Verdana, Geneva, Tahoma, sans-serif;
+    z-index: 10000;
 
   }
   
-  .modalContent {
+  .modalContent1 {
     background-color: var(--MainWhite);
     padding: 20px;
     border-radius: 10px;
@@ -32,14 +24,14 @@
     color: var(--MainActive);
   }
   
-  .modalTitle {
+  .modalTitle1 {
     font-weight: lighter;
     color: var(--MainBlue);
     margin-top: -10px;
     margin-bottom: 7px;
   }
   
-  .modalCloseBtn {
+  .modalCloseBtn1 {
     color: var(--MainWhite);  
     border: none; 
     cursor: pointer; 
@@ -51,17 +43,17 @@
     height: 2.5em; 
   }
   
-  .modalCloseBtn:hover {
+  .modalCloseBtn1:hover {
     background-color: #eb1616;
     color: var(--MainWhite);
   }
 
-  .modalCloseBtn:active{
+  .modalCloseBtn1:active{
     background-color: #a30707;
     color: var(--MainWhite);
   }
 
-  .modalIcon{
+  .modalIcon1{
     width: 30%;
   }
   

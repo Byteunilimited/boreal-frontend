@@ -1,20 +1,30 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "react-feather";
 import "./SideBar.css";
 import { BorealLogo } from "../../assets";
 import {
-  RiListCheck2, RiLoginBoxLine, RiAdminLine, RiTable2, RiRoadMapLine,
-  RiAlignItemHorizontalCenterLine, RiCaravanLine, RiDashboardHorizontalLine, RiDashboardLine
+  RiListCheck2,
+  RiFileListLine,
+  RiLoginBoxLine,
+  RiAdminLine,
+  RiParentLine,
+  RiTable2,
+  RiRoadMapLine,
+  RiAlignItemHorizontalCenterLine,
+  RiCaravanLine,
+  RiDashboardHorizontalLine,
+  RiFileCopy2Line,
+  RiDashboardLine,
 } from "react-icons/ri";
 import { useAuth } from "../../Contexts";
 
 const sideBarItems = [
-  {
+ /* {
     label: "Panel",
     path: "/boreal/panel",
     icon: <RiDashboardLine />,
-  },
+  },*/
   /*{
     label: "Informe técnico",
     path: "/boreal/informe",
@@ -41,25 +51,29 @@ const sideBarItems = [
         path: "/boreal/inventario",
         icon: <RiTable2 />,
       },
-      {
-        label: "Departamentos y ciudades",
-        path: "/boreal/departamentosYCiudades",
-        icon: <RiRoadMapLine />,
-      },
-      {
-        label: "Procedimientos",
-        path: "/boreal/procedimientos",
-        icon: <RiAlignItemHorizontalCenterLine />,
-      },
-      { label: "Equipos", path: "/boreal/equipos", icon: <RiCaravanLine /> },
-      { label: "Bodegas", path: "/boreal/bodegas", icon: <RiDashboardHorizontalLine /> },
+      // {
+      //   label: "Departamentos y ciudades",
+      //   path: "/boreal/departamentosYCiudades",
+      //   icon: <RiRoadMapLine />,
+      // },
+      // {
+      //   label: "Procedimientos",
+      //   path: "/boreal/procedimientos",
+      //   icon: <RiAlignItemHorizontalCenterLine />,
+      // },
+      // { label: "Equipos", path: "/boreal/equipos", icon: <RiCaravanLine /> },
+      // {
+      //   label: "Bodegas",
+      //   path: "/boreal/bodegas",
+      //   icon: <RiDashboardHorizontalLine />,
+      // },
     ],
   },
 ];
 
 export const Sidebar = () => {
-  const { LogOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -67,11 +81,10 @@ export const Sidebar = () => {
 
   return (
     <div className="sidebar">
-
       <Link to="/boreal/panel" className="containLogo">
         <img src={BorealLogo} alt="" className="imgLogo" />
       </Link>
-      <ul >
+      <ul>
         {sideBarItems.map((item, index) => (
           <li key={index} className={item.submenu ? "relative" : ""}>
             {item.submenu ? (
@@ -85,7 +98,12 @@ export const Sidebar = () => {
                   <ul className="submenu">
                     {item.submenu.map((subitem, subindex) => (
                       <li className="itemSub" key={subindex}>
-                        <Link to={subitem.path} className="active">
+                        <Link
+                          to={subitem.path}
+                          className={
+                            location.pathname === subitem.path ? "active" : ""
+                          }
+                        >
                           <span className="icon">{subitem.icon}</span>
                           {subitem.label}
                         </Link>
@@ -95,23 +113,17 @@ export const Sidebar = () => {
                 )}
               </>
             ) : (
-              <Link to={item.path} className="menuItem active">
+              <Link
+                to={item.path}
+                className={location.pathname === item.path ? "active" : ""}
+              >
                 <span className="icon">{item.icon}</span>
                 {item.label}
               </Link>
             )}
           </li>
         ))}
-        <li>
-          <Link className="menuItem" onClick={LogOut}>
-            <span className="icon">
-              <RiLoginBoxLine />
-            </span>
-            Salir
-          </Link>
-        </li>
       </ul>
-
     </div>
   );
 };

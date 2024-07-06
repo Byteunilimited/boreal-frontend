@@ -7,7 +7,7 @@ const data = [
   { year: "2022", servicios: 150 },
   { year: "2023", servicios: 200 },
   { year: "2024", servicios: 180 },
-  { year: "2025", servicios: 250 },
+
 ];
 
 export const ServicesYearlyChart = () => {

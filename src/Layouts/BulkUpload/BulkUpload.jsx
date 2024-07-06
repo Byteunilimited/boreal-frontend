@@ -1,27 +1,64 @@
 import React, { useState, useRef } from "react";
 import * as XLSX from "xlsx";
-import axios from "axios";
-import { RiUploadCloudLine } from "react-icons/ri";
 import "./BulkUpload.css";
 import { Button } from "../../Components";
+import { Table } from "react-bootstrap";
+import { RiUploadCloudLine } from "react-icons/ri";
 
 export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   const [file, setFile] = useState(null);
+  const [jsonData, setJsonData] = useState([]);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const uploadedFile = e.target.files[0];
+    if (uploadedFile) {
+      setFile(uploadedFile);
+      readFile(uploadedFile);
+    }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
-    setFile(droppedFile);
+    if (droppedFile) {
+      setFile(droppedFile);
+      readFile(droppedFile);
+    }
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
   };
+
+  const readFiles = (file) => {
+    const p = new Promise((resolve, reject) => {
+      const filereader = new FileReader();
+      filereader.readAsArrayBuffer(file);
+  
+      filereader.onload = (e) => {
+        const bufferArray = e.target.result;
+        const wb = XLSX.read(bufferArray, {
+          type: "buffer",
+        });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(ws);
+        resolve(data);
+      };
+  
+      filereader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  
+    p.then((d) => {
+      console.log("data", d);
+      setItems(d); 
+    }).catch((error) => {
+      console.error("Error al leer el archivo:", error);
+    });
+  };
+  
 
   const handleUpload = () => {
     if (!file) {
@@ -29,33 +66,61 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
       return;
     }
 
-    const reader = new FileReader();
+    // Validar jsonData antes de enviar
+    const isValid = jsonData.every((item) => {
+      return (
+        item.id &&
+        item.description &&
+        item.inventoryTypeId &&
+        item.officeId
+      );
+    });
 
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    if (!isValid) {
+      alert("Por favor, completa todos los campos requeridos.");
+      return;
+    }
 
-      axios
-        .post("https://api", jsonData)
-        .then((response) => {
-          alert("Datos enviados exitosamente.");
-          onUploadSuccess(response.data);
-          onClose();
-        })
-        .catch((error) => {
-          alert("Error al enviar los datos.");
-        });
-    };
+    // Convertir jsonData a CSV
+    const ws = XLSX.utils.json_to_sheet(jsonData);
+    const csvData = XLSX.utils.sheet_to_csv(ws);
 
-    reader.readAsArrayBuffer(file);
+    // Crear FormData y enviar archivo CSV
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new Blob([csvData], { type: "text/csv" }),
+      "bulk_upload.csv"
+    );
+
+    // Realizar la solicitud utilizando fetch
+    fetch("https://boreal-api-hjgn.onrender.com/boreal/inventory/item/upload/csv", {
+      method: "POST",
+      body: formData,
+      headers: {
+        // No es necesario especificar Content-Type, fetch lo manejará automáticamente con FormData
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error en la solicitud: " + response.status);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert("Datos enviados exitosamente.");
+        onUploadSuccess(data);
+        onClose();
+      })
+      .catch((error) => {
+        console.error("Error al enviar los datos:", error);
+        alert("Ocurrió un error al enviar los datos. Por favor, inténtalo de nuevo.");
+      });
   };
 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Código", "Nombre", "Tipo", "Fecha", "Cantidad"],
+      ["id", "description", "typeInventoryId", "officeId"],
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
@@ -67,43 +132,65 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   }
 
   return (
-    <div className="modal">
-      <div className="modalContent">
-        <h2 className="modalTitle">Cargue masivo</h2>
-        <div className="modalBody">
+    <div className="modalOverlayBulk">
+      <div className="modalContentBulk">
+        <h2 className="modalTitleBulk">Cargue masivo</h2>
+        <div className="modalBodyBulk">
           <Button
             onClick={handleDownloadTemplate}
-            className="ButtonTemplate"
+            className="ButtonTemplateBulk"
             text="Descargar plantilla"
           />
           <div
-            className="dropzone"
+            className="dropzoneBulk"
             onClick={() => fileInputRef.current.click()}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
           >
-            <RiUploadCloudLine className="dropzoneIcon" />
-            <p className="dropzoneText">
+            <RiUploadCloudLine className="dropzoneIconBulk" />
+            <p className="dropzoneTextBulk">
               Haz clic o arrastra el archivo a esta área para cargarlo
             </p>
             <input
               type="file"
               accept=".xlsx, .xls"
               onChange={handleFileChange}
-              className="hiddenInput"
+              className="hiddenInputBulk"
               ref={fileInputRef}
             />
           </div>
+          {jsonData.length > 0 && (
+            <div className="tableContainer">
+              <Table striped className="dynamicTable">
+                <thead>
+                  <tr>
+                    {Object.keys(jsonData[0]).map((key) => (
+                      <th key={key}>{key}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {jsonData.map((item, index) => (
+                    <tr key={index}>
+                      {Object.values(item).map((value, i) => (
+                        <td key={i}>{value}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          )}
         </div>
-        <div className="modalFooter">
+        <div className="buttons">
           <button
             onClick={handleUpload}
             disabled={!file}
-            className="ModalButtonSend"
+            className="ModalButtonSendBulk"
           >
             Cargar
           </button>
-          <button onClick={onClose} className="ModalButtonClose">
+          <button onClick={onClose} className="ModalButtonCloseBulk">
             Cancelar
           </button>
         </div>

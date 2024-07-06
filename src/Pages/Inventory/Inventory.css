@@ -46,7 +46,7 @@ body {
   text-align: left;
   font-size: 2em;
   color: var(--DarkBlue);
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   margin-top: -5px;
   font-family:Verdana, Geneva, Tahoma, sans-serif;
   font-weight: lighter;
@@ -83,10 +83,25 @@ body {
   padding: 10px;
   border: 1px solid #aab7da;
   border-radius: 20px;
-  width: 155px;
+  width: 3em;
   cursor: pointer;
 }
 
+.filterSearch{
+  padding: 10px;
+  border: 1px solid #aab7da;
+  border-radius: 20px;
+  width: 12em;
+  cursor: pointer;
+}
+
+.filterOffice{
+  padding: 10px;
+  border: 1px solid #aab7da;
+  border-radius: 20px;
+  width: 12em;
+  cursor: pointer;
+}
 .filters .filter:focus {
   outline: none;
   border-color: #007bff;
@@ -157,7 +172,7 @@ body {
 }
 
 .exportButton:hover {
-  background-color: var(--MainHover); 
+ background-color: var(--MainHover);
   color: var(--MainActive);
   font-family:Verdana, Geneva, Tahoma, sans-serif;
   font-weight: lighter;

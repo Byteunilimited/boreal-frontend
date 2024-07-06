@@ -1,49 +1,98 @@
-import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useAxios } from "../../../Contexts";
+import { Modal } from "../BaseModal";
+import { ModalIconCorrect, ModalIconMistake } from "../../../assets";
 import "./AddItemModal.css";
-import axios from "axios";
-import { useForm } from "../../../hooks";
-
 
 export const AddItemModal = ({ show, onClose, onSave }) => {
+  const { privateFetch } = useAxios();
   const [error, setError] = useState(null);
-  const { serialize } = useForm();
   const [formData, setFormData] = useState({});
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [isSuccessful, setIsSuccessful] = useState(false);
+  const [offices, setOffices] = useState([]);
+  const [selectedOffice, setSelectedOffice] = useState("");
 
   useEffect(() => {
     if (show) {
       const localDate = new Date();
-      const utcOffset = localDate.getTimezoneOffset() * 60000; 
+      const utcOffset = localDate.getTimezoneOffset() * 60000;
       const adjustedDate = new Date(localDate.getTime() - utcOffset);
       setFormData((prev) => ({
         ...prev,
         Fecha: adjustedDate.toISOString().substr(0, 10),
       }));
+
+      fetchOffices();
     }
   }, [show]);
+
+  const fetchOffices = async () => {
+    try {
+      const response = await privateFetch.get("/office/all");
+      if (response.status === 200) {
+        setOffices(response.data.result.office);
+      }
+    } catch (error) {
+      setError("Ocurrió un error al obtener las oficinas.");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
-    const formData = serialize(ev.target);
-    try {
-      const apiUrl = `http://192.168.101.15:8080/boreal/inventory/create`;
-      const data = await axios.post(apiUrl, formData);
-      if (data.status === 200){
-        console.log("exito");
-      } else {
-        console.log(data);
-      }
-    } catch (error) {
-      console.log(error);
-      setError(error.message);
-    }
+  const handleOfficeChange = (e) => {
+    setSelectedOffice(e.target.value);
+    setFormData((prev) => ({ ...prev, officeId: e.target.value }));
   };
 
+  const closeModal = () => {
+    setShowConfirmationModal(false);
+    setError(null);
+    onClose();
+  };
+
+  const handleSubmit = async (ev) => {
+    ev.preventDefault();
+    try {
+      const requestData = {
+        ...formData,
+        stock: Number(formData.stock),
+      };
+  
+      const response = await fetch("https://boreal-api-hjgn.onrender.com/boreal/inventory/item/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setIsSuccessful(true);
+        setConfirmationMessage("El elemento fue añadido exitosamente.");
+        setShowConfirmationModal(true);
+        onSave(data);
+      } else if (response.status === 422) {
+        setError("El código debe tener al menos 6 caracteres.");
+        setShowConfirmationModal(true);
+      } else if (response.status === 409) {
+        setError("El código ya existe. Por favor, elija otro código.");
+        setShowConfirmationModal(true);
+      } else {
+        throw new Error("Respuesta inesperada del servidor.");
+      }
+    } catch (error) {
+      console.error("Error inesperado:", error);
+      setError("Ocurrió un error inesperado.");
+      setShowConfirmationModal(true);
+    }
+  };
+  
 
   return (
     <div className="modalOverlay">
@@ -71,15 +120,19 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
             />
           </div>
           <div className="formGroup">
-            <label>Tipo:</label>
-            <input
-              placeholder="Tipo elemento"
-              type="text"
-              name="Tipo"
+            <label>Estado:</label>
+            <select
+              name="isEnable"
               onChange={handleChange}
               required
-            />
+              className="selects"
+            >
+              <option value="">Seleccionar estado</option>
+              <option value="true">Activo</option>
+              <option value="false">Inactivo</option>
+            </select>
           </div>
+
           <div className="formGroup">
             <label>Cantidad:</label>
             <input
@@ -90,6 +143,37 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               required
             />
           </div>
+          <div className="formGroup">
+            <label>Tipo:</label>
+            <select
+              name="inventoryTypeId"
+              onChange={handleChange}
+              required
+              className="selects"
+            >
+              <option value="">Seleccionar tipo</option>
+              <option value="1">Repuesto</option>
+              <option value="2">Producto</option>
+            </select>
+          </div>
+          <div className="formGroup">
+            <label>Sucursal:</label>
+            <select
+              name="officeId"
+              value={selectedOffice}
+              onChange={handleOfficeChange}
+              required
+              className="selects"
+            >
+              <option value="">Seleccionar sucursal</option>
+              {offices.map((office) => (
+                <option key={office.id} value={office.id}>
+                  {office.description}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="formActions">
             <button type="submit">Guardar</button>
             <button type="button" onClick={onClose}>
@@ -98,14 +182,15 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
           </div>
         </form>
       </div>
+      {showConfirmationModal && (
+        <Modal
+          title={isSuccessful ? "Éxito" : "Error"}
+          text={isSuccessful ? confirmationMessage : error}
+          onClose={closeModal}
+          modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
+          showCloseButton
+        />
+      )}
     </div>
   );
-
-};
-
-
-AddItemModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  //onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
 };

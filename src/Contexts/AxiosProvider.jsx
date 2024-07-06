@@ -31,7 +31,7 @@ export function AxiosProvider({ children }) {
         });
     privateFetch.interceptors.response.use(
         response => {
-            if (response.data.text === "Unauthorized") LogOut();
+            //if (response.data.text === "Unauthorized") LogOut();
             return response;
         },
         async error => {

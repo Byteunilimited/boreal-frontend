@@ -1,4 +1,6 @@
-.modal {
+/* BulkUpload.css */
+
+.modalOverlayBulk {
   position: fixed;
   top: 0;
   left: 0;
@@ -10,100 +12,105 @@
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  }
-  
-  .modalContent {
-    z-index: 10000;
-    background: #fff;
-    padding: 20px;
-    border-radius: 1em;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 25em;
-    max-width: 100%;
-    display: flex;
-    flex-direction: column;
+}
+
+.modalContentBulk {
+  z-index: 10000;
+  background: #fff;
+  padding: 20px;
+  border-radius: 1em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 50em;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  }
-  
-  .dropzone {
-    border: 2px dashed #a2a5a7;
-    border-radius: 4px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-  }
-  
-  .dropzone:hover {
-    background: #f1f1f1;
-  }
-  
-  .dropzoneIcon {
-    font-size: 40px;
-    color: #668fbb;
-  }
-  
-  .dropzoneText {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #333;
-  }
-  
-  .hiddenInput {
-    display: none;
-  }
-  
-  .buttons{
-    display: flex;
-    flex-direction: row;
-    margin-top: 15px;
-  }
+  text-align: center;
+  align-content: center;
+  max-height: 80%;
+  overflow-y: auto;
+}
 
-  
-  .ModalButtonClose{
-    background-color: #ef6868;
-    border-radius: 1.25em;
-    border: none;
-    cursor: pointer; 
-    font-size: 1em;
-    padding: 0.5em 1.875em; 
-    height: 2.5em; 
-    margin-left: 0.625em;
-    color: var(--MainWhite);
-   }
- 
-   .ModalButtonClose:hover{
-     background-color: #eb1616;
-     color: var(--MainWhite);
-   }
- 
-   .ModalButtonSend{
-     background-color: #77df8b;
-     border-radius: 1.25em;
-     border: none;
-     cursor: pointer; 
-     font-size: 1em;
-     padding: 0.5em 1.875em; 
-     height: 2.5em; 
-     margin-left: 0.625em;
-     color: var(--MainWhite);
-    }
- 
-    .ModalButtonSend:hover{
-     background-color: #05861f;
-     color: var(--MainWhite);
-    }
- 
-    .ButtonTemplate{
-display: flex;
-align-items: center;
-justify-content: center;
-margin-bottom: 10px;
-    }
+.dropzoneBulk {
+  border: 2px dashed #a2a5a7;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 1em;
+}
 
-    .modalTitle{
-    font-weight:normal;
-    color: var(--MainBlue); 
-    }
+.dropzoneBulk:hover {
+  background: #f1f1f1;
+}
+
+.dropzoneIconBulk {
+  font-size: 40px;
+  color: #668fbb;
+
+}
+
+.dropzoneTextBulk {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.hiddenInputBulk {
+  display: none;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  margin-top: 15px;
+}
+
+.ModalButtonCloseBulk {
+  background-color: #ef6868;
+  border-radius: 1.25em;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 0.5em 1.875em;
+  height: 2.5em;
+  margin-left: 0.625em;
+  color: var(--MainWhite);
+}
+
+.ModalButtonCloseBulk:hover {
+  background-color: #eb1616;
+  color: var(--MainWhite);
+}
+
+.ModalButtonSendBulk {
+  background-color: #77df8b;
+  border-radius: 1.25em;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 0.5em 1.875em;
+  height: 2.5em;
+  margin-left: 0.625em;
+  color: var(--MainWhite);
+}
+
+.ModalButtonSendBulk:hover {
+  background-color: #05861f;
+  color: var(--MainWhite);
+}
+
+.ButtonTemplateBulk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.modalTitleBulk {
+  font-weight: normal;
+  color: var(--MainBlue);
+}
 
 
