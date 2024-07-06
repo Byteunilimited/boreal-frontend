@@ -16,18 +16,28 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const [selectedOffice, setSelectedOffice] = useState("");
 
   useEffect(() => {
+    console.log("Item recibido:", item);
     if (item) {
+      const inventoryTypeId = item.Tipo === "Producto" ? 2 : 1;
+      const officeId = item.Sucursal ? findOfficeIdByName(item.Sucursal) : "";
+
       setFormData({
-        id: item.Código,
-        description: item.Nombre,
-        stock: item.Existencias,
+        id: item.Código || "",
+        description: item.Nombre || "",
         isEnable: item.Estado === "Activo",
-        inventoryTypeId: item.inventoryType?.id || 1,
-        officeId: item.office?.id || 1,
+        stock: item.Existencias || 0,
+        inventoryTypeId: inventoryTypeId,
+        officeId: officeId,
       });
+
       fetchOffices();
     }
   }, [item]);
+  
+  const findOfficeIdByName = (name) => {
+    const office = offices.find((office) => office.description === name);
+    return office ? office.id : "";
+  };
 
   const fetchOffices = async () => {
     try {
@@ -61,7 +71,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
     ev.preventDefault();
     try {
       const apiUrl =
-        "https://boreal-api.onrender.com/boreal/inventory/item/update";
+        "https://boreal-api-hjgn.onrender.com/boreal/inventory/item/update";
       const response = await axios.put(apiUrl, {
         ...formData,
         isEnable: formData.isEnable, 

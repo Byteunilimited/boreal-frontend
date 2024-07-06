@@ -29,6 +29,8 @@ export const Inventory = () => {
   const [sucursal, setSucursal] = useState("");
   const [itemToActivate, setItemToActivate] = useState(null);
   const [itemToDeactivate, setItemToDeactivate] = useState(null);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [confirmationAction, setConfirmationAction] = useState(null);
   useEffect(() => {
     document.title = "Inventario";
   }, []);
@@ -143,23 +145,38 @@ export const Inventory = () => {
     setShowConfirmationModal(true);
   };
 
-  
+  const handleActivate = (item) => {
+    setConfirmationMessage(
+      `¿Estás seguro de que deseas activar ${item.Nombre}?`
+    );
+    setItemToActivate(item);
+    setShowConfirmationModal(true);
+    setConfirmationAction(() => () => activateItem(item));
+  };
 
-  const handleActivate = async (item) => {
+  const handleDeactivate = (item) => {
+    setConfirmationMessage(
+      `¿Estás seguro de que deseas desactivar ${item.Nombre}?`
+    );
+    setItemToDeactivate(item);
+    setShowConfirmationModal(true);
+    setConfirmationAction(() => () => deactivateItem(item));
+  };
+
+  const activateItem = async (item) => {
     try {
       const response = await privateFetch.put(
-        `https://boreal-api.onrender.com/boreal/inventory/item/enable?id=${item.Código}`
+        `https://boreal-api-hjgn.onrender.com/boreal/inventory/item/enable?id=${item.Código}`
       );
-  
+
       if (response.status === 200) {
         console.log("Ítem activado con éxito");
         const updatedData = data.map((d) =>
           d.Código === item.Código ? { ...d, Estado: "Activo" } : d
         );
-        setItemToActivate(item);
-        setShowConfirmationModal(true);
         setData(updatedData);
         setFilteredData(updatedData);
+        setShowConfirmationModal(false);
       } else {
         console.error("Ocurrió un error al activar el ítem.");
       }
@@ -168,21 +185,21 @@ export const Inventory = () => {
       alert("Hubo un error al activar el ítem.");
     }
   };
-  const handleDeactivate = async (item) => {
+
+  const deactivateItem = async (item) => {
     try {
       const response = await privateFetch.delete(
-        `https://boreal-api.onrender.com/boreal/inventory/item/disable?id=${item.Código}`
+        `https://boreal-api-hjgn.onrender.com/boreal/inventory/item/disable?id=${item.Código}`
       );
-  
+
       if (response.status === 200) {
         console.log("Ítem desactivado con éxito");
         const updatedData = data.map((d) =>
           d.Código === item.Código ? { ...d, Estado: "Inactivo" } : d
         );
-        setItemToDeactivate(item);
-        setShowConfirmationModal(true);
         setData(updatedData);
         setFilteredData(updatedData);
+        setShowConfirmationModal(false);
       } else {
         console.error("Ocurrió un error al desactivar el ítem.");
       }
@@ -208,6 +225,7 @@ export const Inventory = () => {
     setData([...data, ...newData]);
     setFilteredData([...data, ...newData]);
   };
+
   const activeItems = filteredData.filter((item) => item.Estado === "Activo");
   const inactiveItems = filteredData.filter(
     (item) => item.Estado === "Inactivo"
@@ -315,11 +333,11 @@ export const Inventory = () => {
                         )
                       )}
                     </select>
-                    
+
                     <label>Sucursal:</label>
                     <select
                       value={sucursal}
-                      onChange={handleSucursalChange} 
+                      onChange={handleSucursalChange}
                       className="filterOffice"
                     >
                       {[...new Set(data.map((item) => item.Sucursal))]
@@ -404,18 +422,8 @@ export const Inventory = () => {
             <ConfirmationModal
               show={showConfirmationModal}
               onClose={() => setShowConfirmationModal(false)}
-              onConfirm={() => {
-                if (itemToDelete) {
-                  console.log("Deleting item:", itemToDelete);
-                }
-                if (itemToActivate) {
-                  handleActivate(itemToActivate);
-                }
-                if (itemToDeactivate) {
-                  handleDeactivate(itemToDeactivate);
-                }
-                setShowConfirmationModal(false);
-              }}
+              onConfirm={confirmationAction}
+              message={confirmationMessage}
             />
           </div>
         </div>

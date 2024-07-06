@@ -62,30 +62,37 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         ...formData,
         stock: Number(formData.stock),
       };
-      const response = await privateFetch.post("/inventory/item/create", requestData);
-      if (response.status === 200) {
+  
+      const response = await fetch("https://boreal-api-hjgn.onrender.com/boreal/inventory/item/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
         setIsSuccessful(true);
         setConfirmationMessage("El elemento fue añadido exitosamente.");
         setShowConfirmationModal(true);
-        onSave(response.data);
+        onSave(data);
+      } else if (response.status === 422) {
+        setError("El código debe tener al menos 6 caracteres.");
+        setShowConfirmationModal(true);
+      } else if (response.status === 409) {
+        setError("El código ya existe. Por favor, elija otro código.");
+        setShowConfirmationModal(true);
+      } else {
+        throw new Error("Respuesta inesperada del servidor.");
       }
     } catch (error) {
-      setIsSuccessful(false);
-      if (error.response) {
-        const status = error.response.status;
-        if (status === 422) {
-          setError("El código debe tener al menos 6 caracteres.");
-        } else if (status === 409) {
-          setError("El código ya existe.");
-        } else {
-          setError("Ocurrió un error inesperado.");
-        }
-      } else {
-        setError("Ocurrió un error inesperado.");
-      }
+      console.error("Error inesperado:", error);
+      setError("Ocurrió un error inesperado.");
       setShowConfirmationModal(true);
     }
   };
+  
 
   return (
     <div className="modalOverlay">

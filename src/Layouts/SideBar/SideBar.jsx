@@ -20,11 +20,11 @@ import {
 import { useAuth } from "../../Contexts";
 
 const sideBarItems = [
-  {
+ /* {
     label: "Panel",
     path: "/boreal/panel",
     icon: <RiDashboardLine />,
-  },
+  },*/
   /*{
     label: "Informe técnico",
     path: "/boreal/informe",

@@ -32,12 +32,12 @@ export const Router = () => {
             element={<Protected element={<UserAndRols />} />}
           />
         </Route>
-        <Route path="/boreal/perfil">
+        {/* <Route path="/boreal/perfil">
           <Route
             path="/boreal/perfil"
             element={<Protected element={<Profile />} />}
           />
-        </Route>
+        </Route> */}
 
         <Route path="/boreal/inventario">
           <Route

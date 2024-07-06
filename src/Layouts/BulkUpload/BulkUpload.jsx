@@ -1,10 +1,9 @@
 import React, { useState, useRef } from "react";
 import * as XLSX from "xlsx";
-import axios from "axios";
-import { RiUploadCloudLine } from "react-icons/ri";
 import "./BulkUpload.css";
 import { Button } from "../../Components";
 import { Table } from "react-bootstrap";
+import { RiUploadCloudLine } from "react-icons/ri";
 
 export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   const [file, setFile] = useState(null);
@@ -12,60 +11,54 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    readFile(e.target.files[0]);
+    const uploadedFile = e.target.files[0];
+    if (uploadedFile) {
+      setFile(uploadedFile);
+      readFile(uploadedFile);
+    }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
-    setFile(droppedFile);
-    readFile(droppedFile);
+    if (droppedFile) {
+      setFile(droppedFile);
+      readFile(droppedFile);
+    }
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  const readFile = (file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-      const headers = jsonData[0];
-      const rows = jsonData.slice(1);
-
-      const formattedData = rows.map((row) => {
-        let formattedRow = {};
-        headers.forEach((header, index) => {
-          let key = header;
-          let value = row[index];
-          switch (key) {
-            case "estado":
-              value = value === "active" ? true : value === "inactive" ? false : value;
-              break;
-            case "descripción":
-              key = "description";
-              break;
-            case "tipo_de_inventario":
-              key = "inventoryTypeId";
-              break;
-            default:
-              break;
-          }
-          formattedRow[key] = value;
+  const readFiles = (file) => {
+    const p = new Promise((resolve, reject) => {
+      const filereader = new FileReader();
+      filereader.readAsArrayBuffer(file);
+  
+      filereader.onload = (e) => {
+        const bufferArray = e.target.result;
+        const wb = XLSX.read(bufferArray, {
+          type: "buffer",
         });
-        return formattedRow;
-      });
-
-      setJsonData(formattedData);
-    };
-    reader.readAsArrayBuffer(file);
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(ws);
+        resolve(data);
+      };
+  
+      filereader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  
+    p.then((d) => {
+      console.log("data", d);
+      setItems(d); 
+    }).catch((error) => {
+      console.error("Error al leer el archivo:", error);
+    });
   };
+  
 
   const handleUpload = () => {
     if (!file) {
@@ -73,21 +66,61 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
       return;
     }
 
-    axios
-      .post("https://boreal-api.onrender.com/boreal/inventory/item/upload/csv", jsonData)
+    // Validar jsonData antes de enviar
+    const isValid = jsonData.every((item) => {
+      return (
+        item.id &&
+        item.description &&
+        item.inventoryTypeId &&
+        item.officeId
+      );
+    });
+
+    if (!isValid) {
+      alert("Por favor, completa todos los campos requeridos.");
+      return;
+    }
+
+    // Convertir jsonData a CSV
+    const ws = XLSX.utils.json_to_sheet(jsonData);
+    const csvData = XLSX.utils.sheet_to_csv(ws);
+
+    // Crear FormData y enviar archivo CSV
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new Blob([csvData], { type: "text/csv" }),
+      "bulk_upload.csv"
+    );
+
+    // Realizar la solicitud utilizando fetch
+    fetch("https://boreal-api-hjgn.onrender.com/boreal/inventory/item/upload/csv", {
+      method: "POST",
+      body: formData,
+      headers: {
+        // No es necesario especificar Content-Type, fetch lo manejará automáticamente con FormData
+      },
+    })
       .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error en la solicitud: " + response.status);
+        }
+        return response.json();
+      })
+      .then((data) => {
         alert("Datos enviados exitosamente.");
-        onUploadSuccess(response.data);
+        onUploadSuccess(data);
         onClose();
       })
       .catch((error) => {
-        alert("Error al enviar los datos.");
+        console.error("Error al enviar los datos:", error);
+        alert("Ocurrió un error al enviar los datos. Por favor, inténtalo de nuevo.");
       });
   };
 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-      ["id", "descripción", "estado", "stock", "tipo_de_inventario"],
+      ["id", "description", "typeInventoryId", "officeId"],
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
