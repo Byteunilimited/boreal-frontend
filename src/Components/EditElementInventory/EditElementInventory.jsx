@@ -14,6 +14,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [offices, setOffices] = useState([]);
   const [selectedOffice, setSelectedOffice] = useState("");
+  const [isStockEditable, setIsStockEditable] = useState(true);
 
   useEffect(() => {
     console.log("Item recibido:", item);
@@ -27,39 +28,48 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
         isEnable: item.Estado === "Activo",
         stock: item.Existencias || 0,
         inventoryTypeId: inventoryTypeId,
-        officeId: officeId,
+        // officeId: officeId,
       });
 
-      fetchOffices();
+      // fetchOffices();
     }
   }, [item]);
   
-  const findOfficeIdByName = (name) => {
-    const office = offices.find((office) => office.description === name);
-    return office ? office.id : "";
-  };
+  // const findOfficeIdByName = (name) => {
+  //   const office = offices.find((office) => office.description === name);
+  //   return office ? office.id : "";
+  // };
 
-  const fetchOffices = async () => {
-    try {
-      const response = await privateFetch.get("/office/all");
-      if (response.status === 200) {
-        setOffices(response.data.result.office);
-      }
-    } catch (error) {
-      console.log(error);
-      setError("Ocurrió un error al obtener las oficinas.");
-    }
-  };
-
+  // const fetchOffices = async () => {
+  //   try {
+  //     const response = await privateFetch.get("/office/all");
+  //     if (response.status === 200) {
+  //       setOffices(response.data.result.office);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError("Ocurrió un error al obtener las oficinas.");
+  //   }
+  // };
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "inventoryTypeId") {
+      if (value === "2") {
+        setFormData((prev) => ({ ...prev, stock: 0 }));
+        setIsStockEditable(false);
+      } else {
+        setIsStockEditable(true);
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleOfficeChange = (e) => {
-    setSelectedOffice(e.target.value);
-    setFormData((prev) => ({ ...prev, officeId: e.target.value }));
-  };
+  // const handleOfficeChange = (e) => {
+  //   setSelectedOffice(e.target.value);
+  //   setFormData((prev) => ({ ...prev, officeId: e.target.value }));
+  // };
 
   const closeModal = () => {
     setShowConfirmationModal(false);
@@ -71,12 +81,12 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
     ev.preventDefault();
     try {
       const apiUrl =
-        "https://boreal-api-hjgn.onrender.com/boreal/inventory/item/update";
+        "https://boreal-api-xzsy.onrender.com/boreal/inventory/item/update";
       const response = await axios.put(apiUrl, {
         ...formData,
         isEnable: formData.isEnable, 
         inventoryTypeId: Number(formData.inventoryTypeId),
-        officeId: Number(formData.officeId),
+        // officeId: Number(formData.officeId),
       });
       if (response.status === 200) {
         setIsSuccessful(true);
@@ -100,7 +110,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
         <span className="close" onClick={onClose}>
           &times;
         </span>
-        <h2>Editar Ítem</h2>
+        <h2>Editar Elemento</h2>
         <form onSubmit={handleSubmit}>
           <div className="formGroup">
             <label>Código:</label>
@@ -131,16 +141,6 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
             </select>
           </div>
           <div className="formGroup">
-            <label>Cantidad:</label>
-            <input
-              type="number"
-              name="stock"
-              value={formData.stock || ""}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="formGroup">
             <label>Tipo:</label>
             <select
               name="inventoryTypeId"
@@ -155,6 +155,19 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
             </select>
           </div>
           <div className="formGroup">
+            <label>Cantidad:</label>
+            <input
+              placeholder="Cantidad existente"
+              type="number"
+              name="stock"
+              onChange={handleChange}
+              required
+              value={formData.stock || ""}
+              readOnly={!isStockEditable}
+            />
+          </div>
+          
+          {/* <div className="formGroup">
             <label>Sucursal:</label>
             <select
               value={formData.officeId}
@@ -170,7 +183,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
           <div className="formActions">
             <button type="submit">Guardar</button>
             <button type="button" onClick={onClose}>Cancelar</button>
