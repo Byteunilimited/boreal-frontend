@@ -26,6 +26,31 @@ export const Usuarios = () => {
     }, []);
     const { serialize } = useForm();
 
+    const translateFields = (items) => {
+        return items.map((item) => ({
+          Cédula: item.id,
+          Nombre: item.name,
+          Apellido: item.lastName,
+          Correo:item.email,
+          Télefono: item.phone,
+          Rol:
+            item.role.id === 1
+              ? "Admin"
+              : item.role.id === 2
+              ? "Técnico"
+              : item.role.id === 3
+              ? "Cliente"
+              : "Desconocido",
+          Estado:
+            item.isEnable === true
+              ? "Activo"
+              : item.isEnable === false
+              ? "Inactivo"
+              : "Desconocido",
+        }));
+      };
+
+      
     const getData = async () => {
         setLoading(true);
         if (MOCK_DATA === "true") {
@@ -42,7 +67,8 @@ export const Usuarios = () => {
                 axios.get(`${API_ENDPOINT}/location/city/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
                 axios.get(`${API_ENDPOINT}/role/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
             ])
-            setData(users?.result?.user ?? [])
+            const translatedData = translateFields(users?.result?.user ?? []);
+            setData(translatedData);
             setCities(cities?.result?.city ?? [])
             setRoles(roles?.result?.role ?? [])
         }
@@ -121,7 +147,7 @@ export const Usuarios = () => {
                 </Col>
             </Row>
             <DynamicTable
-                columns={["name", "email", "isEnable"]}
+                columns={["Cédula", "Nombre", "Apellido", "Correo","Télefono", "Rol", "Estado"]}
                 data={data}
                 onEdit={handleEdit}
                 onDelete={handleDelete}

@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./UserAndRols.css";
 import { Tab, Tabs } from "react-bootstrap";
 import { Usuarios } from "../../Components";
 
-
 export const UserAndRols = () => {
+  useEffect(() => {
+    document.title = "Usuarios y roles";
+  }, []);
   const [key, setKey] = useState('users');
   return (
     <>
@@ -23,6 +25,6 @@ export const UserAndRols = () => {
         </Tab>
       </Tabs>
 
-    </>
-  );
+    </>
+  );
 }

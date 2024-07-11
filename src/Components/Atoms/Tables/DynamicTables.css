@@ -74,6 +74,7 @@
 
 .deleteIcon {
   color: red;
+  font-size: 1.5em;
 }
 
 .paginationContainer {
@@ -188,10 +189,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #6e6c6c;
+  background-color: #c12222;
   transition: 0.4s;
   border-radius: 34px;
-  width: 6em;
+  width: 4em;
 }
 
 .slider:before {
@@ -207,11 +208,11 @@
 }
 
 input:checked + .slider {
-  background-color: #1ea809;
+  background-color: #1cb105;
 }
 
 input:checked + .slider:before {
-  transform: translateX(56px);
+  transform: translateX(30px);
 }
 
 .slider.round {
@@ -223,18 +224,18 @@ input:checked + .slider:before {
 }
 
 .slider::after {
-  content: 'Inactivo';
+  content: 'Off';
   color: white;
   display: block;
   position: absolute;
   transform: translate(-50%, -50%);
   top: 50%;
-  left: 65%;
+  left: 71%;
   font-size: 14px;
 }
 
 
 input:checked + .slider::after {
-  content: 'Activo';
-  left: 25%;
+  content: 'On';
+  left: 28%;
 }
