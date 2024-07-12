@@ -13,6 +13,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [offices, setOffices] = useState([]);
   const [selectedOffice, setSelectedOffice] = useState("");
+  const [isStockEditable, setIsStockEditable] = useState(true);
 
   useEffect(() => {
     if (show) {
@@ -24,31 +25,47 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         Fecha: adjustedDate.toISOString().substr(0, 10),
       }));
 
-      fetchOffices();
+      // fetchOffices();
     }
   }, [show]);
 
-  const fetchOffices = async () => {
-    try {
-      const response = await privateFetch.get("/office/all");
-      if (response.status === 200) {
-        setOffices(response.data.result.office);
-      }
-    } catch (error) {
-      setError("Ocurrió un error al obtener las oficinas.");
-    }
-  };
+  // const fetchOffices = async () => {
+  //   try {
+  //     const response = await privateFetch.get("/office/all");
+  //     if (response.status === 200) {
+  //       setOffices(response.data.result.office);
+  //     }
+  //   } catch (error) {
+  //     setError("Ocurrió un error al obtener las oficinas.");
+  //   }
+  // };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "inventoryTypeId") {
+      if (value === "2") {
+        setFormData((prev) => ({ ...prev, stock: 0 }));
+        setIsStockEditable(false);
+      } else {
+        setIsStockEditable(true);
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleOfficeChange = (e) => {
-    setSelectedOffice(e.target.value);
-    setFormData((prev) => ({ ...prev, officeId: e.target.value }));
-  };
+  // const handleOfficeChange = (e) => {
+  //   setSelectedOffice(e.target.value);
+  //   setFormData((prev) => ({ ...prev, officeId: e.target.value }));
+  // };
 
+  const handleKeyPress = (e) => {
+    const regex = /^[a-zA-Z0-9]*$/;
+    if (!regex.test(e.key)) {
+      e.preventDefault();
+    }
+  };
   const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
@@ -63,7 +80,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         stock: Number(formData.stock),
       };
   
-      const response = await fetch("https://boreal-api-hjgn.onrender.com/boreal/inventory/item/create", {
+      const response = await fetch("https://boreal-api-xzsy.onrender.com/boreal/inventory/item/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +95,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         setShowConfirmationModal(true);
         onSave(data);
       } else if (response.status === 422) {
-        setError("El código debe tener al menos 6 caracteres.");
+        setError("El código y/o nombre debe tener al menos 6 caracteres.");
         setShowConfirmationModal(true);
       } else if (response.status === 409) {
         setError("El código ya existe. Por favor, elija otro código.");
@@ -106,6 +123,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               type="text"
               name="id"
               onChange={handleChange}
+              onKeyPress={handleKeyPress}
               required
             />
           </div>
@@ -132,17 +150,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               <option value="false">Inactivo</option>
             </select>
           </div>
-
-          <div className="formGroup">
-            <label>Cantidad:</label>
-            <input
-              placeholder="Cantidad existente"
-              type="number"
-              name="stock"
-              onChange={handleChange}
-              required
-            />
-          </div>
           <div className="formGroup">
             <label>Tipo:</label>
             <select
@@ -157,6 +164,19 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
             </select>
           </div>
           <div className="formGroup">
+            <label>Cantidad:</label>
+            <input
+            placeholder="Cantidad existente"
+            type="number"
+            name="stock"
+            onChange={handleChange}
+            required
+            value={formData.stock || ""}
+            readOnly={!isStockEditable}
+          />
+          </div>
+
+          {/* <div className="formGroup">
             <label>Sucursal:</label>
             <select
               name="officeId"
@@ -172,7 +192,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
 
           <div className="formActions">
             <button type="submit">Guardar</button>

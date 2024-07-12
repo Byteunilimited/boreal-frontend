@@ -31,7 +31,8 @@ export const Usuarios = () => {
           Cédula: item.id,
           Nombre: item.name,
           Apellido: item.lastName,
-          Correo: item.email,
+          Correo:item.email,
+          Télefono: item.phone,
           Rol:
             item.role.id === 1
               ? "Admin"
@@ -67,7 +68,7 @@ export const Usuarios = () => {
             ])
             const translatedData = translateFields(users?.result?.user ?? []);
             setData(translatedData)
-            console.log(users);
+
             setCities(cities?.result?.city ?? [])
             setRoles(roles?.result?.role ?? [])
         }
@@ -146,7 +147,7 @@ export const Usuarios = () => {
                 </Col>
             </Row>
             <DynamicTable
-                columns={["Cédula", "Nombre", "Apellido", "Correo", "Rol", "Estado"]}
+                columns={["Cédula", "Nombre", "Apellido", "Correo","Télefono", "Rol", "Estado"]}
                 data={data}
                 onEdit={handleEdit}
                 onDelete={handleDelete}

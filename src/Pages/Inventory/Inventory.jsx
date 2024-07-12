@@ -60,7 +60,7 @@ export const Inventory = () => {
           : item.isEnable === false
           ? "Inactivo"
           : "Desconocido",
-      Sucursal: item.office.description,
+      // Sucursal: item.office.description,
     }));
   };
 
@@ -123,7 +123,8 @@ export const Inventory = () => {
   };
 
   const handleExport = () => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    const itemsToExport = key === "actives" ? activeItems : inactiveItems;
+    const worksheet = XLSX.utils.json_to_sheet(itemsToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Inventory");
     const excelBuffer = XLSX.write(workbook, {
@@ -166,7 +167,7 @@ export const Inventory = () => {
   const activateItem = async (item) => {
     try {
       const response = await privateFetch.put(
-        `https://boreal-api-hjgn.onrender.com/boreal/inventory/item/enable?id=${item.Código}`
+        `https://boreal-api-xzsy.onrender.com/boreal/inventory/item/enable?id=${item.Código}`
       );
 
       if (response.status === 200) {
@@ -189,7 +190,7 @@ export const Inventory = () => {
   const deactivateItem = async (item) => {
     try {
       const response = await privateFetch.delete(
-        `https://boreal-api-hjgn.onrender.com/boreal/inventory/item/disable?id=${item.Código}`
+        `https://boreal-api-xzsy.onrender.com/boreal/inventory/item/disable?id=${item.Código}`
       );
 
       if (response.status === 200) {
@@ -259,7 +260,7 @@ export const Inventory = () => {
                           </option>
                         ))}
                     </select>
-                    <label>Sucursal:</label>
+                    {/* <label>Sucursal:</label>
                     <select
                       value={sucursal}
                       onChange={handleSucursalChange}
@@ -272,7 +273,7 @@ export const Inventory = () => {
                             {Sucursal}
                           </option>
                         ))}
-                    </select>
+                    </select> */}
                     <label>Buscar:</label>
                     <input
                       type="text"
@@ -305,7 +306,6 @@ export const Inventory = () => {
                     "Nombre",
                     "Tipo",
                     "Existencias",
-                    "Sucursal",
                     "Estado",
                   ]}
                   data={activeItems}
@@ -334,7 +334,7 @@ export const Inventory = () => {
                       )}
                     </select>
 
-                    <label>Sucursal:</label>
+                    {/* <label>Sucursal:</label>
                     <select
                       value={sucursal}
                       onChange={handleSucursalChange}
@@ -347,7 +347,7 @@ export const Inventory = () => {
                             {Sucursal}
                           </option>
                         ))}
-                    </select>
+                    </select> */}
                     <label>Buscar:</label>
                     <input
                       type="text"
@@ -356,7 +356,7 @@ export const Inventory = () => {
                       placeholder="Código o Nombre"
                       className="filterSearch"
                     />
-                  </div>
+                  
                 </div>
                 <div className="actions">
                   <button onClick={handleRefresh} className="iconRefresh">
@@ -374,13 +374,13 @@ export const Inventory = () => {
                     Cargue masivo
                   </button>
                 </div>
+                </div>
                 <DynamicTable
                   columns={[
                     "Código",
                     "Nombre",
                     "Tipo",
                     "Existencias",
-                    "Sucursal",
                     "Estado",
                   ]}
                   data={inactiveItems}

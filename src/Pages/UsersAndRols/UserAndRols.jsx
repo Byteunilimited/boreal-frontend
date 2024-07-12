@@ -7,7 +7,6 @@ export const UserAndRols = () => {
   useEffect(() => {
     document.title = "Usuarios y roles";
   }, []);
-  
   const [key, setKey] = useState('users');
   return (
     <>
@@ -26,6 +25,6 @@ export const UserAndRols = () => {
         </Tab>
       </Tabs>
 
-    </>
-  );
+    </>
+  );
 }
