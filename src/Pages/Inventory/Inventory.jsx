@@ -38,10 +38,10 @@ export const Inventory = () => {
   useEffect(() => {
     getData();
   }, []);
-
+  
   useEffect(() => {
-    filterData();
-  }, [searchTerm, itemType, data]);
+    filterData(data, searchTerm, itemType, sucursal);
+  }, [searchTerm, itemType, sucursal, data]);
 
   const translateFields = (items) => {
     return items.map((item) => ({
@@ -63,7 +63,6 @@ export const Inventory = () => {
       // Sucursal: item.office.description,
     }));
   };
-
   const getData = async () => {
     try {
       const response = await privateFetch.get("/inventory/item/all");
@@ -71,13 +70,7 @@ export const Inventory = () => {
         console.log("API response data:", response.data.result.Inventory);
         const translatedData = translateFields(response.data.result.Inventory);
         setData(translatedData);
-        setFilteredData(translatedData);
-        const uniqueItemTypes = [
-          ...new Set(translatedData.map((item) => item.Tipo)),
-        ].filter(Boolean);
-        if (uniqueItemTypes.length > 0) {
-          setItemType(uniqueItemTypes[0]);
-        }
+        filterData(translatedData, searchTerm, itemType, sucursal);
       } else {
         console.error("Response does not contain data:", response);
       }
@@ -85,10 +78,10 @@ export const Inventory = () => {
       console.error("Error fetching inventory data:", error);
     }
   };
-
-  const filterData = () => {
+  
+  const filterData = (data, searchTerm, itemType, sucursal) => {
     let filtered = data;
-
+  
     if (searchTerm) {
       filtered = filtered.filter(
         (item) =>
@@ -96,16 +89,18 @@ export const Inventory = () => {
           item.Nombre.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
+  
     if (itemType) {
       filtered = filtered.filter((item) => item.Tipo === itemType);
     }
     if (sucursal) {
       filtered = filtered.filter((item) => item.Sucursal === sucursal);
     }
-
+  
     setFilteredData(filtered);
   };
+
+  
 
   const handleSucursalChange = (e) => {
     setSucursal(e.target.value);
@@ -113,15 +108,7 @@ export const Inventory = () => {
   const handleRefresh = () => {
     getData();
     setSearchTerm("");
-    const uniqueItemTypes = [...new Set(data.map((item) => item.Tipo))].filter(
-      Boolean
-    );
-    if (uniqueItemTypes.length > 0) {
-      setItemType(uniqueItemTypes[0]);
-    }
-    setFilteredData(data);
   };
-
   const handleExport = () => {
     const itemsToExport = key === "actives" ? activeItems : inactiveItems;
     const worksheet = XLSX.utils.json_to_sheet(itemsToExport);
