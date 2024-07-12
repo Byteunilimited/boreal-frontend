@@ -7,24 +7,26 @@ export const UserAndRols = () => {
   useEffect(() => {
     document.title = "Usuarios y roles";
   }, []);
-  const [key, setKey] = useState('users');
+  const [key, setKey] = useState("users");
   return (
     <>
-
-      <Tabs
-        id="controlled-tab-example"
-        activeKey={key}
-        onSelect={(k) => setKey(k)}
-        className="mb-3 mt-4"
-      >
-        <Tab eventKey="users" title="Usuarios">
-          <Usuarios />
-        </Tab>
-        <Tab eventKey="roles" title="Roles">
-          Roles
-        </Tab>
-      </Tabs>
-
-    </>
-  );
-}
+      <div className="tittle">
+        <h1>Usuarios y roles</h1>
+        <Tabs
+          id="controlled-tab-example"
+          activeKey={key}
+          onSelect={(k) => setKey(k)}
+          className="mb-3 mt-4"
+        >
+          <Tab eventKey="users" title="Usuarios">
+            <Usuarios />
+          </Tab>
+          <Tab eventKey="roles" title="Roles">
+            Roles
+          </Tab>
+        </Tabs>
+      </div>
+          
+    </>
+  );
+};

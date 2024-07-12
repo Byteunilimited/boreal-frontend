@@ -52,6 +52,16 @@ body {
   font-weight: lighter;
 }
 
+.tittle h1 {
+  text-align: left;
+  font-size: 2em;
+  color: var(--DarkBlue);
+  margin-bottom: 10px;
+  margin-top: -5px;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: lighter;
+}
+
 .filtersContainer {
   display: flex;
   flex-direction: column;

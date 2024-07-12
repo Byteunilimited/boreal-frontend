@@ -14,7 +14,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
     const uploadedFile = e.target.files[0];
     if (uploadedFile) {
       setFile(uploadedFile);
-      readFile(uploadedFile);
+      readFiles(uploadedFile);
     }
   };
 
@@ -23,7 +23,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       setFile(droppedFile);
-      readFile(droppedFile);
+      readFiles(droppedFile);
     }
   };
 
@@ -35,30 +35,27 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
     const p = new Promise((resolve, reject) => {
       const filereader = new FileReader();
       filereader.readAsArrayBuffer(file);
-  
+
       filereader.onload = (e) => {
         const bufferArray = e.target.result;
-        const wb = XLSX.read(bufferArray, {
-          type: "buffer",
-        });
+        const wb = XLSX.read(bufferArray, { type: "buffer" });
         const ws = wb.Sheets[wb.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(ws);
         resolve(data);
       };
-  
+
       filereader.onerror = (error) => {
         reject(error);
       };
     });
-  
+
     p.then((d) => {
-      console.log("data", d);
-      setItems(d); 
+      console.log("Datos leídos del archivo:", d);
+      setJsonData(d);
     }).catch((error) => {
       console.error("Error al leer el archivo:", error);
     });
   };
-  
 
   const handleUpload = () => {
     if (!file) {
@@ -68,12 +65,8 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
 
     // Validar jsonData antes de enviar
     const isValid = jsonData.every((item) => {
-      return (
-        item.id &&
-        item.description &&
-        item.inventoryTypeId &&
-        item.officeId
-      );
+      console.log("Validando item:", item);
+      return item.id && item.description && item.inventoryTypeId;
     });
 
     if (!isValid) {
@@ -94,16 +87,15 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
     );
 
     // Realizar la solicitud utilizando fetch
-    fetch("https://boreal-api-hjgn.onrender.com/boreal/inventory/item/upload/csv", {
+    fetch("https://boreal-api-xzsy.onrender.com/boreal/inventory/item/upload/csv", {
       method: "POST",
       body: formData,
-      headers: {
-        // No es necesario especificar Content-Type, fetch lo manejará automáticamente con FormData
-      },
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Error en la solicitud: " + response.status);
+          return response.text().then(text => { 
+            throw new Error(`Error en la solicitud: ${response.status} - ${text}`); 
+          });
         }
         return response.json();
       })
@@ -114,13 +106,13 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
       })
       .catch((error) => {
         console.error("Error al enviar los datos:", error);
-        alert("Ocurrió un error al enviar los datos. Por favor, inténtalo de nuevo.");
+        alert(`Ocurrió un error al enviar los datos: ${error.message}`);
       });
   };
 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-      ["id", "description", "typeInventoryId", "officeId"],
+      ["id", "description", "inventoryTypeId"],
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
@@ -160,8 +152,8 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
             />
           </div>
           {jsonData.length > 0 && (
-            <div className="tableContainer">
-              <Table striped className="dynamicTable">
+            <div className="tableContainerBulk">
+              <Table striped bordered hover className="dynamicTableBulk">
                 <thead>
                   <tr>
                     {Object.keys(jsonData[0]).map((key) => (
@@ -182,7 +174,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
             </div>
           )}
         </div>
-        <div className="buttons">
+        <div className="buttonsBulk">
           <button
             onClick={handleUpload}
             disabled={!file}

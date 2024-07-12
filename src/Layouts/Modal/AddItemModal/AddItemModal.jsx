@@ -14,6 +14,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
   const [offices, setOffices] = useState([]);
   const [selectedOffice, setSelectedOffice] = useState("");
   const [isStockEditable, setIsStockEditable] = useState(true);
+  const [showStockInput, setShowStockInput] = useState(true);
 
   useEffect(() => {
     if (show) {
@@ -47,13 +48,16 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
       if (value === "2") {
         setFormData((prev) => ({ ...prev, stock: 0 }));
         setIsStockEditable(false);
+        setShowStockInput(false); // Ocultar el campo de cantidad
       } else {
         setIsStockEditable(true);
+        setShowStockInput(true); // Mostrar el campo de cantidad
       }
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
 
   // const handleOfficeChange = (e) => {
   //   setSelectedOffice(e.target.value);
@@ -98,7 +102,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         setError("El código y/o nombre debe tener al menos 6 caracteres.");
         setShowConfirmationModal(true);
       } else if (response.status === 409) {
-        setError("El código ya existe. Por favor, elija otro código.");
+        setError("El código y/nombre ya existe. Por favor, elija otro código.");
         setShowConfirmationModal(true);
       } else {
         throw new Error("Respuesta inesperada del servidor.");
@@ -163,18 +167,20 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               <option value="2">Producto</option>
             </select>
           </div>
-          <div className="formGroup">
-            <label>Cantidad:</label>
-            <input
-            placeholder="Cantidad existente"
-            type="number"
-            name="stock"
-            onChange={handleChange}
-            required
-            value={formData.stock || ""}
-            readOnly={!isStockEditable}
-          />
-          </div>
+          {showStockInput && (
+            <div className="formGroup">
+              <label>Cantidad:</label>
+              <input
+                placeholder="Cantidad existente"
+                type="number"
+                name="stock"
+                onChange={handleChange}
+                required
+                value={formData.stock || ""}
+                readOnly={!isStockEditable}
+              />
+            </div>
+          )}
 
           {/* <div className="formGroup">
             <label>Sucursal:</label>
