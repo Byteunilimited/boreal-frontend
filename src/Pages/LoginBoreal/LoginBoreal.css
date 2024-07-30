@@ -4,6 +4,7 @@
     overflow-x: hidden; 
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     font-weight: lighter;
+    overflow: hidden;
   }
   
   .mainBackground {
@@ -15,6 +16,7 @@
     place-items: center;
     background-attachment: fixed;
     overflow: hidden; 
+    background-size: cover;
   }
   
 .mainSection {
@@ -26,6 +28,7 @@
   height: 70vh;
   width: 80vw;
   align-items: center;
+  overflow: hidden; 
 }
 
 .mainFigure {

@@ -155,10 +155,10 @@ export const DynamicTable = ({
             value={recordsPerPage}
             onChange={handleRecordsPerPageChange}
           >
-            <option value={10}>10/Page</option>
-            <option value={20}>20/Page</option>
-            <option value={30}>30/Page</option>
-            <option value={40}>40/Page</option>
+            <option value={10}>10 por pagina</option>
+            <option value={20}>20 por pagina</option>
+            <option value={40}>30 por pagina</option>
+            <option value={50}>40 por pagina</option>
           </select>
         </div>
       </div>
