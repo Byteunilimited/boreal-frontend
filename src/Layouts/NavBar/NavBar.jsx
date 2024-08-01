@@ -23,7 +23,7 @@ export const NavBar = ({ userName }) => {
       {menuOpen && (
         <div className="dropdownMenu">
           <ul>
-            <li><Link to={"/boreal/perfil"}>Perfil</Link></li>
+            {/* <li><Link to={"/boreal/perfil"}>Perfil</Link></li> */}
             <li onClick={LogOut}>Cerrar sesión</li>
           </ul>
         </div>

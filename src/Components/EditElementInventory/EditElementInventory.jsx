@@ -15,6 +15,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const [offices, setOffices] = useState([]);
   const [selectedOffice, setSelectedOffice] = useState("");
   const [isStockEditable, setIsStockEditable] = useState(true);
+  const [showStockInput, setShowStockInput] = useState(true);
 
   useEffect(() => {
     console.log("Item recibido:", item);
@@ -30,6 +31,11 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
         inventoryTypeId: inventoryTypeId,
         // officeId: officeId,
       });
+      if (item.Tipo === "Producto") {
+        setShowStockInput(false); 
+      } else {
+        setShowStockInput(true);
+      }
 
       // fetchOffices();
     }
@@ -58,8 +64,10 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
       if (value === "2") {
         setFormData((prev) => ({ ...prev, stock: 0 }));
         setIsStockEditable(false);
+        setShowStockInput(false); // Ocultar el campo de cantidad
       } else {
         setIsStockEditable(true);
+        setShowStockInput(true); // Mostrar el campo de cantidad
       }
     }
 
@@ -154,19 +162,21 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
               <option value="2">Producto</option>
             </select>
           </div>
-          <div className="formGroup">
-            <label>Cantidad:</label>
-            <input
-              placeholder="Cantidad existente"
-              type="number"
-              name="stock"
-              onChange={handleChange}
-              required
-              value={formData.stock || ""}
-              readOnly={!isStockEditable}
-            />
-          </div>
-          
+
+           {showStockInput && (
+            <div className="formGroup">
+              <label>Cantidad:</label>
+              <input
+                placeholder="Cantidad existente"
+                type="number"
+                name="stock"
+                onChange={handleChange}
+                required
+                value={formData.stock || ""}
+                readOnly={!isStockEditable}
+              />
+            </div>
+          )}
           {/* <div className="formGroup">
             <label>Sucursal:</label>
             <select

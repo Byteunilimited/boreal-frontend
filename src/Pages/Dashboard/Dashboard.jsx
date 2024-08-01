@@ -22,7 +22,7 @@ export const Dashboard = () => {
     <Row className='my-3'>
         <Col sm>
           <Alert>
-            Hola <strong>{user?.nombre}</strong> ,bienvenido de nuevo a Boreal
+           ¡Bienvenido de nuevo a Boreal!
           </Alert>
         </Col>
       </Row>

@@ -11,7 +11,7 @@ import { useAxios } from "../../Contexts";
 import { createSearchParams } from "react-router-dom";
 import { Tab, Tabs } from "react-bootstrap";
 
-export const Inventory = () => {
+export const Offices = () => {
   const [key, setKey] = useState("actives");
   const { privateFetch } = useAxios();
   const [dateTo, setDateTo] = useState(new Date().toISOString().split("T")[0]);
@@ -228,30 +228,10 @@ console.log("Inactive items:", inactiveItems);
       <div>
         <div>
           <div className="inventory">
-            <h1>Inventario</h1>
-            <Tabs
-              id="controlled-tab-example"
-              activeKey={key}
-              onSelect={(k) => setKey(k)}
-              className="mb-3 mt-4"
-            >
-              <Tab eventKey="actives" title="Activos">
+            <h1>Sucursales</h1>
                 <div className="filtersContainer">
                   <div className="filters">
-                    <label>Tipo:</label>
-                    <select
-                      value={itemType}
-                      onChange={(e) => setItemType(e.target.value)}
-                      className="filter"
-                    >
-                      {[...new Set(data.map((item) => item.Tipo))]
-                        .filter(Boolean)
-                        .map((Tipo, index) => (
-                          <option key={index} value={Tipo}>
-                            {Tipo}
-                          </option>
-                        ))}
-                    </select>
+
                     {/* <label>Sucursal:</label>
                     <select
                       value={sucursal}
@@ -283,12 +263,6 @@ console.log("Inactive items:", inactiveItems);
                     <button onClick={handleExport} className="exportButton">
                       <RiFileExcel2Line className="ExportIcon" />
                       Exportar
-                    </button>
-                    <button
-                      onClick={() => setShowBulkUploadModal(true)}
-                      className="exportButton"
-                    >
-                      Cargue masivo
                     </button>
                   </div>
                 </div>
@@ -302,78 +276,6 @@ console.log("Inactive items:", inactiveItems);
                   hideDeleteIcon={true}
                 />
 
-              </Tab>
-              <Tab eventKey="Inactives" title="Inactivos">
-                <div className="filtersContainer">
-                  <div className="filters">
-                    <label>Tipo:</label>
-                    <select
-                      value={itemType}
-                      onChange={(e) => setItemType(e.target.value)}
-                      className="filter"
-                    >
-                      {[...new Set(data.map((item) => item.Tipo))].map(
-                        (Tipo, index) => (
-                          <option key={index} value={Tipo}>
-                            {Tipo}
-                          </option>
-                        )
-                      )}
-                    </select>
-
-                    {/* <label>Sucursal:</label>
-                    <select
-                      value={sucursal}
-                      onChange={handleSucursalChange}
-                      className="filterOffice"
-                    >
-                      {[...new Set(data.map((item) => item.Sucursal))]
-                        .filter(Boolean)
-                        .map((Sucursal, index) => (
-                          <option key={index} value={Sucursal}>
-                            {Sucursal}
-                          </option>
-                        ))}
-                    </select> */}
-                    <label>Buscar:</label>
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      placeholder="Código o Nombre"
-                      className="filterSearch"
-                    />
-
-                  </div>
-                  <div className="actions">
-                    <button onClick={handleRefresh} className="iconRefresh">
-                      <FaSyncAlt />
-                    </button>
-                    <Button onClick={() => setShowModal(true)} text="Añadir" />
-                    <button onClick={handleExport} className="exportButton">
-                      <RiFileExcel2Line className="ExportIcon" />
-                      Exportar
-                    </button>
-                    <button
-                      onClick={() => setShowBulkUploadModal(true)}
-                      className="exportButton"
-                    >
-                      Cargue masivo
-                    </button>
-                  </div>
-                </div>
-                <DynamicTable
-                  columns={["Código", "Nombre", "Tipo", "Existencias", "Estado"]}
-                  data={inactiveItems}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onFilter={handleFilter}
-                  onToggle={handleActivate}
-                  hideDeleteIcon={true}
-                />
-              </Tab>
-              <Tab eventKey="actives" title="Asignaciones"></Tab>
-            </Tabs>
             {showModal && (
               <AddItemModal
                 show={showModal}

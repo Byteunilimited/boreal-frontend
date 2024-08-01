@@ -16,6 +16,8 @@ import {
   RiDashboardHorizontalLine,
   RiFileCopy2Line,
   RiDashboardLine,
+  RiBuilding2Line,
+  RiTableLine
 } from "react-icons/ri";
 import { useAuth } from "../../Contexts";
 
@@ -61,7 +63,9 @@ const sideBarItems = [
       //   path: "/boreal/procedimientos",
       //   icon: <RiAlignItemHorizontalCenterLine />,
       // },
-      // { label: "Equipos", path: "/boreal/equipos", icon: <RiCaravanLine /> },
+      { label: "Sucursales", path: "/boreal/sucursales", icon: <RiBuilding2Line /> },
+      { label: "Empresas", path: "/boreal/empresas", icon: <RiTableLine /> },
+     { label: "Equipos", path: "/boreal/equipos", icon: <RiCaravanLine /> },
       // {
       //   label: "Bodegas",
       //   path: "/boreal/bodegas",

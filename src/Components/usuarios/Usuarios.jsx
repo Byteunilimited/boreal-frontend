@@ -50,7 +50,6 @@ export const Usuarios = () => {
         }));
       };
 
-      
     const getData = async () => {
         setLoading(true);
         if (MOCK_DATA === "true") {
@@ -68,13 +67,14 @@ export const Usuarios = () => {
                 axios.get(`${API_ENDPOINT}/role/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
             ])
             const translatedData = translateFields(users?.result?.user ?? []);
-            setData(translatedData);
+            setData(translatedData)
+
             setCities(cities?.result?.city ?? [])
             setRoles(roles?.result?.role ?? [])
         }
         setLoading(false);
     }
-   
+
 
     useEffect(() => {
         //filterData();

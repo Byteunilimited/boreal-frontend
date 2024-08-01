@@ -80,6 +80,12 @@
 
 .inputLoginContainer {
   position: relative;
+  width: 24em; 
+}
+
+.inputLoginContainer input {
+  width: 100%;
+  box-sizing: border-box; 
 }
 
 .passwordToggle {
