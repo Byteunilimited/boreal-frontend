@@ -89,7 +89,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
     ev.preventDefault();
     try {
       const apiUrl =
-        "https://boreal-api-xzsy.onrender.com/boreal/inventory/item/update";
+        `${API_ENDPOINT}/inventory/item/update`;
       const response = await axios.put(apiUrl, {
         ...formData,
         isEnable: formData.isEnable, 
@@ -152,7 +152,8 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
             <label>Tipo:</label>
             <select
               name="inventoryTypeId"
-              value={formData.inventoryTypeId}
+              value={formData.inventoryTypeId || ""}
+              disabled
               onChange={handleChange}
               required
               className="selects"

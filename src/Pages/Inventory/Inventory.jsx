@@ -10,9 +10,10 @@ import { BulkUpload } from "../../Layouts/BulkUpload/BulkUpload";
 import { useAxios } from "../../Contexts";
 import { createSearchParams } from "react-router-dom";
 import { Tab, Tabs } from "react-bootstrap";
-
+import { ModalIconCorrect, ModalIconMistake } from "../../assets";
 export const Inventory = () => {
   const [key, setKey] = useState("actives");
+  const [error, setError] = useState(null);
   const { privateFetch } = useAxios();
   const [dateTo, setDateTo] = useState(new Date().toISOString().split("T")[0]);
   const [data, setData] = useState([]);
@@ -31,9 +32,13 @@ export const Inventory = () => {
   const [itemToDeactivate, setItemToDeactivate] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [confirmationAction, setConfirmationAction] = useState(null);
+  const [isSuccessful, setIsSuccessful] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  
   useEffect(() => {
     document.title = "Inventario";
   }, []);
+
 
   useEffect(() => {
     getData();
@@ -156,11 +161,13 @@ export const Inventory = () => {
   const activateItem = async (item) => {
     try {
       const response = await privateFetch.put(
-        `https://boreal-api-xzsy.onrender.com/boreal/inventory/item/enable?id=${item.Código}`
+        `${API_ENDPOINT}/inventory/item/enable?id=${item.Código}`
       );
 
       if (response.status === 200) {
-        console.log("Ítem activado con éxito");
+        setIsSuccessful(true);
+          setConfirmationMessage("El elemento fue activado exitosamente.");
+          setShowConfirmationModal(true);
         const updatedData = data.map((d) =>
           d.Código === item.Código ? { ...d, Estado: "Activo" } : d
         );
@@ -168,22 +175,27 @@ export const Inventory = () => {
         setFilteredData(updatedData);
         setShowConfirmationModal(false);
       } else {
-        console.error("Ocurrió un error al activar el ítem.");
+        setIsSuccessful(false);
+        setConfirmationMessage("Ocurrió un error al activar el ítem.");
+        setShowConfirmationModal(true);
       }
     } catch (error) {
-      console.error("Error al activar el ítem:", error);
-      alert("Hubo un error al activar el ítem.");
+      setIsSuccessful(false);
+      setConfirmationMessage("Hubo un error al activar el ítem.");
+      setShowConfirmationModal(true);
     }
   };
 
   const deactivateItem = async (item) => {
     try {
       const response = await privateFetch.delete(
-        `https://boreal-api-xzsy.onrender.com/boreal/inventory/item/disable?id=${item.Código}`
+        `${API_ENDPOINT}/inventory/item/disable?id=${item.Código}`
       );
 
       if (response.status === 200) {
-        console.log("Ítem desactivado con éxito");
+        setIsSuccessful(true);
+          setConfirmationMessage("El elemento fue desactivado exitosamente.");
+          setShowConfirmationModal(true);
         const updatedData = data.map((d) =>
           d.Código === item.Código ? { ...d, Estado: "Inactivo" } : d
         );
@@ -191,11 +203,14 @@ export const Inventory = () => {
         setFilteredData(updatedData);
         setShowConfirmationModal(false);
       } else {
-        console.error("Ocurrió un error al desactivar el ítem.");
+        setIsSuccessful(false);
+        error("Ocurrió un error al desactivar el ítem.");
+        setShowConfirmationModal(true);
       }
     } catch (error) {
-      console.error("Error al desactivar el ítem:", error);
-      alert("Hubo un error al desactivar el ítem.");
+      setIsSuccessful(false);
+      error("Hubo un error al desactivar el ítem.");
+      setShowConfirmationModal(true);
     }
   };
 
@@ -221,8 +236,8 @@ export const Inventory = () => {
     (item) => item.Estado === "Inactivo"
   );
 
-console.log("Active items:", activeItems); 
-console.log("Inactive items:", inactiveItems); 
+  console.log("Active items:", activeItems);
+  console.log("Inactive items:", inactiveItems);
   return (
     <>
       <div>
@@ -407,6 +422,15 @@ console.log("Inactive items:", inactiveItems);
               onConfirm={confirmationAction}
               message={confirmationMessage}
             />
+            {showConfirmationModal && (
+              <Modal
+                title={isSuccessful ? "Éxito" : "Error"}
+                text={isSuccessful ? confirmationMessage : error}
+                onClose={()=> setShowConfirmationModal(false)}
+                modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
+                showCloseButton
+              />
+            )}
           </div>
         </div>
       </div>

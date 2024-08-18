@@ -84,7 +84,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         stock: Number(formData.stock),
       };
   
-      const response = await fetch("https://boreal-api-xzsy.onrender.com/boreal/inventory/item/create", {
+      const response = await fetch(`${API_ENDPOINT}/inventory/item/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
