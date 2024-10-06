@@ -4,6 +4,7 @@ import "./BulkUpload.css";
 import { Button } from "../../Components";
 import { Table } from "react-bootstrap";
 import { RiUploadCloudLine } from "react-icons/ri";
+import { API_ENDPOINT } from "../../util";
 
 export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   const [file, setFile] = useState(null);
@@ -13,10 +14,16 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
     if (uploadedFile) {
+      const validFileType = uploadedFile.type === 'text/csv' || uploadedFile.name.endsWith('.csv');
+      if (!validFileType) {
+        alert('Por favor, selecciona un archivo CSV válido.');
+        return;
+      }
       setFile(uploadedFile);
       readFiles(uploadedFile);
     }
   };
+
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -57,71 +64,86 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
     });
   };
 
-  const handleUpload = () => {
-    if (!file) {
-      alert("Por favor, selecciona un archivo.");
-      return;
-    }
 
-    // Validar jsonData antes de enviar
-    const isValid = jsonData.every((item) => {
-      console.log("Validando item:", item);
-      return item.id && item.description && item.inventoryTypeId;
-    });
 
-    if (!isValid) {
-      alert("Por favor, completa todos los campos requeridos.");
-      return;
-    }
+const handleDownloadTemplate = () => {
+  // Crear los datos para la plantilla con solo id y description
+  const templateData = [
+    ["id", "description"], // Solo las columnas necesarias
+  ];
 
-    // Convertir jsonData a CSV
-    const ws = XLSX.utils.json_to_sheet(jsonData);
-    const csvData = XLSX.utils.sheet_to_csv(ws);
+  // Convertir los datos a CSV
+  const csvContent = templateData.map(e => e.join(",")).join("\n");
 
-    // Crear FormData y enviar archivo CSV
-    const formData = new FormData();
-    formData.append(
-      "file",
-      new Blob([csvData], { type: "text/csv" }),
-      "bulk_upload.csv"
-    );
+  // Crear un blob con el contenido CSV
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-    // Realizar la solicitud utilizando fetch
-    fetch("https://boreal-api-xzsy.onrender.com/boreal/inventory/item/upload/csv", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.text().then(text => { 
-            throw new Error(`Error en la solicitud: ${response.status} - ${text}`); 
-          });
-        }
-        return response.json();
-      })
-      .then((data) => {
-        alert("Datos enviados exitosamente.");
-        onUploadSuccess(data);
-        onClose();
-      })
-      .catch((error) => {
-        console.error("Error al enviar los datos:", error);
-        alert(`Ocurrió un error al enviar los datos: ${error.message}`);
-      });
-  };
-
-  const handleDownloadTemplate = () => {
-    const ws = XLSX.utils.aoa_to_sheet([
-      ["id", "description", "inventoryTypeId"],
-    ]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
-    XLSX.writeFile(wb, "Cargue masivo.xlsx");
-  };
-
-  if (!show) {
-    return null;
+  // Crear un enlace para descargar el archivo CSV
+  const link = document.createElement("a");
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "Cargue_masivo.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
+};
+
+// Actualización de la validación para comprobar solo los campos 'id' y 'description'
+const handleUpload = () => {
+  if (!file) {
+    alert("Por favor, selecciona un archivo.");
+    return;
+  }
+
+  // Validar jsonData antes de enviar
+  const isValid = jsonData.every((item) => {
+    console.log("Validando item:", item);
+    return item.id && item.description; // Validación solo para 'id' y 'description'
+  });
+
+  if (!isValid) {
+    alert("Por favor, completa todos los campos requeridos.");
+    return;
+  }
+
+  // Convertir jsonData a CSV
+  const ws = XLSX.utils.json_to_sheet(jsonData);
+  const csvData = XLSX.utils.sheet_to_csv(ws);
+
+  // Crear FormData y enviar archivo CSV
+  const formData = new FormData();
+  formData.append(
+    "file",
+    new Blob([csvData], { type: "text/csv" }),
+    "bulk_upload.csv"
+  );
+
+  fetch(`${API_ENDPOINT}/inventory/item/upload/csv`, {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        return response.text().then(text => {
+          throw new Error(`Error en la solicitud: ${response.status} - ${text}`);
+        });
+      }
+      return response.json();
+    })
+    .then((data) => {
+      alert("Datos enviados exitosamente.");
+      onUploadSuccess(data);
+      onClose();
+    })
+    .catch((error) => {
+      console.error("Error al enviar los datos:", error);
+      alert(`Ocurrió un error al enviar los datos: ${error.message}`);
+    });
+};
+
+  
 
   return (
     <div className="modalOverlayBulk">
@@ -145,7 +167,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
             </p>
             <input
               type="file"
-              accept=".xlsx, .xls"
+              accept=".csv"
               onChange={handleFileChange}
               className="hiddenInputBulk"
               ref={fileInputRef}

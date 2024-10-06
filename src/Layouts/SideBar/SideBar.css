@@ -9,6 +9,8 @@
   left: 0;
   overflow-y: hidden;
   transition: box-shadow 0.3s;
+  border-top-right-radius: 1em;
+  border-bottom-right-radius: 1em;
 }
 
 .sidebar h1 {
@@ -63,7 +65,7 @@
 }
 
 .submenu {
-  max-height: 350px; 
+  max-height: 330px; 
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--MainHover) var(--DarkBlue);

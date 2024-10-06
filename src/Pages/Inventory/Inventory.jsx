@@ -11,6 +11,8 @@ import { useAxios } from "../../Contexts";
 import { createSearchParams } from "react-router-dom";
 import { Tab, Tabs } from "react-bootstrap";
 import { ModalIconCorrect, ModalIconMistake } from "../../assets";
+import { API_ENDPOINT } from "../../util";
+
 export const Inventory = () => {
   const [key, setKey] = useState("actives");
   const [error, setError] = useState(null);
@@ -23,8 +25,7 @@ export const Inventory = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [itemToEdit, setItemToEdit] = useState(null);
-  const [showEditElementInventory, setShowEditElementInventory] =
-    useState(false);
+  const [showEditElementInventory, setShowEditElementInventory] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [sucursal, setSucursal] = useState("");
@@ -34,19 +35,6 @@ export const Inventory = () => {
   const [confirmationAction, setConfirmationAction] = useState(null);
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
-  
-  useEffect(() => {
-    document.title = "Inventario";
-  }, []);
-
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  useEffect(() => {
-    filterData(data, searchTerm, itemType);
-  }, [data, searchTerm, itemType]);
 
   const translateFields = (items) => {
     return items.map((item) => ({
@@ -68,13 +56,14 @@ export const Inventory = () => {
       // Sucursal: item.office.description,
     }));
   };
+
   const getData = async () => {
     try {
       const response = await privateFetch.get("/inventory/item/all");
       if (response && response.data) {
         console.log("API response data:", response.data.result.Inventory);
         const translatedData = translateFields(response.data.result.Inventory);
-        console.log("Translated data:", translatedData); // Añadir este log
+        console.log("Translated data:", translatedData);
         setData(translatedData);
         filterData(translatedData, searchTerm, itemType, sucursal);
       } else {
@@ -103,19 +92,18 @@ export const Inventory = () => {
       filtered = filtered.filter((item) => item.Sucursal === sucursal);
     }
 
-    console.log("Filtered data:", filtered);
-
     setFilteredData(filtered);
   };
-
 
   const handleSucursalChange = (e) => {
     setSucursal(e.target.value);
   };
+
   const handleRefresh = () => {
     getData();
     setSearchTerm("");
   };
+
   const handleExport = () => {
     const itemsToExport = key === "actives" ? activeItems : inactiveItems;
     const worksheet = XLSX.utils.json_to_sheet(itemsToExport);
@@ -166,8 +154,8 @@ export const Inventory = () => {
 
       if (response.status === 200) {
         setIsSuccessful(true);
-          setConfirmationMessage("El elemento fue activado exitosamente.");
-          setShowConfirmationModal(true);
+        setConfirmationMessage("El elemento fue activado exitosamente.");
+        setShowConfirmationModal(true);
         const updatedData = data.map((d) =>
           d.Código === item.Código ? { ...d, Estado: "Activo" } : d
         );
@@ -194,8 +182,8 @@ export const Inventory = () => {
 
       if (response.status === 200) {
         setIsSuccessful(true);
-          setConfirmationMessage("El elemento fue desactivado exitosamente.");
-          setShowConfirmationModal(true);
+        setConfirmationMessage("El elemento fue desactivado exitosamente.");
+        setShowConfirmationModal(true);
         const updatedData = data.map((d) =>
           d.Código === item.Código ? { ...d, Estado: "Inactivo" } : d
         );
@@ -217,11 +205,13 @@ export const Inventory = () => {
   const handleFilter = (value, column) => {
     setSearchTerm((prev) => ({ ...prev, [column]: value }));
   };
+
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
 
   const handleSave = (newItem) => {
+    console.log(newItem)
     setData([...data, newItem]);
     setFilteredData([...data, newItem]);
   };
@@ -236,8 +226,21 @@ export const Inventory = () => {
     (item) => item.Estado === "Inactivo"
   );
 
-  console.log("Active items:", activeItems);
-  console.log("Inactive items:", inactiveItems);
+  useEffect(() => {
+    document.title = "Inventario";
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      getData();
+    }, 1000);
+
+  }, [handleSave]);
+
+  useEffect(() => {
+    filterData(data, searchTerm, itemType);
+  }, [data, searchTerm, itemType]);
+
   return (
     <>
       <div>
@@ -248,8 +251,7 @@ export const Inventory = () => {
               id="controlled-tab-example"
               activeKey={key}
               onSelect={(k) => setKey(k)}
-              className="mb-3 mt-4"
-            >
+              className="mb-3 mt-4">
               <Tab eventKey="actives" title="Activos">
                 <div className="filtersContainer">
                   <div className="filters">
@@ -267,20 +269,6 @@ export const Inventory = () => {
                           </option>
                         ))}
                     </select>
-                    {/* <label>Sucursal:</label>
-                    <select
-                      value={sucursal}
-                      onChange={handleSucursalChange}
-                      className="filterOffice"
-                    >
-                      {[...new Set(data.map((item) => item.Sucursal))]
-                        .filter(Boolean)
-                        .map((Sucursal, index) => (
-                          <option key={index} value={Sucursal}>
-                            {Sucursal}
-                          </option>
-                        ))}
-                    </select> */}
                     <label>Buscar:</label>
                     <input
                       type="text"
@@ -301,8 +289,7 @@ export const Inventory = () => {
                     </button>
                     <button
                       onClick={() => setShowBulkUploadModal(true)}
-                      className="exportButton"
-                    >
+                      className="exportButton">
                       Cargue masivo
                     </button>
                   </div>
@@ -426,7 +413,7 @@ export const Inventory = () => {
               <Modal
                 title={isSuccessful ? "Éxito" : "Error"}
                 text={isSuccessful ? confirmationMessage : error}
-                onClose={()=> setShowConfirmationModal(false)}
+                onClose={() => setShowConfirmationModal(false)}
                 modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
                 showCloseButton
               />

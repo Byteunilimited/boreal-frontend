@@ -1,40 +1,41 @@
 .navBarContainer {
   display: flex;
   align-items: center;
-  width: 100%; 
+  width: 100%;
+  padding: 10px 20px;
+  position: relative; /* Asegura que el dropdown esté correctamente posicionado */
 }
 
 .profileContainer {
   display: flex;
-  align-items: end;
+  align-items: center;
   cursor: pointer;
-  position: relative;
-  text-align: end;
-  margin-left: auto; 
+  margin-left: auto;
 }
 
 .profileIcon {
   font-size: 2em;
-  border-radius: 50%;
   color: var(--MainBlue);
-  text-align: end;
+  margin-right: 0.5em;
 }
 
 .userName {
-  margin-left: 10px;
   font-size: 16px;
   font-weight: bold;
+  color: white;
 }
 
 .dropdownMenu {
   position: absolute;
-  top: 50px;
+  top: 80%; 
   right: 0;
   background-color: white;
   border: 1px solid #ccc;
-  border-radius: 1em;
+  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  z-index: 1000; 
+  margin-top: 10px;
+  width: 200px;
 }
 
 .dropdownMenu ul {
@@ -44,10 +45,25 @@
 }
 
 .dropdownMenu li {
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .dropdownMenu li:hover {
   background-color: #f0f0f0;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+}
+
+.menuIcon {
+  margin-right: 10px;
+  font-size: 1.2em;
 }

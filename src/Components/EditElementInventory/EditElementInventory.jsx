@@ -5,6 +5,8 @@ import "./EditElementInventory.css";
 import { useAxios } from "../../Contexts";
 import { Modal } from "../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../assets";
+import { API_ENDPOINT } from "../../util";
+
 export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const { privateFetch } = useAxios();
   const [formData, setFormData] = useState({});

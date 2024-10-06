@@ -4,73 +4,27 @@ import { ChevronDown } from "react-feather";
 import "./SideBar.css";
 import { BorealLogo } from "../../assets";
 import {
-  RiListCheck2,
-  RiFileListLine,
-  RiLoginBoxLine,
-  RiAdminLine,
-  RiParentLine,
-  RiTable2,
-  RiRoadMapLine,
-  RiAlignItemHorizontalCenterLine,
-  RiCaravanLine,
-  RiDashboardHorizontalLine,
-  RiFileCopy2Line,
-  RiDashboardLine,
-  RiBuilding2Line,
-  RiTableLine
+  RiListCheck2, RiFileListLine, RiLoginBoxLine, RiAdminLine, RiParentLine, RiTable2, RiRoadMapLine, RiAlignItemHorizontalCenterLine,
+  RiCaravanLine, RiDashboardHorizontalLine, RiFileCopy2Line, RiDashboardLine, RiBuilding2Line, RiTableLine, RiAddCircleLine
 } from "react-icons/ri";
 import { useAuth } from "../../Contexts";
 
 const sideBarItems = [
- /* {
-    label: "Panel",
-    path: "/boreal/panel",
-    icon: <RiDashboardLine />,
-  },*/
-  /*{
-    label: "Informe técnico",
-    path: "/boreal/informe",
-    icon: <RiFileListLine />,
-  },*/
-  /*{
-    label: "Facturas",
-    path: "/boreal/facturas",
-    icon: <RiFileCopy2Line />,
-  },*/
+  /*{ label: "Informe técnico", path: "/boreal/informe", icon: <RiFileListLine /> },
+  { label: "Facturas", path: "/boreal/facturas", icon: <RiFileCopy2Line /> },*/
   {
-    label: "Administrativo",
-    path: "",
-    icon: <RiListCheck2 />,
+    label: "Administrativo", path: "", icon: <RiListCheck2 />,
     submenu: [
-      {
-        label: "Usuarios y roles",
-        path: "/boreal/usuariosYRoles",
-        icon: <RiAdminLine />,
-      },
-      /*{ label: "Clientes", path: "/boreal/clientes", icon: <RiParentLine /> },*/
-      {
-        label: "Inventario",
-        path: "/boreal/inventario",
-        icon: <RiTable2 />,
-      },
-      // {
-      //   label: "Departamentos y ciudades",
-      //   path: "/boreal/departamentosYCiudades",
-      //   icon: <RiRoadMapLine />,
-      // },
-      // {
-      //   label: "Procedimientos",
-      //   path: "/boreal/procedimientos",
-      //   icon: <RiAlignItemHorizontalCenterLine />,
-      // },
+
+      { label: "Usuarios y roles", path: "/boreal/usuariosYRoles", icon: <RiAdminLine /> },
+     /* { label: "Clientes", path: "/boreal/clientes", icon: <RiParentLine /> },*/
+      { label: "Inventario", path: "/boreal/inventario", icon: <RiTable2 /> },
+      { label: "Departamentos y ciudades", path: "/boreal/departamentosYCiudades", icon: <RiRoadMapLine /> },
+    /*  { label: "Procedimientos", path: "/boreal/procedimientos", icon: <RiAlignItemHorizontalCenterLine /> },*/
       { label: "Sucursales", path: "/boreal/sucursales", icon: <RiBuilding2Line /> },
-      { label: "Empresas", path: "/boreal/empresas", icon: <RiTableLine /> },
-     { label: "Equipos", path: "/boreal/equipos", icon: <RiCaravanLine /> },
-      // {
-      //   label: "Bodegas",
-      //   path: "/boreal/bodegas",
-      //   icon: <RiDashboardHorizontalLine />,
-      // },
+      { label: "Propietarios", path: "/boreal/propietarios", icon: <RiTableLine /> },
+     /* { label: "Equipos", path: "/boreal/equipos", icon: <RiCaravanLine /> },*/
+      { label: "Bodegas", path: "/boreal/bodegas", icon: <RiDashboardHorizontalLine /> },
     ],
   },
 ];

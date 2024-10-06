@@ -99,43 +99,51 @@ export const DynamicTable = ({
           </tr>
         </thead>
         <tbody>
-          {data
-            .slice(pagesVisited, pagesVisited + recordsPerPage)
-            .map((row, rowIndex) => (
-              <tr key={rowIndex} className="tableRow">
-                {columns.map((column, colIndex) => (
-                  <td key={colIndex}>
-                    {column === "Estado" && showToggle ? (
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          checked={row[column] === "Activo"}
-                          onChange={() => onToggle(row)}
-                        />
-                        <span className="slider round"></span>
-                      </label>
-                    ) : (
-                      row[column]
-                    )}
-                  </td>
-                ))}
-                {showToggle && (
-                  <td>
-                    <RiEdit2Line
-                      className="actionIcon editIcon"
-                      onClick={() => onEdit(row)}
-                    />
-                    {!hideDeleteIcon && (
-                      <RiCloseFill
-                        className="actionIcon deleteIcon"
-                        onClick={() => onDelete(row)}
-                      />
-                    )}
-                  </td>
-                )}
-              </tr>
-            ))}
-        </tbody>
+  {Array.isArray(data) && data.length === 0 ? (
+    <tr>
+      <td colSpan={columns.length + (showToggle ? 1 : 0)} className="text-center">
+        No hay información para mostrar
+      </td>
+    </tr>
+  ) : (
+    data
+      .slice(pagesVisited, pagesVisited + recordsPerPage)
+      .map((row, rowIndex) => (
+        <tr key={rowIndex} className="tableRow">
+          {columns.map((column, colIndex) => (
+            <td key={colIndex}>
+              {column === "Estado" && showToggle ? (
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={row[column] === "Activo"}
+                    onChange={() => onToggle(row)}
+                  />
+                  <span className="slider round"></span>
+                </label>
+              ) : (
+                row[column]
+              )}
+            </td>
+          ))}
+          {showToggle && (
+            <td>
+              <RiEdit2Line
+                className="actionIcon editIcon"
+                onClick={() => onEdit(row)}
+              />
+              {!hideDeleteIcon && (
+                <RiCloseFill
+                  className="actionIcon deleteIcon"
+                  onClick={() => onDelete(row)}
+                />
+              )}
+            </td>
+          )}
+        </tr>
+      ))
+  )}
+</tbody>
       </Table>
       <div className="paginationContainer">
         <Pagination className="border-radius.sm">
@@ -155,10 +163,10 @@ export const DynamicTable = ({
             value={recordsPerPage}
             onChange={handleRecordsPerPageChange}
           >
-            <option value={10}>10 por pagina</option>
-            <option value={20}>20 por pagina</option>
-            <option value={40}>30 por pagina</option>
-            <option value={50}>40 por pagina</option>
+            <option value={10}>10 por página</option>
+            <option value={40}>40 por página</option>
+            <option value={80}>80 por página</option>
+            <option value={100}>100 por página</option>
           </select>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { LoginBoreal, Inventory, UserAndRols, Dashboard, DepartmentsAndCities, W
 import { BaseSideBar, Error404 } from "../Layouts";
 import { useAuth } from "../Contexts";
 import Profile from "../Pages/Profile/Profile";
+import Owners from "../Pages/Owners/Owners";
 
 export const Router = () => {
   const { isAutenticated } = useAuth();
@@ -45,6 +46,15 @@ export const Router = () => {
           />
 
         </Route>
+
+        <Route path="/boreal/propietarios">
+          <Route
+            path="/boreal/propietarios"
+            element={<Protected element={<Owners />} />}
+          />
+
+        </Route>
+
         <Route path="/boreal/inventario">
           <Route
             path="/boreal/inventario"

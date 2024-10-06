@@ -3,6 +3,7 @@ import { useAxios } from "../../../Contexts";
 import { Modal } from "../BaseModal";
 import { ModalIconCorrect, ModalIconMistake } from "../../../assets";
 import "./AddItemModal.css";
+import { API_ENDPOINT } from "../../../util";
 
 export const AddItemModal = ({ show, onClose, onSave }) => {
   const { privateFetch } = useAxios();
@@ -77,6 +78,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
   };
 
   const handleSubmit = async (ev) => {
+  
     ev.preventDefault();
     try {
       const requestData = {
@@ -173,7 +175,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               <input
                 placeholder="Cantidad existente"
                 type="number"
-                name="stock"
+                name="quantity"
                 onChange={handleChange}
                 required
                 value={formData.stock || ""}
