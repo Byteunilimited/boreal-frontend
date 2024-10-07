@@ -122,6 +122,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
+                            placeholder="Nombre de la bodega"
                             required
                         />
                     </div>
@@ -132,6 +133,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
+                            placeholder="Telefón de la bodega"
                             required
                         />
                     </div>
@@ -142,6 +144,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
+                            placeholder="Email de la bodega"
                             required
                         />
                     </div>
@@ -152,12 +155,13 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             name="address"
                             value={formData.address}
                             onChange={handleChange}
+                            placeholder="Dirección de la bodega"
                             required
                         />
                     </div>
                     <div className="formGroup">
                         <label>Sucursal:</label>
-                        <select name="officeId" value={formData.officeId} onChange={handleChange} required className="selects">
+                        <select name="officeId" value={formData.officeId} onChange={handleChange} required className="selects" placeholder="Sucursal">
                             <option value="">Seleccionar sucursal</option>
                             {offices && offices.length > 0 ? (
                                 offices.map((office) => (
@@ -173,7 +177,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
 
                     <div className="formGroup">
                         <label>Propietario:</label>
-                        <select name="ownerId" value={formData.ownerId} onChange={handleChange} required className="selects">
+                        <select name="ownerId" value={formData.ownerId} onChange={handleChange} required className="selects" placeholder="Propietario">
                             <option value="">Seleccionar propietario</option>
                             {owners && owners.length > 0 ? (
                                 owners.map((owner) => (
@@ -189,7 +193,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
 
                     <div className="formGroup">
                         <label>Tipo de Bodega:</label>
-                        <select name="storeTypeId" value={formData.storeTypeId} onChange={handleChange} required className="selects">
+                        <select name="storeTypeId" value={formData.storeTypeId} onChange={handleChange} required className="selects" placeholder="Tipo de bodega">
                             <option value=""> Seleccionar tipo</option>
                             {storeTypes && storeTypes.length > 0 ? (
                                 storeTypes.map((type) => (
