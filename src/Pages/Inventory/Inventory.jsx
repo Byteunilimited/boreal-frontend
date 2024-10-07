@@ -211,7 +211,6 @@ export const Inventory = () => {
   };
 
   const handleSave = (newItem) => {
-    console.log(newItem)
     setData([...data, newItem]);
     setFilteredData([...data, newItem]);
   };
@@ -231,10 +230,7 @@ export const Inventory = () => {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
       getData();
-    }, 1000);
-
   }, [handleSave]);
 
   useEffect(() => {

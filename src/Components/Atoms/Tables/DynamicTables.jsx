@@ -16,7 +16,7 @@ export const DynamicTable = ({
 }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
-
+  const [isLoading, setIsLoading] = useState(true);
   const pagesVisited = pageNumber * recordsPerPage;
   const pageCount = Math.ceil(data.length / recordsPerPage);
 
@@ -85,91 +85,108 @@ export const DynamicTable = ({
     return items;
   };
 
+useState(() => {
+
+  const timeoutId = setTimeout(() => {
+    setIsLoading(false);
+  }, 2000);
+
+  return () => clearTimeout(timeoutId); 
+}, []);
   return (
     <div className="tableContainer">
-      <Table striped className="dynamicTable">
-        <thead>
-          <tr>
-            {columns?.map((column, index) =>  (
-              <th key={index} className="bg-blue">
-                {column}
-              </th>
-            ))}
-            {showToggle && <th>Acciones</th>}
-          </tr>
-        </thead>
-        <tbody>
-  {Array.isArray(data) && data.length === 0 ? (
-    <tr>
-      <td colSpan={columns.length + (showToggle ? 1 : 0)} className="text-center">
-        No hay información para mostrar
-      </td>
-    </tr>
-  ) : (
-    data
-      .slice(pagesVisited, pagesVisited + recordsPerPage)
-      .map((row, rowIndex) => (
-        <tr key={rowIndex} className="tableRow">
-          {columns.map((column, colIndex) => (
-            <td key={colIndex}>
-              {column === "Estado" && showToggle ? (
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    checked={row[column] === "Activo"}
-                    onChange={() => onToggle(row)}
-                  />
-                  <span className="slider round"></span>
-                </label>
+      {isLoading ? (
+        <div className="loadingMessage">Cargando información...</div>
+      ) : (
+        <>
+          <Table striped className="dynamicTable">
+            <thead>
+              <tr>
+                {columns?.map((column, index) => (
+                  <th key={index} className="bg-blue">
+                    {column}
+                  </th>
+                ))}
+                {showToggle && <th>Acciones</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(data) && data.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={columns.length + (showToggle ? 1 : 0)}
+                    className="text-center"
+                  >
+                    No hay información para mostrar
+                  </td>
+                </tr>
               ) : (
-                row[column]
+                data
+                  .slice(pagesVisited, pagesVisited + recordsPerPage)
+                  .map((row, rowIndex) => (
+                    <tr key={rowIndex} className="tableRow">
+                      {columns.map((column, colIndex) => (
+                        <td key={colIndex}>
+                          {column === "Estado" && showToggle ? (
+                            <label className="switch">
+                              <input
+                                type="checkbox"
+                                checked={row[column] === "Activo"}
+                                onChange={() => onToggle(row)}
+                              />
+                              <span className="slider round"></span>
+                            </label>
+                          ) : (
+                            row[column]
+                          )}
+                        </td>
+                      ))}
+                      {showToggle && (
+                        <td>
+                          <RiEdit2Line
+                            className="actionIcon editIcon"
+                            onClick={() => onEdit(row)}
+                          />
+                          {!hideDeleteIcon && (
+                            <RiCloseFill
+                              className="actionIcon deleteIcon"
+                              onClick={() => onDelete(row)}
+                            />
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  ))
               )}
-            </td>
-          ))}
-          {showToggle && (
-            <td>
-              <RiEdit2Line
-                className="actionIcon editIcon"
-                onClick={() => onEdit(row)}
+            </tbody>
+          </Table>
+          <div className="paginationContainer">
+            <Pagination className="border-radius.sm">
+              <Pagination.First onClick={() => changePage(0)} />
+              <Pagination.Prev
+                onClick={() => changePage(Math.max(pageNumber - 1, 0))}
               />
-              {!hideDeleteIcon && (
-                <RiCloseFill
-                  className="actionIcon deleteIcon"
-                  onClick={() => onDelete(row)}
-                />
-              )}
-            </td>
-          )}
-        </tr>
-      ))
-  )}
-</tbody>
-      </Table>
-      <div className="paginationContainer">
-        <Pagination className="border-radius.sm">
-          <Pagination.First onClick={() => changePage(0)} />
-          <Pagination.Prev
-            onClick={() => changePage(Math.max(pageNumber - 1, 0))}
-          />
-          {renderPaginationItems()}
-          <Pagination.Next
-            onClick={() => changePage(Math.min(pageNumber + 1, pageCount - 1))}
-          />
-          <Pagination.Last onClick={() => changePage(pageCount - 1)} />
-        </Pagination>
-        <div className="recordsPerPage">
-          <select
-            id="recordsPerPage"
-            value={recordsPerPage}
-            onChange={handleRecordsPerPageChange}
-          >
-            <option value={10}>10 por página</option>
-            <option value={40}>40 por página</option>
-            <option value={80}>80 por página</option>
-            <option value={100}>100 por página</option>
-          </select>
-        </div>
-      </div>
+              {renderPaginationItems()}
+              <Pagination.Next
+                onClick={() => changePage(Math.min(pageNumber + 1, pageCount - 1))}
+              />
+              <Pagination.Last onClick={() => changePage(pageCount - 1)} />
+            </Pagination>
+            <div className="recordsPerPage">
+              <select
+                id="recordsPerPage"
+                value={recordsPerPage}
+                onChange={handleRecordsPerPageChange}
+              >
+                <option value={10}>10 por página</option>
+                <option value={40}>40 por página</option>
+                <option value={80}>80 por página</option>
+                <option value={100}>100 por página</option>
+              </select>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

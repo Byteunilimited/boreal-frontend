@@ -28,27 +28,17 @@ export const Usuarios = () => {
 
     const translateFields = (items) => {
         return items.map((item) => ({
-          Cédula: item.id,
-          Nombre: item.name,
-          Apellido: item.lastName,
-          Correo:item.email,
-          Télefono: item.phone,
-          Rol:
-            item.role.id === 1
-              ? "Admin"
-              : item.role.id === 2
-              ? "Técnico"
-              : item.role.id === 3
-              ? "Cliente"
-              : "Desconocido",
-          Estado:
-            item.isEnable === true
-              ? "Activo"
-              : item.isEnable === false
-              ? "Inactivo"
-              : "Desconocido",
+            Cédula: item.id,
+            Nombre: item.name,
+            Apellido: item.lastName,
+            Correo: item.email,
+            Télefono: item.phone,
+            Rol: item.role?.description,
+            Dirección: item.address,
+            Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido",
+            Contraseña: item.password
         }));
-      };
+    };
 
     const getData = async () => {
         setLoading(true);
@@ -60,7 +50,7 @@ export const Usuarios = () => {
             const [
                 { data: users },
                 { data: cities },
-                { data: roles}
+                { data: roles }
             ] = await Promise.all([
                 axios.get(`${API_ENDPOINT}/user/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
                 axios.get(`${API_ENDPOINT}/location/city/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
@@ -82,11 +72,11 @@ export const Usuarios = () => {
 
     const handleEdit = (item) => {
         console.log(item)
-       setEditUser(item);
-       setShowEditUser(true);
+        setEditUser(item);
+        setShowEditUser(true);
     };
     //! Pendiente a terminar
-     const saveUser = async (ev) => {
+    const saveUser = async (ev) => {
         setLoading(true);
         ev.preventDefault();
         const formData = serialize(ev.target);
@@ -147,7 +137,7 @@ export const Usuarios = () => {
                 </Col>
             </Row>
             <DynamicTable
-                columns={["Cédula", "Nombre", "Apellido", "Correo","Télefono", "Rol", "Estado"]}
+                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad", "Contraseña"]}
                 data={data}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
@@ -262,8 +252,8 @@ export const Usuarios = () => {
                 }
             </Modal>
             <Modal show={showEditUser} onHide={() => setShowEditUser(false)} >                <Modal.Header closeButton>
-                    <Modal.Title>Editar Usuario</Modal.Title>
-                </Modal.Header>
+                <Modal.Title>Editar Usuario</Modal.Title>
+            </Modal.Header>
                 {
                     !loading ? (
                         <Form onSubmit={saveEditUser} autoComplete="off">
@@ -272,7 +262,7 @@ export const Usuarios = () => {
                                 <Row>
                                     <Col sm>
                                         <label>Nombre</label>
-                                        <FormControl size="sm" type="text" name="name" required defaultValue={editUser?.name}/>
+                                        <FormControl size="sm" type="text" name="name" required defaultValue={editUser?.name} />
                                     </Col>
                                 </Row>
                                 <Row>
@@ -284,7 +274,7 @@ export const Usuarios = () => {
                                 <Row>
                                     <Col sm>
                                         <label>Teléfono</label>
-                                        <FormControl size="sm" type="text" name="phone" required defaultValue={editUser?.phone}  />
+                                        <FormControl size="sm" type="text" name="phone" required defaultValue={editUser?.phone} />
                                     </Col>
                                 </Row>
                                 <Row>
@@ -322,7 +312,7 @@ export const Usuarios = () => {
                                 <Row>
                                     <Col sm>
                                         <label>Correo</label>
-                                        <FormControl size="sm" type="email" name="email" required defaultValue={editUser?.email}  />
+                                        <FormControl size="sm" type="email" name="email" required defaultValue={editUser?.email} />
                                     </Col>
                                 </Row>
                                 <Row>

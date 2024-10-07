@@ -49,10 +49,10 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
       if (value === "2") {
         setFormData((prev) => ({ ...prev, stock: 0 }));
         setIsStockEditable(false);
-        setShowStockInput(false); // Ocultar el campo de cantidad
+        setShowStockInput(false); 
       } else {
         setIsStockEditable(true);
-        setShowStockInput(true); // Mostrar el campo de cantidad
+        setShowStockInput(true); 
       }
     }
 
