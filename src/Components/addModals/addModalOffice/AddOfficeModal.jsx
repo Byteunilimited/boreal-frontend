@@ -75,7 +75,7 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
             return;
         }
 
-        setIsSubmitting(true); // Evitar múltiples envíos
+        setIsSubmitting(true); 
         try {
             const requestData = { ...formData };
 
@@ -97,7 +97,7 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
                 setError("Verifica la infromación proporcionada.");
                 setShowConfirmationModal(true);
             } else if (response.status === 409) {
-                setError("Ya existe una oficina con ese nombre.");
+                setError("Verifica la información, ya existen oficinas con estos datos");
                 setShowConfirmationModal(true);
             } else {
                 throw new Error("Respuesta inesperada del servidor.");

@@ -141,6 +141,10 @@ export const Usuarios = () => {
                 data={data}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                showToggle={true}
+                onToggle={() => {}}
+                hideDeleteIcon={true}
+                
             />
             <Modal show={showAddUser} onHide={() => setShowAddUser(false)} >
                 <Modal.Header closeButton>

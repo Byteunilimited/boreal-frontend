@@ -22,7 +22,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
     const [isSuccessful, setIsSuccessful] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-
+    const [cities, setCities] = useState([]);
     const [owners, setOwners] = useState([]);
     const [storeTypes, setStoreTypes] = useState([]);
     const [offices, setOffices] = useState([]);
@@ -33,6 +33,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
             fetchOwners();
             fetchStoreTypes();
             fetchOffices();
+            fetchCities();
         }
     }, [show]);
 
@@ -60,6 +61,18 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
         }
     };
 
+    
+    const fetchCities = async () => {
+        try {
+            const response = await privateFetch.get("/location/city/all");
+            if (response.status === 200) {
+                setCities(response.data.result.city);
+            }
+        } catch (error) {
+            setError("Ocurrió un error al obtener las ciudades.");
+        }
+    };
+
     const fetchOffices = async () => {
         try {
             const response = await privateFetch.get("/location/office/all");
@@ -68,9 +81,6 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
             }
         } catch (error) {
             console.error("Error fetching offices:", error);
-            /**
-             * Fetches the offices from the API
-             */
         }
     };
 
@@ -82,10 +92,6 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
         }));
     };
 
-    /**
-     * Handles changes to the form data
-     * @param {SyntheticEvent} e - The event
-     */
     const handleSubmit = async (ev) => {
         ev.preventDefault();
         try {
@@ -94,10 +100,6 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                 const data = response.data;
                 setIsSuccessful(true);
                 setConfirmationMessage("La bodega fue añadida exitosamente.");
-                /**
-                 * Handles the form submission
-                 * @param {SyntheticEvent} ev - The event
-                 */
                 setShowConfirmationModal(true);
                 onSave(data);
             } else {
@@ -105,8 +107,21 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
             }
         } catch (error) {
             console.error("Error creando la bodega:", error);
-            setError("Ocurrió un error inesperado.");
+            setError("Ocurrió un error en el servidor, por favor, intenta de nuevo.");
             setShowConfirmationModal(true);
+        }
+    };
+
+    const closeModal = () => {
+        setShowConfirmationModal(false);
+        setError(null);
+        onClose();
+    };
+    
+    const handleKeyPress = (e) => {
+        const regex = /^[a-zA-Z0-9\s]*$/;
+        if (!regex.test(e.key)) {
+            e.preventDefault();
         }
     };
 
@@ -123,7 +138,9 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             value={formData.description}
                             onChange={handleChange}
                             placeholder="Nombre de la bodega"
+                            onKeyPress={handleKeyPress}
                             required
+                            maxLength="40" 
                         />
                     </div>
                     <div className="formGroup">
@@ -135,6 +152,13 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             onChange={handleChange}
                             placeholder="Telefón de la bodega"
                             required
+                            onKeyPress={(e) => {
+                                const regex = /^[0-9]*$/; 
+                                if (!regex.test(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
+                            maxLength="10" 
                         />
                     </div>
                     <div className="formGroup">
@@ -157,6 +181,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             onChange={handleChange}
                             placeholder="Dirección de la bodega"
                             required
+                            maxLength="50" 
                         />
                     </div>
                     <div className="formGroup">
@@ -206,6 +231,24 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             )}
                         </select>
                     </div>
+                    {cities && cities.length > 0 && (
+                        <div className="formGroup">
+                            <label>Ciudad:</label>
+                            <select
+                                name="cityId"
+                                onChange={handleChange}
+                                required
+                                className="selects"
+                            >
+                                <option value="">Seleccionar ciudad</option>
+                                {cities.map((city) => (
+                                    <option key={city.id} value={city.id}>
+                                        {`${city.description} (${city.department.description})`}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
                     <div className="formActions">
                         <button type="submit">Guardar</button>
@@ -221,7 +264,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                     title={isSuccessful ? "Éxito" : "Error"}
                     text={isSuccessful ? confirmationMessage : error}
                     modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
-                    onClose={() => setShowConfirmationModal(false)}
+                    onClose={closeModal}
                     showCloseButton
                 />
             )}

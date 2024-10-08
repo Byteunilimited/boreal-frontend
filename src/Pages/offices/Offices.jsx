@@ -16,8 +16,8 @@ export const Offices = () => {
   const [showModal, setShowModal] = useState(false);
   const { privateFetch } = useAxios();
   const [showAddOfficeModal, setShowAddOfficeModal] = useState(false);
-  const [showUpdateOfficeModal, setShowUpdateOfficeModal] = useState(false); 
-  const [selectedOffice, setSelectedOffice] = useState(null); 
+  const [showUpdateOfficeModal, setShowUpdateOfficeModal] = useState(false);
+  const [selectedOffice, setSelectedOffice] = useState(null);
 
   useEffect(() => {
     document.title = "Sucursales";
@@ -59,7 +59,7 @@ export const Offices = () => {
   };
 
 
-  
+
   const translateFields = (items) => {
     return items.map((item) => ({
       Código: item.id,
@@ -104,8 +104,8 @@ export const Offices = () => {
         phone: officeToEdit.Teléfono,
         email: officeToEdit.Correo,
         address: officeToEdit.Dirección,
-        ownerId: officeToEdit.Propietario, 
-        cityId: officeToEdit.Ciudad, 
+        ownerId: officeToEdit.Propietario,
+        cityId: officeToEdit.Ciudad,
       });
       setShowUpdateOfficeModal(true);
     }
@@ -121,7 +121,7 @@ export const Offices = () => {
   };
 
   useEffect(() => {
-      getData();
+    getData();
   }, [handleSave]);
 
   return (
@@ -154,8 +154,10 @@ export const Offices = () => {
         <DynamicTable
           columns={["Código", "Nombre", "Dirección", "Teléfono", "Correo", "Ciudad", "Propietario"]}
           data={filteredData}
-          onEdit={handleEdit} 
+          onEdit={handleEdit}
           hideDeleteIcon={true}
+          showToggle={true}
+          onToggle={() => { }}
         />
       </div>
 
@@ -171,7 +173,7 @@ export const Offices = () => {
           show={showUpdateOfficeModal}
           onClose={() => setShowUpdateOfficeModal(false)}
           onUpdate={handleUpdate}
-          officeData={selectedOffice} 
+          officeData={selectedOffice}
         />
       )}
     </div>

@@ -10,9 +10,9 @@ export const DynamicTable = ({
   data,
   onEdit,
   onDelete,
-  onToggle,
-  showToggle,
-  hideDeleteIcon,
+  onToggle = () => {}, 
+  showToggle = true,    
+  hideDeleteIcon = false,
 }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
@@ -194,14 +194,12 @@ useState(() => {
 DynamicTable.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.string).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onToggle: PropTypes.func.isRequired,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  onToggle: PropTypes.func, 
   showToggle: PropTypes.bool,
   hideDeleteIcon: PropTypes.bool,
 };
 
-DynamicTable.defaultProps = {
-  showToggle: true,
-  hideDeleteIcon: false,
-};
+
+
