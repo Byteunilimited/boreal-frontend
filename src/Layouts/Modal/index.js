@@ -1,5 +1,3 @@
-export * from './AddItemModal'
 export * from './BaseModal'
-export * from './PasswordRecoveryModal'
 export * from './ConfirmationModal'
 export * from './ConfirmationOkModal'

@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { LoginBoreal, Inventory, UserAndRols, Dashboard, DepartmentsAndCities, Wineries, Equipment, Bills, Procedures, Offices } from "../Pages";
+import { LoginBoreal,  UserAndRols, Dashboard, DepartmentsAndCities, Equipment, Bills, Procedures, Offices,  Inventory, Store } from "../Pages";
 import { BaseSideBar, Error404 } from "../Layouts";
 import { useAuth } from "../Contexts";
-import Profile from "../Pages/Profile/Profile";
-import Owners from "../Pages/Owners/Owners";
+import Profile from "../Pages/Profile/ProfileIndex/Profile";
+import Owners from "../Pages/Owners/ownersIndex/Owners";
+
 
 export const Router = () => {
   const { isAutenticated } = useAuth();
@@ -33,12 +34,12 @@ export const Router = () => {
             element={<Protected element={<UserAndRols />} />}
           />
         </Route>
-        {/* <Route path="/boreal/perfil">
+        <Route path="/boreal/perfil">
           <Route
             path="/boreal/perfil"
             element={<Protected element={<Profile />} />}
           />
-        </Route> */}
+        </Route> 
         <Route path="/boreal/sucursales">
           <Route
             path="/boreal/sucursales"
@@ -72,7 +73,7 @@ export const Router = () => {
         <Route path="/boreal/bodegas">
           <Route
             path="/boreal/bodegas"
-            element={<Protected element={<Wineries />} />}
+            element={<Protected element={<Store />} />}
           />
 
         </Route>

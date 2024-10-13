@@ -1,1 +1,2 @@
-export * from './LoginBoreal'
+export * from './PasswordRecoveryModal'
+export * from './LoginIndex'

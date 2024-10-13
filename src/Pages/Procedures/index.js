@@ -1,1 +1,1 @@
-export * from './Procedures'
+export * from './ProceduresIndex'

@@ -1,1 +1,1 @@
-export * from './Bills'
+export * from './BillsIndex'

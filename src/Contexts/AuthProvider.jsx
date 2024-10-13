@@ -1,4 +1,4 @@
-import { TokenManager } from '../lib';
+import { TokenManager } from '../Lib';
 import React, { useState, createContext, useEffect, useContext } from 'react';
 const AuthContext = createContext({});
 const { Provider } = AuthContext;

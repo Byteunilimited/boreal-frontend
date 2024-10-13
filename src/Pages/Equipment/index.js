@@ -1,1 +1,1 @@
-export * from './Equipment'
+export * from './EquipmentIndex'

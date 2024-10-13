@@ -1,1 +1,6 @@
-export * from './Inventory'
+export * from './InventoryIndex'
+export * from './ActionsInventory'
+export * from './ActiveItemsTab'
+export * from './InactiveItemsTab'
+export * from './Assignments'
+export * from './InventoryDepends'

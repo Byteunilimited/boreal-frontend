@@ -4,12 +4,16 @@ import "./BulkUpload.css";
 import { Button } from "../../Components";
 import { Table } from "react-bootstrap";
 import { RiUploadCloudLine } from "react-icons/ri";
-import { API_ENDPOINT } from "../../util";
+import { API_ENDPOINT } from "../../Util";
+import { useAxios } from "../../Contexts";
 
 export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   const [file, setFile] = useState(null);
   const [jsonData, setJsonData] = useState([]);
+  const { privateFetch } = useAxios();
   const fileInputRef = useRef(null);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [isSuccessful, setIsSuccessful] = useState(false);
 
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
@@ -66,84 +70,76 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
 
 
 
-const handleDownloadTemplate = () => {
-  // Crear los datos para la plantilla con solo id y description
-  const templateData = [
-    ["id", "description"], // Solo las columnas necesarias
-  ];
+  const handleDownloadTemplate = () => {
+    // Crear los datos para la plantilla con solo id y description
+    const templateData = [
+      ["id", "description"], // Solo las columnas necesarias
+    ];
 
-  // Convertir los datos a CSV
-  const csvContent = templateData.map(e => e.join(",")).join("\n");
+    // Convertir los datos a CSV
+    const csvContent = templateData.map(e => e.join(",")).join("\n");
 
-  // Crear un blob con el contenido CSV
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    // Crear un blob con el contenido CSV
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-  // Crear un enlace para descargar el archivo CSV
-  const link = document.createElement("a");
-  if (link.download !== undefined) {
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "Cargue_masivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-};
+    // Crear un enlace para descargar el archivo CSV
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "Cargue_masivo.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
-// Actualización de la validación para comprobar solo los campos 'id' y 'description'
-const handleUpload = () => {
-  if (!file) {
-    alert("Por favor, selecciona un archivo.");
-    return;
-  }
+  // Actualización de la validación para comprobar solo los campos 'id' y 'description'
+  const handleUpload = () => {
+    if (!fileInputRef.current.files[0]) { // Usar la referencia aquí
+      alert("Por favor, selecciona un archivo.");
+      return;
+    }
 
-  // Validar jsonData antes de enviar
-  const isValid = jsonData.every((item) => {
-    console.log("Validando item:", item);
-    return item.id && item.description; // Validación solo para 'id' y 'description'
-  });
+    const formData = new FormData();
+    formData.append("file", fileInputRef.current.files[0], "lista_requestos.csv");
+    formData.append("inventoryType", JSON.stringify({ id: 1 }));
+    formData.append("options", JSON.stringify({
+      itemConditionId: 1,
+      stateId: 1,
+      statusId: 1,
+      storeId: 1,
+      ownerId: 1,
+    }));
 
-  if (!isValid) {
-    alert("Por favor, completa todos los campos requeridos.");
-    return;
-  }
-
-  // Convertir jsonData a CSV
-  const ws = XLSX.utils.json_to_sheet(jsonData);
-  const csvData = XLSX.utils.sheet_to_csv(ws);
-
-  // Crear FormData y enviar archivo CSV
-  const formData = new FormData();
-  formData.append(
-    "file",
-    new Blob([csvData], { type: "text/csv" }),
-    "bulk_upload.csv"
-  );
-
-  fetch(`${API_ENDPOINT}/inventory/item/upload/csv`, {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        return response.text().then(text => {
-          throw new Error(`Error en la solicitud: ${response.status} - ${text}`);
-        });
+    const requestOptions = {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow'
+    };
+  
+    fetch(`${API_ENDPOINT}/inventory/item/upload/csv`, requestOptions)
+    .then(response => {
+      if (response.status === 415) {
+        throw new Error('Tipo de contenido no soportado. Verifica el formato del archivo.');
+      } else if (!response.ok) {
+        throw new Error('La respuesta de la red no fue correcta: ' + response.statusText);
       }
-      return response.json();
+      return response.text(); // Cambia a response.text() si esperas texto
     })
-    .then((data) => {
-      alert("Datos enviados exitosamente.");
-      onUploadSuccess(data);
-      onClose();
+    .then(result => {
+      console.log(result);
+      // Manejar el resultado exitoso aquí
     })
-    .catch((error) => {
-      console.error("Error al enviar los datos:", error);
-      alert(`Ocurrió un error al enviar los datos: ${error.message}`);
+    .catch(error => {
+      console.error('Hubo un problema con la operación de fetch:', error);
+      alert(`Ocurrió un error: ${error.message}`);
     });
 };
 
-  
+
+
+
 
   return (
     <div className="modalOverlayBulk">
@@ -166,11 +162,11 @@ const handleUpload = () => {
               Haz clic o arrastra el archivo a esta área para cargarlo
             </p>
             <input
+              onChange={handleFileChange}
               type="file"
               accept=".csv"
-              onChange={handleFileChange}
               className="hiddenInputBulk"
-              ref={fileInputRef}
+              ref={fileInputRef} 
             />
           </div>
           {jsonData.length > 0 && (
@@ -208,6 +204,15 @@ const handleUpload = () => {
             Cancelar
           </button>
         </div>
+        {showResultModal && (
+          <Modal
+            icon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
+            title={isSuccessful ? "¡Éxito!" : "Error"}
+            message={isSuccessful ? "Los datos fueron cargados exitosamente." : "Hubo un error al cargar los datos."}
+            onClose={() => setShowResultModal(false)}
+          />
+        )}
+
       </div>
     </div>
   );

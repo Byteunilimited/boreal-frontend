@@ -1,0 +1,187 @@
+
+  body {
+    margin: 0;
+    overflow-x: hidden; 
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: lighter;
+    overflow: hidden;
+  }
+  
+  .mainBackground {
+    background-image: url('../../../Assets/Images/BorealBackgroundLogin.png');
+    background-position: center;
+    height:100vh;
+    width: 100vw;
+    display: grid;
+    place-items: center;
+    background-attachment: fixed;
+    overflow: hidden; 
+    background-size: cover;
+  }
+  
+.mainSection {
+  background-color: #ffffffcc; 
+  padding: 1em;
+  border-radius: 2em;
+  display: grid;
+  gap: 1em; 
+  height: 70vh;
+  width: 80vw;
+  align-items: center;
+  overflow: hidden; 
+}
+
+.mainFigure {
+  display: flex;
+  justify-content: center; 
+  align-items: center;   
+  grid-column: 1 / 2; 
+  height: 100%; 
+  margin: 0;
+}
+
+.mainImg {
+  max-width: 70%; 
+  height: auto;
+}
+
+.mainContainer {
+  grid-column: 2 / 2; 
+}
+
+
+.mainTitle {
+  text-align: center;
+  margin-bottom:  1em;
+  color: var(--MainBlue);
+  font-size: 2.2em;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: lighter;
+}
+
+.mainForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mainInput {
+  padding: 0.5em;
+  margin-bottom: 1.5em;
+  border-radius: 2em;
+  font-size: 1em;
+  width: 24em;
+  height: 2.7em; 
+  background-color: var(--MainWhite);
+  border: 1px solid var(--MainBlue);
+  transition: border-color 0.3s ; 
+  color: var(--MainActive);
+}
+
+.inputLoginContainer {
+  position: relative;
+  width: 24em; 
+}
+
+.inputLoginContainer input {
+  width: 100%;
+  box-sizing: border-box; 
+}
+
+.passwordToggle {
+  position: absolute;
+  top: 30%;
+  right: 1em;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--MainBlue);
+}
+
+.pass{
+  color: var(--MainBlue);
+  font-size: 1.2em;
+  margin-top: -5px;
+  cursor: pointer;
+}
+
+
+@media (max-width: 900px) {
+
+  
+  .mainSection {
+    display: grid;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .mainTitle {
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .mainInput,
+  .inputLoginContainer {
+    width: 17em;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-left: -50px;
+  }
+
+  .passwordToggle {
+    margin-top: -6px;
+    margin-right: 25px;
+  }
+
+  .inputLoginContainer{
+    width: 17em;
+    font-size: 14px;
+    margin-right: -80px;
+  }
+
+  .mainImg {
+    width: 70%;
+    height: auto;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .mainSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+  }
+
+  .mainTitle {
+    text-align: center;
+    font-size: 22px;
+    margin-top: -35px;
+    margin-right: -45px;
+  }
+
+  .mainInput,
+  .inputLoginContainer {
+    width: 90%;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-right: -47px;
+  }
+
+  .passwordToggle {
+    margin-right: 120px;
+    margin-top: -6px;
+  }
+
+  .inputLoginContainer{
+    width: 22em;
+    font-size: 14px;
+    margin-right: -185px;
+  }
+
+  .mainImg {
+    width: 100%;
+  }
+}
+

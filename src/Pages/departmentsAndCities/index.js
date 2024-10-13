@@ -1,1 +1,1 @@
-export * from "./DepartmentsAndCities.jsx"
+export * from "./DepartamentsAndCitiesIndex"
