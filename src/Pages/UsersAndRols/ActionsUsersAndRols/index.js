@@ -1,2 +1,2 @@
-
-export * from './updateUser'
+export * from './AddNewUser'
+export * from './UpdateUser'
