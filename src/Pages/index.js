@@ -1,6 +1,5 @@
 export * from './Bills'
 export * from './Dashboard'
-export * from './DepartmentsAndCities'
 export * from './Equipment'
 export * from './Inventory'
 export * from './LoginBoreal'

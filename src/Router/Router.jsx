@@ -1,11 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { LoginBoreal,  UserAndRols, Dashboard, DepartmentsAndCities, Equipment, Bills, Procedures, Offices,  Inventory, Store } from "../Pages";
+import { LoginBoreal,  UserAndRols, Dashboard, Equipment, Bills, Procedures, Offices,  Inventory, Store } from "../Pages";
 import { BaseSideBar, Error404 } from "../Layouts";
 import { useAuth } from "../Contexts";
 import Profile from "../Pages/Profile/ProfileIndex/Profile";
 import Owners from "../Pages/Owners/ownersIndex/Owners";
-
-
+import {DepartmentsAndCities} from "../Pages/DepartmentsAndCities/DepartamentsAndCitiesIndex/DepartmentsAndCities"
 export const Router = () => {
   const { isAutenticated } = useAuth();
   const Protected = ({ element }) => {
