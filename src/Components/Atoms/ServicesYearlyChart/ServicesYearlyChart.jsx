@@ -42,13 +42,12 @@ export const ServicesYearlyChart = () => {
 
   return (
     <div className="chartContainer">
-      {/* Primera gráfica: Barras anuales */}
       <div className="chartItem">
         <h4>Valor por año</h4>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart
             data={yearlyData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            margin={{ top: 20, right: 50, left: 20, bottom: 5 }}
           >
             <defs>
               {yearlyData.map((entry, index) => (

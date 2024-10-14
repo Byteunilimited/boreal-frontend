@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal } from "../../../../Layouts";
-import { ModalIconCorrect, ModalIconMistake } from "../../../../Assets";
-import { API_ENDPOINT } from "../../../../Util";
+import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
+import { API_ENDPOINT } from "../../../../util";
 import { useAxios } from "../../../../Contexts";
 
 export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {

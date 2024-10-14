@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import "../../../ActionsStore/AddNewStore/AddStoreModal.css";
-import { ModalIconCorrect, ModalIconMistake } from "../../../../../Assets";
+import { ModalIconCorrect, ModalIconMistake } from "../../../../../assets";
 import { useAxios } from "../../../../../Contexts";
 import { Modal } from "../../../../../Layouts";
 

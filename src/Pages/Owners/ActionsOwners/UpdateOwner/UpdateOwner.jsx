@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Modal } from "../../../../Layouts";
-import { ModalIconCorrect, ModalIconMistake } from "../../../../Assets";
+import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
-import { API_ENDPOINT } from "../../../../Util";
+import { API_ENDPOINT } from "../../../../util";
 
 export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
     const { privateFetch } = useAxios();

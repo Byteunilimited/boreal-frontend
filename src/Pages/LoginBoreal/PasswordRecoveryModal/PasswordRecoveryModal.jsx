@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal } from "../../../Layouts";
-import { ModalIconQuestion } from "../../../Assets";
+import { ModalIconQuestion } from "../../../assets";
 import "./PasswordRecoveryModal.css";
 import { Button } from "../../../Components";
 

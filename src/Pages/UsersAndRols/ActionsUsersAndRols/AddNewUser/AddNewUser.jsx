@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "../../../../Layouts";
-import { ModalIconCorrect, ModalIconMistake } from "../../../../Assets";
+import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
 import { Eye, EyeOff } from "react-feather";
 export const AddNewUserModal = ({ show, onClose, onSave }) => {

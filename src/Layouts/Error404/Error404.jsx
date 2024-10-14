@@ -1,6 +1,6 @@
 import React from 'react';
 import './Error404.css'; 
-import { robot404 } from '../../Assets';
+import { robot404 } from '../../assets';
 
 
 export const Error404 = () => {

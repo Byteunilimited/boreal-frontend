@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAxios } from "../../../../Contexts";
-import { ModalIconCorrect, ModalIconMistake } from "../../../../Assets";
-import { API_ENDPOINT } from "../../../../Util";
+import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
+import { API_ENDPOINT } from "../../../../util";
 import { Modal } from "../../../../Layouts";
 
 export const AddOfficeModal = ({ show, onClose, onSave }) => {

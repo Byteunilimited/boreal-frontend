@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import { FaSyncAlt } from "react-icons/fa";
 import { Button, DynamicTable } from "../../../Components";
-import { API_ENDPOINT, MOCK_DATA } from "../../../Util";
+import { API_ENDPOINT, MOCK_DATA } from "../../../util";
 import { Form, FormControl, InputGroup, Modal, Row, Col, FormSelect } from "react-bootstrap";
 import { usersMock } from "../../../FalseData";
 import axios from "axios";
-import { useForm } from "../../../Hooks";
+import { useForm } from "../../../hooks";
 import { RiFileExcel2Line } from "react-icons/ri";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";

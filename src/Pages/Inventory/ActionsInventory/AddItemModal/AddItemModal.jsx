@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAxios } from "../../../../Contexts";
 import { Modal } from "../../../../Layouts";
-import { ModalIconCorrect, ModalIconMistake } from "../../../../Assets";
+import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import "./AddItemModal.css";
 
 export const AddItemModal = ({ show, onClose, onSave }) => {

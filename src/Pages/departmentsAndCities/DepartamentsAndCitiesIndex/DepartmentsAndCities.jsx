@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./DepartmentsAndCities.css";
 import { Button, DynamicTable } from "../../../Components";
-import { API_ENDPOINT } from "../../../Util";
+import { API_ENDPOINT } from "../../../util";
 import { Tab, Tabs } from "react-bootstrap";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { saveAs } from "file-saver";

@@ -7,12 +7,12 @@ import {
   ModalIconCorrect,
   ModalIconWarning,
   BorealLogo,
-} from "../../../Assets";
+} from "../../../assets";
 import {  Modal } from "../../../Layouts";
 import { PasswordRecoveryModal } from "../PasswordRecoveryModal"
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../Components";
-import { useForm } from "../../../Hooks";
+import { useForm } from "../../../hooks";
 import { useAuth, useAxios } from "../../../Contexts";
 import { Navigate } from 'react-router-dom';
 

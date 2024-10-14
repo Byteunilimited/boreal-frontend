@@ -4,8 +4,8 @@ import axios from "axios";
 import "./EditElementInventory.css";
 import { useAxios } from "../../../../Contexts";
 import { Modal } from "../../../../Layouts";
-import { ModalIconCorrect, ModalIconMistake } from "../../../../Assets";
-import { API_ENDPOINT } from "../../../../Util";
+import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
+import { API_ENDPOINT } from "../../../../util";
 
 export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const { privateFetch } = useAxios();
@@ -33,7 +33,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
             const productData = response.data.result.inventory[0];
 
             setFormData({
-              id: productData.inventory.id || "",
+              id: productData.id || "",
               description: productData.inventory.description || "",
               isEnable: productData.state.id || "", 
               stock: productData.quantity || 0,

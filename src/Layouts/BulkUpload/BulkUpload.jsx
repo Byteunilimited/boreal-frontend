@@ -4,7 +4,7 @@ import "./BulkUpload.css";
 import { Button } from "../../Components";
 import { Table } from "react-bootstrap";
 import { RiUploadCloudLine } from "react-icons/ri";
-import { API_ENDPOINT } from "../../Util";
+import { API_ENDPOINT } from "../../util";
 import { useAxios } from "../../Contexts";
 
 export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {

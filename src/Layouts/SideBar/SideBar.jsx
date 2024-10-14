@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "react-feather";
 import "./SideBar.css";
-import { BorealLogo } from "../../Assets";
+import { BorealLogo } from "../../assets";
 import {
   RiListCheck2, RiFileListLine, RiLoginBoxLine, RiAdminLine, RiParentLine, RiTable2, RiRoadMapLine, RiAlignItemHorizontalCenterLine,
   RiCaravanLine, RiDashboardHorizontalLine, RiFileCopy2Line, RiDashboardLine, RiBuilding2Line, RiTableLine, RiAddCircleLine

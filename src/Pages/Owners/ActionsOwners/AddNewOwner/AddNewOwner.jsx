@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Modal } from "../../../../Layouts";
-import { ModalIconCorrect, ModalIconMistake } from "../../../../Assets";
+import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
 import { Eye, EyeOff } from "react-feather";
-import { API_ENDPOINT } from "../../../../Util";
+import { API_ENDPOINT } from "../../../../util";
 
 export const AddNewOwner = ({ show, onClose, onSave }) => {
     const { privateFetch } = useAxios();
