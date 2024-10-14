@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { LoginBoreal,  UserAndRols, Dashboard, Equipment, Bills, Procedures, Offices,  Inventory, Store, DepartmentsAndCities } from "../Pages";
+import { LoginBoreal,  UserAndRols, Dashboard, Equipment, Bills, Procedures, Offices,  Inventory, Store } from "../Pages";
 import { BaseSideBar, Error404 } from "../Layouts";
 import { useAuth } from "../Contexts";
 import Profile from "../Pages/Profile/ProfileIndex/Profile";
