@@ -104,6 +104,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
       if (response.status === 200) {
         const data = response.data;
         setIsSuccessful(true);
+        console.log("Elemento creado:");
         setConfirmationMessage("El elemento fue añadido exitosamente.");
         setShowConfirmationModal(true);
         onSave(data);
