@@ -69,7 +69,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
   const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
-    onClose();
   };
 
   const handleSubmit = async (ev) => {
@@ -94,8 +93,11 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         inventory,
         options
       };
+
+
+  console.log(JSON.stringify(payload));
   
-      const response = await privateFetch.post("/inventory/item/create", payload, {
+      const response = await privateFetch.post("/inventory/item/create", JSON.stringify(payload), {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -104,7 +106,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
       if (response.status === 200) {
         const data = response.data;
         setIsSuccessful(true);
-        console.log("Elemento creado:");
         setConfirmationMessage("El elemento fue añadido exitosamente.");
         setShowConfirmationModal(true);
         onSave(data);
@@ -118,7 +119,6 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
       setShowConfirmationModal(true);
     }
   };
-  
   
   return (
     <div className="modalOverlay">
