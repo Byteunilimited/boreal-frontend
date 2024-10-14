@@ -1,10 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { LoginBoreal,  UserAndRols, Dashboard, Equipment, Bills, Procedures,   Inventory, Store, DepartmentsAndCities } from "../Pages";
+import { LoginBoreal,  UserAndRols, Dashboard, Equipment, Bills, Procedures,   Inventory, Store, DepartmentsAndCities, Offices } from "../Pages";
 import { BaseSideBar, Error404 } from "../Layouts";
 import { useAuth } from "../Contexts";
 import Profile from "../Pages/Profile/ProfileIndex/Profile";
 import Owners from "../Pages/Owners/ownersIndex/Owners";
-import { Offices } from "../Pages/Offices/OfficcesIndex/Offices";
 
 export const Router = () => {
   const { isAutenticated } = useAuth();
