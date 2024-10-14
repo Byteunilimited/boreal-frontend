@@ -229,10 +229,10 @@ body {
   position: absolute; /* Posición absoluta para el ícono */
   right: 10px; /* Ajusta la distancia desde el borde derecho */
   top: 50%; /* Centrar verticalmente */
-  transform: translateY(-50%); /* Ajusta el centrado */
-  cursor: pointer; /* Cambia el cursor al pasar por encima */
+  transform: translateY(-50%); 
+  cursor: pointer; 
 }
 
-.icon {
-  color:#007bff; /* Color del ícono, ajusta según tu diseño */
+.iconPassword {
+  color:#007bff; 
 }

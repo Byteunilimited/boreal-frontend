@@ -24,7 +24,7 @@ export const Dashboard = () => {
           <h1>Administrador de tareas diarias</h1>
         </div> 
       </div>
-      <ServicesYearlyChart /> 
+      {/*<ServicesYearlyChart /> */}
 
     </div>
   );

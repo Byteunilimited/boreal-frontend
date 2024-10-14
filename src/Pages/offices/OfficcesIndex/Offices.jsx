@@ -86,9 +86,10 @@ export const Offices = () => {
     setFilteredData(filtered);
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
   };
+
 
   const handleRefresh = () => {
     getData();
@@ -134,7 +135,7 @@ export const Offices = () => {
             <input
               type="text"
               value={searchTerm}
-              onChange={handleSearch}
+              onChange={(e) => handleSearch(e.target.value)}
               placeholder="Buscar..."
               className="filterSearch"
             />

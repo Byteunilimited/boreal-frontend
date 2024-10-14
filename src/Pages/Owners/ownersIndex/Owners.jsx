@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { DynamicTable } from '../../../Components';
+import { Button, DynamicTable } from '../../../Components';
 import { useAxios } from '../../../Contexts';
+import { FaSyncAlt } from "react-icons/fa";
+import { RiFileExcel2Line } from "react-icons/ri";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { AddNewOwner } from '../ActionsOwners/AddNewOwner/AddNewOwner';
+import { UpdateOwner } from '../ActionsOwners/UpdateOwner/UpdateOwner';
 
 export default function () {
   const [data, setData] = useState([]);
@@ -10,7 +16,12 @@ export default function () {
   const [showEditElementInventory, setShowEditElementInventory] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-
+  const [showModal, setShowModal] = useState(false);
+  const [showAddOwner, setShowAddOwner] = useState(false);
+  const [showEditOwner, setShowEditOwner] = useState(false);
+  const [showUpdateOwner, setShowUpdateOwner] = useState(false);
+  const [selectedOwner, setSelectedOwner] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
   const translateFields = (items) => {
     return items.map((item) => ({
       Código: item.id,
@@ -23,10 +34,9 @@ export default function () {
     }));
   };
 
-  // Fetch data from the API
   const getData = async () => {
     try {
-      const response = await privateFetch.get("/location/owner/all"); 
+      const response = await privateFetch.get("/location/owner/all");
       if (response && response.data) {
         const translatedData = translateFields(response.data.result.zone);
         setData(translatedData);
@@ -39,10 +49,29 @@ export default function () {
   };
 
   // Handle edit action
-  const handleEdit = (item) => {
-    setItemToEdit(item);
-    setShowEditElementInventory(true);
+  const handleEdit = (owner) => {
+    const ownerToEdit = data.find((item) => item.Código === owner.Código);
+    if (ownerToEdit) {
+      setSelectedOwner({
+        id: ownerToEdit.Código,
+        businessName: ownerToEdit.Nombre,
+        phone: ownerToEdit.Teléfono,
+        email: ownerToEdit.Correo,
+        address: ownerToEdit.Dirección,
+        cityId: ownerToEdit.Ciudad,
+      });
+      setShowUpdateOwner(true);
+    }
   };
+
+  const handleUpdate = (updatedItem) => {
+    const updatedData = data.map((item) =>
+      item.Código === updatedItem.id ? translateFields([updatedItem])[0] : item
+    );
+    setData(updatedData);
+    setFilteredData(updatedData);
+  };
+
 
   // Handle delete action
   const handleDelete = (item) => {
@@ -55,50 +84,103 @@ export default function () {
     setSearchTerm(value);
   };
 
+  const handleRefresh = () => {
+    getData();
+    setSearchTerm("");
+  };
   // Handle save of new data
   const handleSave = (newItem) => {
     setData((prevData) => [...prevData, newItem]);
   };
 
+  const handleExport = () => {
+    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Propietarios");
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, "Propietarios.xlsx");
+  };
+
   // Set the document title on component mount
   useEffect(() => {
-    document.title = "Zonas";
+    document.title = "Propietarios";
   }, []);
 
   // Fetch data on component mount
   useEffect(() => {
     getData();
-  }, []);
+  }, [handleSave]);
 
-  // Filter data based on search term
-  const filteredData = data.filter((item) => {
+  const filterData = data.filter((item) => {
+    const codigo = item.Código ? item.Código.toString() : "";
+    const nombre = item.Nombre ? item.Nombre.toLowerCase() : "";
+    const nit = item.NIT ? item.NIT.toLowerCase() : "";
     return (
-      item.Código.toString().includes(searchTerm) ||
-      item.Nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.NIT.toLowerCase().includes(searchTerm.toLowerCase())
+      codigo.includes(searchTerm) ||
+      nombre.includes(searchTerm.toLowerCase())
+      || nit.includes(searchTerm.toLowerCase())
     );
   });
 
   return (
     <>
-      <div>
-        <h2>Propietarios</h2>
-        <label>Buscar:</label>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Código, NIT o Nombre"
-          className="filterSearch"
-        />
+      <div className='storeMain'>
+        <h2 className='storeTitle'>Propietarios</h2>
+        <div className="filtersContainer">
+          <div className="filters">
+            <label>Buscar:</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="Buscar..."
+              className="filterSearch"
+            />
+          </div>
+          <div className="actions">
+            <button onClick={handleRefresh} className="iconRefresh">
+              <FaSyncAlt />
+            </button>
+            <Button onClick={() => setShowAddOwner(true)} text="Añadir" />
+
+            <button onClick={handleExport} className="exportButton">
+              <RiFileExcel2Line className="ExportIcon" />
+              Exportar
+            </button>
+          </div>
+        </div>
         <DynamicTable
           columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Ciudad"]}
-          data={filteredData}
+          data={filterData}
           onEdit={handleEdit}
           onDelete={handleDelete}
           hideDeleteIcon={true}
         />
-      </div>
+      </div >
+      {showAddOwner && (
+        <AddNewOwner
+          show={showAddOwner}
+          onClose={() => setShowAddOwner(false)}
+          onSave={handleSave}
+        />
+      )}
+      {showEditOwner && itemToEdit && (
+        <UpdateNewOwner
+          show={showEditOwner}
+          onClose={() => setShowEditOwner(false)}
+          user={itemToEdit}
+          onSave={handleUpdate}
+        />
+      )}
+      {showUpdateOwner && selectedOwner && (
+        <UpdateOwner
+          show={showUpdateOwner}
+          onClose={() => setShowUpdateOwner(false)}
+          onUpdate={handleUpdate}
+          ownerData={selectedOwner}
+        />
+      )}
     </>
   );
 }

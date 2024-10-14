@@ -9,6 +9,8 @@ import { saveAs } from "file-saver";
 import { Tab, Tabs } from "react-bootstrap";
 import './Store.css';
 import { StoreType } from '../StoreType/StoreTypeIndex/StoreType';
+import { UpdateStore } from '../ActionsStore/UpdateStore/UpdateStore';
+
 
 export const Store = () => {
   const [key, setKey] = useState("store");
@@ -16,10 +18,11 @@ export const Store = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { privateFetch } = useAxios();
   const [itemToEdit, setItemToEdit] = useState(null);
-  const [showEditElementInventory, setShowEditElementInventory] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showEditStore, setShowEditStore] = useState(false);
+  const [selectedStore, setSelectedStore] = useState(null);
 
   const translateFields = (items) => {
     return items.map((item) => ({
@@ -50,11 +53,22 @@ export const Store = () => {
   };
 
   // Handle edit action
-  const handleEdit = (item) => {
-    setItemToEdit(item);
-    setShowEditElementInventory(true);
+  const handleEdit = (store) => {
+    const storeToEdit = data.find((item) => item.Código === store.Código);
+    if (storeToEdit) {
+      setSelectedStore(storeToEdit);
+      setShowEditStore(true);
+    }
   };
 
+
+  const handleUpdate = (updatedItem) => {
+    const updatedData = data.map((item) =>
+      item.Código === updatedItem.id ? translateFields([updatedItem])[0] : item
+    );
+    setData(updatedData); 
+  };
+  
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -82,17 +96,17 @@ export const Store = () => {
 
   // Filter data based on search term
   const filteredData = data.filter((item) => {
-    const codigo = item.Código ? item.Código.toString() : ""; 
-    const nombre = item.Nombre ? item.Nombre.toLowerCase() : ""; 
+    const codigo = item.Código ? item.Código.toString() : "";
+    const nombre = item.Nombre ? item.Nombre.toLowerCase() : "";
     return (
-        codigo.includes(searchTerm) ||
-        nombre.includes(searchTerm.toLowerCase())
+      codigo.includes(searchTerm) ||
+      nombre.includes(searchTerm.toLowerCase())
     );
-});
+  });
 
-const handleCloseModal = () => {
-  setShowModal(false);
-};
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   const handleExport = () => {
     const worksheet = XLSX.utils.json_to_sheet(filteredData);
@@ -157,6 +171,14 @@ const handleCloseModal = () => {
         />
       )}
 
+      {showEditStore && (
+        <UpdateStore
+          show={showEditStore}
+          onClose={() => setShowEditStore(false)}
+          storeData={selectedStore} // Pass the selectedStore object
+          onUpdate={handleUpdate}
+        />
+      )}
     </>
   );
 };

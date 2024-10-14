@@ -7,28 +7,32 @@ import { Modal } from "../../../../Layouts";
 export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
   const { privateFetch } = useAxios();
   const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({});
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [owners, setOwners] = useState([]);
   const [cities, setCities] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    id: officeData?.id || "",
+    description: "",
+    phone: "",
+    email: "",
+    address:"",
+    cityId: "",
+    ownerId:"",
+});
 
-  useEffect(() => {
-    if (show && officeData) {
-      fetchOwners();
-      fetchCities();
-      setFormData(officeData); 
-    }
-  }, [show, officeData]);
+useEffect(() => {
+  if (show && officeData?.id) {
+    fetchOwners();
+    fetchCities();
+    fetchOfficeData();
+  }
+}, [show, officeData]);
+
   
-console.log(officeData);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
   const handleKeyPress = (e) => {
     const regex = /^[a-zA-Z0-9\s]*$/;
@@ -49,6 +53,39 @@ console.log(officeData);
     );
   };
 
+  
+  const fetchOfficeData = async () => {
+    try {
+      console.log("Fetching office data for ID:", officeData.id);
+      const response = await privateFetch.get(`/location/office/id?id=${officeData.id}`);
+      
+      console.log("Datos recibidos:", response.data); // Imprime los datos para verificar
+  
+      // Accede al array en result.entity y toma el primer elemento (siempre que haya datos)
+      if (response.status === 200 && response.data.result.entity.length > 0) {
+        const office = response.data.result.entity[0]; // Accede al primer objeto del array
+  
+        // Actualiza el estado con los datos de la oficina
+        setFormData({
+          id: office.id,
+          description: office.description, 
+          phone: office.phone,
+          email: office.email,
+          address: office.address,
+          cityId: office.city.id,
+          ownerId: office.owner.id,
+        });
+      } else {
+        setError("No se encontraron datos para la oficina.");
+      }
+    } catch (error) {
+      console.error("Error fetching office data:", error);
+      setError("Ocurrió un error al obtener los datos de la oficina.");
+    }
+  };
+  
+  
+  
   
 
   const fetchOwners = async () => {
@@ -123,6 +160,13 @@ console.log(officeData);
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+    }));
+};
   return (
     <div className="modalOverlay">
       <div className="modalContent">

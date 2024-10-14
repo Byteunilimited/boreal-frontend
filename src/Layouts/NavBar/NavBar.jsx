@@ -20,12 +20,12 @@ export const NavBar = () => {
       {menuOpen && (
         <div className="dropdownMenu">
           <ul>
-            <li>
+            {/*<li>
               <Link to={"/boreal/perfil"} className="menuItem">
                 <RiUserShared2Line  className="menuIcon" />
                 Perfil
               </Link>
-            </li>
+            </li>*/}
             <li onClick={LogOut} className="menuItem">
               <RiLogoutBoxRLine className="menuIcon" />
               Cerrar sesión

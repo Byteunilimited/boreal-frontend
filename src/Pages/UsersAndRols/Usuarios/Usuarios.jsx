@@ -16,7 +16,8 @@ export const Usuarios = () => {
     const [showAddUser, setShowAddUser] = useState(false);
     const [showEditUser, setShowEditUser] = useState(false);
     const [data, setData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState({ Código: "", Nombre: "" });
+    const [filteredData, setFilteredData] = useState([]); // Estado para los datos filtrados
+    const [searchTerm, setSearchTerm] = useState("");
     const [itemToEdit, setItemToEdit] = useState(null);
     const [loading, setLoading] = useState(false);
     const { serialize } = useForm();
@@ -59,14 +60,25 @@ export const Usuarios = () => {
 
             ])
             const translatedData = translateFields(users?.result?.user ?? []);
-            setData(translatedData)
+            setData(translatedData);
+            setFilteredData(translatedData);
         }
         setLoading(false);
     }
 
 
     useEffect(() => {
-    }, [searchTerm]);
+        if (searchTerm) {
+            const filtered = data.filter((user) =>
+                user.Nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.Cédula.toString().includes(searchTerm)
+            );
+            setFilteredData(filtered);
+        } else {
+            setFilteredData(data); 
+        }
+    }, [searchTerm, data]); 
+
 
     const handleEdit = (item) => {
         setItemToEdit(item);
@@ -88,24 +100,34 @@ export const Usuarios = () => {
 
     return (
         <>
+            <div className="filtersContainer">
+                <div className="filters">
+                    <label>Buscar:</label>
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)} // Actualizamos el valor de búsqueda
+                        placeholder="Buscar..."
+                        className="filterSearch"
 
-            <div className="actions">
-                <button onClick={getData} className="iconRefresh">
-                    <FaSyncAlt />
-                </button>
-                <Button onClick={() => setShowAddUser(true)} text="Añadir" />
+                    />
+                </div>
+                <div className="actions">
+                    <button onClick={getData} className="iconRefresh">
+                        <FaSyncAlt />
+                    </button>
+                    <Button onClick={() => setShowAddUser(true)} text="Añadir" />
 
-                <button onClick={handleExport} className="exportButton">
-                    <RiFileExcel2Line className="ExportIcon" />
-                    Exportar
-                </button>
-
+                    <button onClick={handleExport} className="exportButton">
+                        <RiFileExcel2Line className="ExportIcon" />
+                        Exportar
+                    </button>
+                </div>
             </div>
-
 
             <DynamicTable
                 columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad"]}
-                data={data}
+                data={filteredData}
                 onEdit={handleEdit}
                 showToggle={true}
                 onToggle={() => { }}
@@ -120,7 +142,7 @@ export const Usuarios = () => {
                     onSave={handleSave}
                 />
             )}
-                        {showEditUser && itemToEdit && (
+            {showEditUser && itemToEdit && (
                 <UpdateUserModal
                     show={showEditUser}
                     onClose={() => setShowEditUser(false)}

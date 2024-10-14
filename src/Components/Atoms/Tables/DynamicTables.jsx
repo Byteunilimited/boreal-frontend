@@ -13,6 +13,7 @@ export const DynamicTable = ({
   onToggle = () => {}, 
   showToggle = true,    
   hideDeleteIcon = false,
+  hideEditIcon = false,
 }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
@@ -143,10 +144,12 @@ useState(() => {
                       ))}
                       {showToggle && (
                         <td>
-                          <RiEdit2Line
-                            className="actionIcon editIcon"
-                            onClick={() => onEdit(row)}
-                          />
+                          {!hideEditIcon && (  
+                            <RiEdit2Line
+                              className="actionIcon editIcon"
+                              onClick={() => onEdit(row)}
+                            />
+                          )}
                           {!hideDeleteIcon && (
                             <RiCloseFill
                               className="actionIcon deleteIcon"

@@ -186,9 +186,9 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                                 onClick={toggleShowConfirmPassword}
                             >
                                 {showConfirmPassword ? (
-                                    <EyeOff size={20} className="icon" />
+                                    <EyeOff size={20} className="iconPassword" />
                                 ) : (
-                                    <Eye size={20} className="icon" />
+                                    <Eye size={20} className="iconPassword" />
                                 )}
                             </span>
                         </div>

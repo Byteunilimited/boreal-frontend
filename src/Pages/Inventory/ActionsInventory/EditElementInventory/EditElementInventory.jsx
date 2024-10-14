@@ -14,72 +14,78 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [isSuccessful, setIsSuccessful] = useState(false);
-  const [offices, setOffices] = useState([]);
-  const [selectedOffice, setSelectedOffice] = useState("");
-  const [isStockEditable, setIsStockEditable] = useState(true);
-  const [showStockInput, setShowStockInput] = useState(true);
+  const [inventoryTypes, setInventoryTypes] = useState([]);
+  const [conditions, setConditions] = useState([]);
+  const [states, setStates] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [stores, setStores] = useState([]);
+  const [owners, setOwners] = useState([]);
 
   useEffect(() => {
-    console.log("Item recibido:", item);
-    if (item) {
-      const inventoryTypeId = item.Tipo === "Producto" ? 2 : 1;
-      const officeId = item.Sucursal ? findOfficeIdByName(item.Sucursal) : "";
+    const fetchItemData = async () => {
+      if (item && item.Código) {
+        try {
+          const apiUrl = `${API_ENDPOINT}/inventory/item/find`;
+          const payload = { inventoryId: item.Código };
+          const response = await axios.post(apiUrl, payload);
 
-      setFormData({
-        id: item.Código || "",
-        description: item.Nombre || "",
-        isEnable: item.Estado === "Activo",
-        stock: item.Existencias || 0,
-        inventoryTypeId: inventoryTypeId,
-        // officeId: officeId,
-      });
-      if (item.Tipo === "Producto") {
-        setShowStockInput(false); 
-      } else {
-        setShowStockInput(true);
+          if (response.data && response.data.result && response.data.result.inventory.length > 0) {
+            const productData = response.data.result.inventory[0];
+
+            setFormData({
+              id: productData.inventory.id || "",
+              description: productData.inventory.description || "",
+              isEnable: productData.state.id || "", 
+              stock: productData.quantity || 0,
+              owner: productData.owner.id || "", 
+              office: productData.store.id || "", 
+              condition: productData.itemCondition.id || "", 
+              status: productData.status.id || "", 
+              type: productData.inventory.inventoryType.id || "", 
+            });
+          } else {
+            setError("No se encontraron datos del producto.");
+          }
+        } catch (error) {
+          console.log("Error fetching item data:", error);
+          setError("Error al cargar los datos del producto.");
+        }
       }
+    };
 
-      // fetchOffices();
+    const fetchFilters = async () => {
+      try {
+        const [typeRes, conditionRes, stateRes, statusRes, storeRes, ownerRes] = await Promise.all([
+          privateFetch.get("/inventory/type/all"),
+          privateFetch.get("/lifecycle/condition/all"),
+          privateFetch.get("/lifecycle/state/all"),
+          privateFetch.get("/lifecycle/status/all"),
+          privateFetch.get("/location/store/item/all"), 
+          privateFetch.get("/location/owner/all")
+        ]);
+
+        setInventoryTypes(typeRes.data.result.item || []);
+        setConditions(conditionRes.data.result.entity || []);
+        setStates(stateRes.data.result.entity || []);
+        setStatuses(statusRes.data.result.entity || []);
+        setStores(storeRes.data.result.store || []);
+        setOwners(ownerRes.data.result.zone || []);
+      } catch (error) {
+        console.error("Error fetching filter data:", error);
+        setError("Ocurrió un error al obtener los datos de los filtros.");
+      }
+    };
+
+    if (show) {
+      fetchItemData();
+      fetchFilters();
     }
-  }, [item]);
-  
-  // const findOfficeIdByName = (name) => {
-  //   const office = offices.find((office) => office.description === name);
-  //   return office ? office.id : "";
-  // };
+  }, [item, show]);
 
-  // const fetchOffices = async () => {
-  //   try {
-  //     const response = await privateFetch.get("/office/all");
-  //     if (response.status === 200) {
-  //       setOffices(response.data.result.office);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setError("Ocurrió un error al obtener las oficinas.");
-  //   }
-  // };
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "inventoryTypeId") {
-      if (value === "2") {
-        setFormData((prev) => ({ ...prev, stock: 0 }));
-        setIsStockEditable(false);
-        setShowStockInput(false); // Ocultar el campo de cantidad
-      } else {
-        setIsStockEditable(true);
-        setShowStockInput(true); // Mostrar el campo de cantidad
-      }
-    }
-
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-  // const handleOfficeChange = (e) => {
-  //   setSelectedOffice(e.target.value);
-  //   setFormData((prev) => ({ ...prev, officeId: e.target.value }));
-  // };
 
   const closeModal = () => {
     setShowConfirmationModal(false);
@@ -90,14 +96,8 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     try {
-      const apiUrl =
-        `${API_ENDPOINT}/inventory/item/update`;
-      const response = await axios.put(apiUrl, {
-        ...formData,
-        isEnable: formData.isEnable, 
-        inventoryTypeId: Number(formData.inventoryTypeId),
-        // officeId: Number(formData.officeId),
-      });
+      const apiUrl = `${API_ENDPOINT}/inventory/item/update`;
+      const response = await axios.put(apiUrl, formData);
       if (response.status === 200) {
         setIsSuccessful(true);
         setConfirmationMessage("El elemento fue actualizado exitosamente.");
@@ -109,7 +109,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
     } catch (error) {
       console.log(error);
       setIsSuccessful(false);
-      setError("Ocurrió un error inesperado.");
+      setError("Ocurrió un error en el servidor, intente nuevamente.");
       setShowConfirmationModal(true);
     }
   };
@@ -124,7 +124,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
         <form onSubmit={handleSubmit}>
           <div className="formGroup">
             <label>Código:</label>
-            <input type="text" name="id" value={formData.id || ""} disabled/>
+            <input type="text" name="id" value={formData.id || ""} disabled />
           </div>
           <div className="formGroup">
             <label>Nombre:</label>
@@ -140,66 +140,85 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
             <label>Estado:</label>
             <select
               name="isEnable"
-              value={formData.isEnable}
+              value={formData.isEnable || ""}
               onChange={handleChange}
               required
               className="selects"
             >
               <option value="">Seleccionar estado</option>
-              <option value="true">Activo</option>
-              <option value="false">Inactivo</option>
+              {states.map((state) => (
+                <option key={state.id} value={state.id}>
+                  {state.description}
+                </option>
+              ))}
             </select>
           </div>
           <div className="formGroup">
             <label>Tipo:</label>
             <select
-              name="inventoryTypeId"
-              value={formData.inventoryTypeId || ""}
-              disabled
+              name="type"
+              value={formData.type || ""}
               onChange={handleChange}
               required
               className="selects"
             >
               <option value="">Seleccionar tipo</option>
-              <option value="1">Repuesto</option>
-              <option value="2">Producto</option>
-            </select>
-          </div>
-
-           {showStockInput && (
-            <div className="formGroup">
-              <label>Cantidad:</label>
-              <input
-                placeholder="Cantidad existente"
-                type="number"
-                name="stock"
-                onChange={handleChange}
-                required
-                value={formData.stock || ""}
-                readOnly={!isStockEditable}
-              />
-            </div>
-          )}
-          {/* <div className="formGroup">
-            <label>Sucursal:</label>
-            <select
-              value={formData.officeId}
-              name="officeId"
-              onChange={handleOfficeChange}
-              required
-              className="selects"
-            >
-              <option value="">Seleccionar sucursal</option>
-              {offices.map((office) => (
-                <option key={office.id} value={office.id}>
-                  {office.description}
+              {inventoryTypes.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.description}
                 </option>
               ))}
             </select>
-          </div> */}
+          </div>
+          <div className="formGroup">
+            <label>Condición:</label>
+            <select
+              name="condition"
+              value={formData.condition || ""}
+              onChange={handleChange}
+              required
+              className="selects"
+            >
+              <option value="">Seleccionar condición</option>
+              {conditions.map((condition) => (
+                <option key={condition.id} value={condition.id}>
+                  {condition.description}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="formGroup">
+            <label>Estado del artículo:</label>
+            <select
+              name="status"
+              value={formData.status || ""}
+              onChange={handleChange}
+              required
+              className="selects"
+            >
+              <option value="">Seleccionar estado del artículo</option>
+              {statuses.map((status) => (
+                <option key={status.id} value={status.id}>
+                  {status.description}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="formGroup">
+            <label>Cantidad:</label>
+            <input
+              type="number"
+              name="stock"
+              value={formData.stock || 0}
+              onChange={handleChange}
+              required
+            />
+          </div>
           <div className="formActions">
             <button type="submit">Guardar</button>
-            <button type="button" onClick={onClose}>Cancelar</button>
+            <button type="button" onClick={onClose}>
+              Cancelar
+            </button>
           </div>
         </form>
       </div>
