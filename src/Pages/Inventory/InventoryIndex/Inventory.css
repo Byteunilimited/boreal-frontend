@@ -21,6 +21,7 @@ body {
     display: flex;
     margin-left: 18%;
     flex-direction: column;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
   }
   
   
@@ -94,7 +95,7 @@ body {
   padding: 10px;
   border: 1px solid #aab7da;
   border-radius: 20px;
-  width: 3em;
+  width: 9em;
   cursor: pointer;
 }
 

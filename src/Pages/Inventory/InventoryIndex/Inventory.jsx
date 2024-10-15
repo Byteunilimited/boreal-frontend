@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
 import "./Inventory.css";
 import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { AddItemModal } from "../ActionsInventory";
+import { AddItemModal } from "../ActionsInventory/AddItemModal/AddItemModal";
 import { BulkUpload } from "../../../Layouts/BulkUpload/BulkUpload";
 import { useAxios } from "../../../Contexts";
 import { createSearchParams } from "react-router-dom";

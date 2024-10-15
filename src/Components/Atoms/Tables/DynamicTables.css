@@ -5,7 +5,10 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: #ffffff;    margin: 0;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: lighter;
+
 }
 
 .dynamicTable th,

@@ -6,7 +6,8 @@ import { ConfirmationModal } from "../../../Layouts";
 import { useAxios } from "../../../Contexts";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { AddOfficeModal, UpdateOfficeModal } from "../AddModals";
+import { AddOfficeModal } from "../AddModals/addModalOffice/AddOfficeModal";
+import { UpdateOfficeModal } from "../AddModals/editModalOffice/UpdateOfficeModal";
 import './Officces.css'
 
 export const Offices = () => {

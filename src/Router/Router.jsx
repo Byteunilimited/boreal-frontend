@@ -1,9 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { LoginBoreal,  UserAndRols, Dashboard, Equipment, Bills, Procedures,   Inventory, Store, DepartmentsAndCities, Offices } from "../Pages";
 import { BaseSideBar, Error404 } from "../Layouts";
 import { useAuth } from "../Contexts";
-import Profile from "../Pages/Profile/ProfileIndex/Profile";
-import Owners from "../Pages/Owners/ownersIndex/Owners";
+import {Bills} from '../Pages/Bills/BillsIndex/Bills'
+import {LoginBoreal} from '../Pages/LoginBoreal/LoginIndex/LoginBoreal'
+import {UserAndRols} from '../Pages/UsersAndRols/UsersAndRolsIndex/UserAndRols'
+import {Profile} from '../Pages/Profile/ProfileIndex/Profile'
+import {Offices} from '../Pages/Offices/OfficcesIndex/Offices'
+import {DepartmentsAndCities} from '../Pages/DepartmentsAndCities/DepartamentsAndCitiesIndex/DepartmentsAndCities'
+import {Inventory} from '../Pages/Inventory/InventoryIndex/Inventory'
+import {Dashboard} from '../Pages/Dashboard/DashboardIndex/DashboardPage'
+import {Equipment} from '../Pages/Equipment/EquipmentIndex/Equipment'
+import {Owners} from '../Pages/Owners/ownersIndex/Owners'
+import {Procedures} from '../Pages/Procedures/ProceduresIndex/Procedures'
+import {Store} from '../Pages/Stores/StoreIndex/Store'
 
 export const Router = () => {
   const { isAutenticated } = useAuth();

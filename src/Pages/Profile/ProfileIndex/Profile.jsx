@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useAxios } from '../../../Contexts';
 
-const Profile = () => {
+export const Profile = () => {
   const { privateFetch } = useAxios();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const token = localStorage.getItem('token'); // Obtener el token del almacenamiento local
-        const userId = localStorage.getItem('userId'); // Obtener el ID del usuario del almacenamiento local
+        const token = localStorage.getItem('token'); 
+        const userId = localStorage.getItem('userId'); 
 
         if (!token || !userId) {
           // Manejar el caso en que no haya token o ID de usuario (usuario no autenticado)
@@ -31,18 +31,18 @@ const Profile = () => {
     };
 
     fetchUserProfile();
-  }, [privateFetch]); // Solo privateFetch como dependencia, ya que userId no cambiará después de la carga inicial
+  }, [privateFetch]); 
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token'); // Obtener el token del almacenamiento local
+      const token = localStorage.getItem('token'); 
       if (!token) {
         console.error('No token found. User not authenticated.');
         return;
       }
 
-      // Hacer la solicitud PUT para actualizar el perfil del usuario
+
       const response = await privateFetch.put('/boreal/user/update', user, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -91,4 +91,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+

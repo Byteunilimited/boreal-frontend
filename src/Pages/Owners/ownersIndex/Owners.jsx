@@ -8,7 +8,7 @@ import { saveAs } from "file-saver";
 import { AddNewOwner } from '../ActionsOwners/AddNewOwner/AddNewOwner';
 import { UpdateOwner } from '../ActionsOwners/UpdateOwner/UpdateOwner';
 
-export default function () {
+export const Owners =  () =>{
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { privateFetch } = useAxios();

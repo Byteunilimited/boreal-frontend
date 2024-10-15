@@ -9,7 +9,7 @@ import {
   BorealLogo,
 } from "../../../assets";
 import {  Modal } from "../../../Layouts";
-import { PasswordRecoveryModal } from "../PasswordRecoveryModal"
+import { PasswordRecoveryModal } from "../PasswordRecoveryModal/PasswordRecoveryModal"
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../Components";
 import { useForm } from "../../../hooks";
