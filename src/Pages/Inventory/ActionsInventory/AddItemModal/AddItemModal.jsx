@@ -3,6 +3,8 @@ import { useAxios } from "../../../../Contexts";
 import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import "./AddItemModal.css";
+import axios from "axios";
+import FormData from "form-data";
 
 export const AddItemModal = ({ show, onClose, onSave }) => {
   const { privateFetch } = useAxios();
@@ -71,44 +73,48 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
     setError(null);
   };
 
+  
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     try {
-      const inventory = {
+
+      const inventoryData = {
         id: formData.id,
         description: formData.description,
-        inventoryTypeId: Number(formData.inventoryTypeId),
-        quantity: Number(formData.stock) || 0,
+        inventoryTypeId: formData.inventoryTypeId
       };
   
-      const options = {
-        itemConditionId: Number(formData.itemConditionId),
-        stateId: Number(formData.stateId),
-        statusId: Number(formData.statusId),
-        storeId: Number(formData.storeId),
-        ownerId: Number(formData.ownerId),
+      const optionsData = {
+        itemConditionId: parseInt(formData.itemConditionId),
+        stateId: parseInt(formData.stateId),
+        statusId: parseInt(formData.statusId), 
+        storeId: parseInt(formData.storeId),
+        ownerId: parseInt(formData.ownerId) ,
+        quantity: parseInt(formData.quantity) 
       };
   
       const payload = {
-        inventory,
-        options
+        inventory: JSON.stringify(inventoryData),
+        options: JSON.stringify(optionsData), 
       };
-
-
-  console.log(JSON.stringify(payload));
   
-      const response = await privateFetch.post("/inventory/item/create", JSON.stringify(payload), {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      console.log(payload);
+  
+      const response = await axios.post(
+        "https://boreal-api-j8oy.onrender.com/boreal/inventory/item/create",
+        payload,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
   
       if (response.status === 200) {
-        const data = response.data;
         setIsSuccessful(true);
         setConfirmationMessage("El elemento fue añadido exitosamente.");
         setShowConfirmationModal(true);
-        onSave(data);
+        onSave(response.data);
       } else {
         setError("Ocurrió un error al crear el elemento.");
         setShowConfirmationModal(true);
@@ -163,10 +169,10 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
               <label>Cantidad:</label>
               <input
                 type="number"
-                name="stock"
+                name="quantity"
                 onChange={handleChange}
                 required
-                value={formData.stock || ""}  
+                value={formData.quantity || ""}  
                 readOnly={!isStockEditable}
               />
             </div>

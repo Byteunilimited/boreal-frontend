@@ -84,7 +84,7 @@ export const Profile = () => {
       <label>Email:</label>
       <input type="email" name="email" value={user.email} onChange={handleChange} />
       
-      {/* Add more fields as needed */}
+  
 
       <button type="submit">Update Profile</button>
     </form>
