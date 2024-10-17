@@ -188,7 +188,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
             </select>
           </div>
           <div className="formGroup">
-            <label>Estado del artículo:</label>
+            <label>Calidad:</label>
             <select
               name="status"
               value={formData.status || ""}
@@ -196,7 +196,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
               required
               className="selects"
             >
-              <option value="">Seleccionar estado del artículo</option>
+              <option value="">Seleccionar calidad del artículo</option>
               {statuses.map((status) => (
                 <option key={status.id} value={status.id}>
                   {status.description}

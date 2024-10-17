@@ -34,7 +34,7 @@ export const InventoryDepends = () => {
       const response = await privateFetch.get('/lifecycle/status/all');
       handleResponse(response, 'entity');
     } catch (error) {
-      console.error('Error fetching Circunstancia:', error);
+      console.error('Error fetching Calidad:', error);
       setData([]);
     }
   };
@@ -69,7 +69,7 @@ export const InventoryDepends = () => {
       case 'Estados':
         fetchStates();
         break;
-      case 'Circunstancia':
+      case 'Calidad':
         fetchCircumstances();
         break;
       case 'Tipo':
@@ -89,7 +89,7 @@ export const InventoryDepends = () => {
       case 'Estados':
         endpoint = '/lifecycle/state/create';
         break;
-      case 'Circunstancia':
+      case 'Calidad':
         endpoint = '/lifecycle/status/create';
         break;
       case 'Tipo':
@@ -132,7 +132,7 @@ export const InventoryDepends = () => {
                         <option value="">Selecciona</option>
                         <option value="Condiciones">Condiciones</option>
                         <option value="Estados">Estados</option>
-                        <option value="Circunstancia">Circunstancia</option>
+                        <option value="Calidad">Calidad</option>
                         <option value="Tipo">Tipo de elemento</option>
                     </select>
                 </div>

@@ -15,10 +15,9 @@ import { API_ENDPOINT } from "../../../util";
 import { ConfirmationModal, Modal } from "../../../Layouts";
 import { EditElementInventory } from "../ActionsInventory/EditElementInventory/EditElementInventory";
 import { InventoryDepends } from "../InventoryDepends/InventoryDepends";
-import { Assignments } from "../Assignments/Assignments";
 
 export const Inventory = () => {
-  const [key, setKey] = useState("items");
+  const [key, setKey] = useState("activos");
   const [error, setError] = useState(null);
   const { privateFetch } = useAxios();
   const [dateTo, setDateTo] = useState(new Date().toISOString().split("T")[0]);
@@ -49,7 +48,7 @@ export const Inventory = () => {
       Estado: item.state.description,
       Condición: item.itemCondition.description,
       Cantidad: item.quantity,
-      Circunstancia: item.status.description,
+      Calidad: item.status.description,
     }));
   };
 
@@ -94,7 +93,6 @@ export const Inventory = () => {
 
 
   const handleEdit = (item) => {
-    console.log(item);
     setItemToEdit(item);
     setShowEditElementInventory(true);
   };
@@ -156,8 +154,9 @@ export const Inventory = () => {
               id="controlled-tab-example"
               activeKey={key}
               onSelect={(k) => setKey(k)}
-              className="mb-3 mt-4">
-              <Tab eventKey="items" title="Inventario">
+              className="mb-3 mt-4"
+            >
+              <Tab eventKey="activos" title="Activos">
                 <div className="filtersContainer">
                   <div className="filters">
                     <label>Tipo:</label>
@@ -166,7 +165,7 @@ export const Inventory = () => {
                       onChange={(e) => setItemType(e.target.value)}
                       className="filter"
                     >
-                      <option value="">Todos</option> 
+                      <option value="">Todos</option>
                       {[...new Set(data.map((item) => item.Tipo))]
                         .filter(Boolean)
                         .map((Tipo, index) => (
@@ -194,11 +193,6 @@ export const Inventory = () => {
                       <RiFileExcel2Line className="ExportIcon" />
                       Exportar
                     </button>
-                    {/*<button
-                      onClick={() => setShowBulkUploadModal(true)}
-                      className="exportButton">
-                      Cargue masivo
-                    </button>*/}
                   </div>
                 </div>
                 <DynamicTable
@@ -211,19 +205,80 @@ export const Inventory = () => {
                     "Estado",
                     "Condición",
                     "Cantidad",
-                    "Circunstancia",
+                    "Calidad",
                   ]}
-                  data={filteredData}
+                  data={filteredData.filter(item => item.Estado === 'Activo')}
                   onEdit={handleEdit}
                   onFilter={handleFilter}
                   hideDeleteIcon={true}
                 />
-
               </Tab>
-              {/*               <Tab eventKey="asignaciones" title="Asignaciones">
-                <Assignments />
-              </Tab> */}
-              <Tab eventKey="dependencias" title="Dependencias">
+
+              {/* Pestaña de Inactivos */}
+              <Tab eventKey="inactivos" title="Inactivos">
+                <div className="filtersContainer">
+                  <div className="filters">
+                    <label>Tipo:</label>
+                    <select
+                      value={itemType}
+                      onChange={(e) => setItemType(e.target.value)}
+                      className="filter"
+                    >
+                      <option value="">Todos</option>
+                      {[...new Set(data.map((item) => item.Tipo))]
+                        .filter(Boolean)
+                        .map((Tipo, index) => (
+                          <option key={index} value={Tipo}>
+                            {Tipo}
+                          </option>
+                        ))}
+                    </select>
+
+                    <label>Buscar:</label>
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      placeholder="Código o Nombre"
+                      className="filterSearch"
+                    />
+                  </div>
+                  <div className="actions">
+                    <button onClick={handleRefresh} className="iconRefresh">
+                      <FaSyncAlt />
+                    </button>
+                    <Button onClick={() => setShowModal(true)} text="Añadir" />
+                    <button onClick={handleExport} className="exportButton">
+                      <RiFileExcel2Line className="ExportIcon" />
+                      Exportar
+                    </button>
+                  </div>
+                </div>
+
+                <DynamicTable
+                  columns={[
+                    "Código",
+                    "Nombre",
+                    "Tipo",
+                    "Propietario",
+                    "Bodega",
+                    "Estado",
+                    "Condición",
+                    "Cantidad",
+                    "Calidad",
+                  ]}
+                  data={filteredData.filter(item => item.Estado === 'Inactivo')}
+                  onEdit={handleEdit}
+                  onFilter={handleFilter}
+                  hideDeleteIcon={true}
+                />
+              </Tab>
+
+              <Tab eventKey="asiganciones" title="Asignaciones">
+                Asignaciones
+              </Tab>
+
+              <Tab eventKey="vinculaciones" title="Vinculaciones">
                 <InventoryDepends />
               </Tab>
             </Tabs>
@@ -231,7 +286,7 @@ export const Inventory = () => {
         </div>
       </div>
 
-      {/* Modals */}
+
       {showModal && (
         <AddItemModal
           show={showModal}

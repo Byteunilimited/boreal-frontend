@@ -17,10 +17,11 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
   const [conditions, setConditions] = useState([]);
   const [states, setStates] = useState([]);
   const [statuses, setStatuses] = useState([]);
-  const [stores, setStores] = useState([]);  
-  const [owners, setOwners] = useState([]);  
+  const [stores, setStores] = useState([]);
+  const [owners, setOwners] = useState([]);
   const [isStockEditable, setIsStockEditable] = useState(true);
   const [showStockInput, setShowStockInput] = useState(true);
+  const [activeTab, setActiveTab] = useState('active');
 
   useEffect(() => {
     if (show) {
@@ -35,16 +36,16 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         privateFetch.get("/lifecycle/condition/all"),
         privateFetch.get("/lifecycle/state/all"),
         privateFetch.get("/lifecycle/status/all"),
-        privateFetch.get("/location/store/item/all"), 
-        privateFetch.get("/location/owner/all")       
+        privateFetch.get("/location/store/item/all"),
+        privateFetch.get("/location/owner/all")
       ]);
 
       setInventoryTypes(typeRes.data.result.item || []);
       setConditions(conditionRes.data.result.entity || []);
       setStates(stateRes.data.result.entity || []);
       setStatuses(statusRes.data.result.entity || []);
-      setStores(storeRes.data.result.store || []);  
-      setOwners(ownerRes.data.result.zone || []);  
+      setStores(storeRes.data.result.store || []);
+      setOwners(ownerRes.data.result.zone || []);
     } catch (error) {
       console.error("Error fetching filter data:", error);
       setError("Ocurrió un error al obtener los datos de los filtros.");
@@ -72,60 +73,58 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
     setShowConfirmationModal(false);
     setError(null);
   };
-
-  
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
+  const handleSubmit = async () => {
     try {
-
+      // Crear una nueva instancia de FormData
+      const formDataToSend = new FormData();
+  
+      // Datos quemados para 'inventory'
       const inventoryData = {
-        id: formData.id,
-        description: formData.description,
-        inventoryTypeId: formData.inventoryTypeId
+        id: "5559565", // ID quemado
+        description: "Manigueta 15 pulgadas", // Descripción quemada
+        inventoryTypeId: 1, // ID de tipo de inventario quemado
       };
   
+      // Datos quemados para 'options'
       const optionsData = {
-        itemConditionId: parseInt(formData.itemConditionId),
-        stateId: parseInt(formData.stateId),
-        statusId: parseInt(formData.statusId), 
-        storeId: parseInt(formData.storeId),
-        ownerId: parseInt(formData.ownerId) ,
-        quantity: parseInt(formData.quantity) 
+        itemConditionId: 1, 
+        stateId: 2, 
+        statusId: 1, 
+        storeId: 2, 
+        ownerId: 1,
+        quantity: 66,
       };
   
-      const payload = {
-        inventory: JSON.stringify(inventoryData),
-        options: JSON.stringify(optionsData), 
-      };
+
+      formDataToSend.append('inventory', JSON.stringify(inventoryData));
+      formDataToSend.append('options', JSON.stringify(optionsData));
+
+
+      for (const pair of formDataToSend.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+      }
   
-      console.log(payload);
+
+      const response = await fetch("https://boreal-api-j8oy.onrender.com/boreal/inventory/item/create", {
+        method: 'POST',
+        body: formDataToSend, 
+
+      });
   
-      const response = await axios.post(
-        "https://boreal-api-j8oy.onrender.com/boreal/inventory/item/create",
-        payload,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        }
-      );
+      // Procesar la respuesta
+      const data = await response.json();
   
-      if (response.status === 200) {
-        setIsSuccessful(true);
-        setConfirmationMessage("El elemento fue añadido exitosamente.");
-        setShowConfirmationModal(true);
-        onSave(response.data);
+      if (response.ok) {
+        console.log("Success:", data);
       } else {
-        setError("Ocurrió un error al crear el elemento.");
-        setShowConfirmationModal(true);
+        console.error("Error en la respuesta:", data);
       }
     } catch (error) {
       console.error("Error inesperado:", error);
-      setError(error.response?.data?.message || "Error al crear el elemento, verifica los datos.");
-      setShowConfirmationModal(true);
     }
   };
   
+
   return (
     <div className="modalOverlay">
       <div className="modalContent">
@@ -172,7 +171,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
                 name="quantity"
                 onChange={handleChange}
                 required
-                value={formData.quantity || ""}  
+                value={formData.quantity || ""}
                 readOnly={!isStockEditable}
               />
             </div>
@@ -200,7 +199,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
             </select>
           </div>
           <div className="formGroup">
-            <label>Circunstancia:</label>
+            <label>Calidad:</label>
             <select name="statusId" onChange={handleChange} required className="selects" value={formData.statusId || ""}>  // Valor añadido
               <option value="">Seleccionar estatus</option>
               {statuses.map((status) => (
@@ -213,7 +212,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
           <div className="formGroup">
             <label>Bodega:</label>
             <select name="storeId" onChange={handleChange} required className="selects" value={formData.storeId || ""}>  // Valor añadido
-              <option value="">Seleccionar tienda</option>
+              <option value="">Seleccionar bodega</option>
               {stores.map((store) => (
                 <option key={store.id} value={store.id}>
                   {store.description}
@@ -240,14 +239,14 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
           </div>
         </form>
         {showConfirmationModal && (
-        <Modal
-          title={isSuccessful ? "Éxito" : "Error"}
-          text={isSuccessful ? confirmationMessage : error}
-          onClose={closeModal}
-          modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
-          showCloseButton
-        />
-      )}
+          <Modal
+            title={isSuccessful ? "Éxito" : "Error"}
+            text={isSuccessful ? confirmationMessage : error}
+            onClose={closeModal}
+            modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
+            showCloseButton
+          />
+        )}
       </div>
     </div>
   );
