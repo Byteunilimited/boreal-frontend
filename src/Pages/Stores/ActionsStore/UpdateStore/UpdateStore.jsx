@@ -40,8 +40,8 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
     const fetchStoreData = async () => {
         try {
             const response = await privateFetch.get(`/location/store/item/id?id=${storeData.Código}`);
-            if (response.status === 200 && response.data.result.store.length > 0) {
-                const store = response.data.result.store[0];
+            if (response.status === 200 && response.data.result.items.length > 0) {
+                const store = response.data.result.items[0];
                 setFormData({
                     id: store.id,
                     description: store.description,
@@ -66,7 +66,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         try {
             const response = await privateFetch.get("/location/owner/all");
             if (response.status === 200) {
-                setOwners(response.data.result.zone);
+                setOwners(response.data.result.items);
             }
         } catch (error) {
             console.error("Error fetching owners:", error);
@@ -77,7 +77,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         try {
             const response = await privateFetch.get("/location/store/type/all");
             if (response.status === 200) {
-                setStoreTypes(response.data.result.item);
+                setStoreTypes(response.data.result.items);
             }
         } catch (error) {
             console.error("Error fetching store types:", error);
@@ -88,7 +88,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         try {
             const response = await privateFetch.get("/location/city/all");
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                setCities(response.data.result.items);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
@@ -99,7 +99,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         try {
             const response = await privateFetch.get("/location/office/all");
             if (response.status === 200) {
-                setOffices(response.data.result.entity);
+                setOffices(response.data.result.items);
             }
         } catch (error) {
             console.error("Error fetching offices:", error);

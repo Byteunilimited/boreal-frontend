@@ -34,11 +34,11 @@ console.log(ownerData);
         try {
             const response = await privateFetch.get(`/location/owner/id?id=${ownerData.id}`);
             if (response.status === 200 && response.data.result.zone.length > 0) {
-                const owner = response.data.result.zone[0];
+                const owner = response.data.result.items[0];
                 setFormData({
                     id: owner.id,
                     nit: owner.nit,
-                    businessName: owner.businessName,
+                    businessName: owner.name,
                     phone: owner.phone,
                     email: owner.email,
                     address: owner.address,
@@ -56,7 +56,7 @@ console.log(ownerData);
         try {
             const response = await privateFetch.get("/location/city/all");
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                setCities(response.data.result.items);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");

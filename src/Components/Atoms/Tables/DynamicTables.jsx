@@ -132,7 +132,7 @@ useState(() => {
                             <label className="switch">
                               <input
                                 type="checkbox"
-                                checked={row[column] === "Activo"}
+                                checked={row[column] === "Habilitado"}
                                 onChange={() => onToggle(row)}
                               />
                               <span className="slider round"></span>

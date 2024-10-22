@@ -26,11 +26,13 @@ export const Owners =  () =>{
     return items.map((item) => ({
       Código: item.id,
       NIT: item.nit,
-      Nombre: item.businessName,
+      Nombre: item.name,
       Teléfono: item.phone,
       Dirección: item.address,
       Email: item.email,
-      Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido"
+      Estado: item.stateId,
+      Ciudad: item.cityId 
+
     }));
   };
 
@@ -38,7 +40,7 @@ export const Owners =  () =>{
     try {
       const response = await privateFetch.get("/location/owner/all");
       if (response && response.data) {
-        const translatedData = translateFields(response.data.result.zone);
+        const translatedData = translateFields(response.data.result.items);
         setData(translatedData);
       } else {
         console.error("Response does not contain data:", response);
@@ -151,7 +153,7 @@ export const Owners =  () =>{
           </div>
         </div>
         <DynamicTable
-          columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Ciudad"]}
+          columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Estado", "Ciudad"]}
           data={filterData}
           onEdit={handleEdit}
           onDelete={handleDelete}

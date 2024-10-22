@@ -15,12 +15,14 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
         address: "",
         cityId: "",
         roleId: "",
+        officeId: "",  
     });
     const [error, setError] = useState(null);
     const [isSuccessful, setIsSuccessful] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [cities, setCities] = useState([]);
+    const [offices, setOffices] = useState([]);
     const [roles, setRoles] = useState([]);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -29,6 +31,8 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
         if (show) {
             fetchCities();
             fetchRoles();
+            fetchOffices(); 
+            fetchDepartments();
         }
     }, [show]);
 
@@ -36,10 +40,27 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
         try {
             const response = await privateFetch.get("/location/city/all");
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                const citiesData = response.data.result.items;
+                setCities(citiesData);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
+        }
+    };
+
+    const fetchDepartments = async () => {
+        try {
+            const response = await privateFetch.get("/location/department/all");
+            if (response.status === 200) {
+                const deptData = response.data.result.items;
+                const deptNames = deptData.reduce((acc, dept) => {
+                    acc[dept.id] = dept.description;
+                    return acc;
+                }, {});
+                setDepartments(deptNames);
+            }
+        } catch (error) {
+            console.error("Error al obtener los departamentos:", error);
         }
     };
 
@@ -47,13 +68,23 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
         try {
             const response = await privateFetch.get("/role/all");
             if (response.status === 200) {
-                setRoles(response.data.result.role);
+                setRoles(response.data.result.items);
             }
         } catch (error) {
             console.error("Error fetching roles:", error);
         }
     };
 
+    const fetchOffices = async () => {
+        try {
+            const response = await privateFetch.get("/location/office/all");
+            if (response.status === 200) {
+                setOffices(response.data.result.items);
+            }
+        } catch (error) {
+            setError("Ocurrió un error al obtener las oficinas.");
+        }
+    };
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -81,7 +112,6 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
             setShowConfirmationModal(true);
         }
     };
-
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
@@ -196,7 +226,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                         />
                     </div>
                     <div className="formGroup">
-                        <label>Ciudad:</label>
+                    <label>Ciudad:</label>
                         <select
                             name="cityId"
                             value={formData.cityId}
@@ -207,8 +237,25 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                             <option value="">Seleccionar ciudad</option>
                             {cities.map(city => (
                                 <option key={city.id} value={city.id}>
-                                {`${city.description} (${city.department.description})`}
-                            </option>
+                                    {`${city.description} (Dept: ${departments[city.departmentId]})`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="formGroup">
+                        <label>Oficina:</label>
+                        <select
+                            name="officeId"
+                            value={formData.officeId}
+                            onChange={handleChange}
+                            required
+                            className="selects"
+                        >
+                            <option value="">Seleccionar oficina</option>
+                            {offices.map((office) => (
+                                <option key={office.id} value={office.id}>
+                                    {office.description}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -224,7 +271,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                             <option value="">Seleccionar rol</option>
                             {roles.map((role) => (
                                 <option key={role.id} value={role.id}>
-                                    {role.description}
+                                    {role.name}
                                 </option>
                             ))}
                         </select>

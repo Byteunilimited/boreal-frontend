@@ -7,19 +7,23 @@ import { Tab, Tabs } from "react-bootstrap";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
+
 export const DepartmentsAndCities = () => {
   const [key, setKey] = useState("departments");
   const [departments, setDepartments] = useState([]);
   const [cities, setCities] = useState([]);
   const [filteredDepartments, setFilteredDepartments] = useState([]);
   const [filteredCities, setFilteredCities] = useState([]);
+  const [departmentNames, setDepartmentNames] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
+
+
 
   useEffect(() => {
     document.title = "Departamentos y Ciudades";
-    getDepartments();
-    getCities();
-  }, []);
+    fetchDepartments();
+    fetchCities();
+  }, []); 
 
   useEffect(() => {
     if (key === "departments") {
@@ -29,15 +33,21 @@ export const DepartmentsAndCities = () => {
     }
   }, [departments, cities, searchTerm, key]);
 
-  const getDepartments = async () => {
+  const fetchDepartments = async () => {
     try {
-      const response = await axios.get(`${API_ENDPOINT}/location/department/all`, {
+      const response = await axios.get(`${API_ENDPOINT}/location/department/all?page=0&size=33`, {
         headers: {
           "x-custom-header": "Boreal Api",
         },
       });
       if (response.data && response.data.result) {
-        setDepartments(response.data.result.department);
+        const deptData = response.data.result.items;
+        setDepartments(deptData);
+        const deptNames = deptData.reduce((acc, dept) => {
+          acc[dept.id] = dept.description;
+          return acc;
+        }, {});
+        setDepartmentNames(deptNames);
       } else {
         console.error("Error fetching departments data:", response);
       }
@@ -46,15 +56,15 @@ export const DepartmentsAndCities = () => {
     }
   };
 
-  const getCities = async () => {
+  const fetchCities = async () => {
     try {
-      const response = await axios.get(`${API_ENDPOINT}/location/city/all`, {
+      const response = await axios.get(`${API_ENDPOINT}/location/city/all?page=0&size=1119`, {
         headers: {
           "x-custom-header": "Boreal Api",
         },
       });
       if (response.data && response.data.result) {
-        setCities(response.data.result.city);
+        setCities(response.data.result.items);
       } else {
         console.error("Error fetching cities data:", response);
       }
@@ -75,7 +85,27 @@ export const DepartmentsAndCities = () => {
     }
   };
 
-  
+  const filterCities = (searchTerm) => {
+    if (!searchTerm) {
+      setFilteredCities(cities);
+    } else {
+      const filtered = cities.filter((city) => {
+        const departmentName = departmentNames[city.departmentId] || "";
+        return (
+          city.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          city.id.toString().includes(searchTerm) ||
+          departmentName.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
+      setFilteredCities(filtered);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+  };
+
   const handleExport = () => {
     const dataToExport = key === "departments" ? formattedDepartments : formattedCities;
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -85,20 +115,20 @@ export const DepartmentsAndCities = () => {
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, key === "departments" ? "Departamentos.xlsx" : "Ciudades.xlsx");
   };
-  
 
-  const filterCities = (searchTerm) => {
-    if (!searchTerm) {
-      setFilteredCities(cities);
-    } else {
-      const filtered = cities.filter((city) =>
-        city.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        city.id.toString().includes(searchTerm)
-      );
-      setFilteredCities(filtered);
-    }
-  };
+  const departmentColumns = ["Código", "Nombre"];
+  const cityColumns = ["Código", "Nombre", "Departamento"];
 
+  const formattedDepartments = filteredDepartments.map((dept) => ({
+    Código: dept.id,
+    Nombre: dept.description,
+  }));
+
+  const formattedCities = filteredCities.map((city) => ({
+    Código: city.id,
+    Nombre: city.description,
+    Departamento: departmentNames[city.departmentId] || "Desconocido",
+  }));
 
   const handleEdit = (row) => {
     console.log("Edit:", row);
@@ -112,19 +142,6 @@ export const DepartmentsAndCities = () => {
     console.log("Toggle status:", row);
   };
 
-  const departmentColumns = ["Código", "Nombre"];
-  const cityColumns = ["Código", "Nombre"];
-
-  const formattedDepartments = filteredDepartments.map((dept) => ({
-    Código: dept.id,
-    Nombre: dept.description,
-  }));
-
-  const formattedCities = filteredCities.map((city) => ({
-    Código: city.id,
-    Nombre: city.description,
-  }));
-
   return (
     <>
       <div className="departments-container">
@@ -135,14 +152,12 @@ export const DepartmentsAndCities = () => {
           onSelect={(k) => setKey(k)}
           className="mb-3 mt-4"
         >
-
           <Tab eventKey="departments" title="Departamentos">
-
             <label>Buscar:</label>
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               placeholder="Código o Nombre"
               className="filterSearchCities"
             />
@@ -162,13 +177,12 @@ export const DepartmentsAndCities = () => {
           </Tab>
 
           <Tab eventKey="cities" title="Ciudades">
-
             <label>Buscar:</label>
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Código o Nombre"
+              onChange={handleSearchChange}
+              placeholder="Código, Nombre o Departamento"
               className="filterSearchCities"
             />
             <button onClick={handleExport} className="exportButton">

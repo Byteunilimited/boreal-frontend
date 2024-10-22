@@ -31,7 +31,7 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
         try {
             const response = await privateFetch.get("/location/city/all");
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                setCities(response.data.result.items);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");

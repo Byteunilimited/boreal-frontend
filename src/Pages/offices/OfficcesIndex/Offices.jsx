@@ -36,7 +36,7 @@ export const Offices = () => {
     try {
       const response = await privateFetch.get("/location/office/all");
       if (response && response.data) {
-        const translatedData = translateFields(response.data.result.entity);
+        const translatedData = translateFields(response.data.result.items);
         setData(translatedData);
         setFilteredData(translatedData);
       } else {

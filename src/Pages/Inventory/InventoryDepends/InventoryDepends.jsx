@@ -12,7 +12,7 @@ export const InventoryDepends = () => {
   const fetchConditions = async () => {
     try {
       const response = await privateFetch.get('/lifecycle/condition/all');
-      handleResponse(response, 'entity');
+      handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Condiciones:', error);
       setData([]);
@@ -22,7 +22,7 @@ export const InventoryDepends = () => {
   const fetchStates = async () => {
     try {
       const response = await privateFetch.get('/lifecycle/state/all');
-      handleResponse(response, 'entity');
+      handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Estados:', error);
       setData([]);
@@ -31,8 +31,8 @@ export const InventoryDepends = () => {
 
   const fetchCircumstances = async () => {
     try {
-      const response = await privateFetch.get('/lifecycle/status/all');
-      handleResponse(response, 'entity');
+      const response = await privateFetch.get('/lifecycle/health/all');
+      handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Calidad:', error);
       setData([]);
@@ -42,7 +42,7 @@ export const InventoryDepends = () => {
   const fetchTypes = async () => {
     try {
       const response = await privateFetch.get('/inventory/type/all');
-      handleResponse(response, 'item');
+      handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Tipo de elemento:', error);
       setData([]);
@@ -90,7 +90,7 @@ export const InventoryDepends = () => {
         endpoint = '/lifecycle/state/create';
         break;
       case 'Calidad':
-        endpoint = '/lifecycle/status/create';
+        endpoint = '/lifecycle/health/create';
         break;
       case 'Tipo':
         endpoint = '/inventory/type/create';

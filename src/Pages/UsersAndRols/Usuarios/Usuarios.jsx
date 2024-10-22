@@ -1,14 +1,11 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import { FaSyncAlt } from "react-icons/fa";
 import { Button, DynamicTable } from "../../../Components";
 import { API_ENDPOINT, MOCK_DATA } from "../../../util";
-import { Form, FormControl, InputGroup, Modal, Row, Col, FormSelect } from "react-bootstrap";
-import { usersMock } from "../../../FalseData";
-import axios from "axios";
-import { useForm } from "../../../hooks";
 import { RiFileExcel2Line } from "react-icons/ri";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import axios from "axios";
 import { AddNewUserModal } from "../ActionsUsersAndRols/AddNewUser/AddNewUser";
 import { UpdateUserModal } from "../ActionsUsersAndRols/UpdateUser/UpdateUser";
 
@@ -16,11 +13,14 @@ export const Usuarios = () => {
     const [showAddUser, setShowAddUser] = useState(false);
     const [showEditUser, setShowEditUser] = useState(false);
     const [data, setData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]); // Estado para los datos filtrados
+    const [filteredData, setFilteredData] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [itemToEdit, setItemToEdit] = useState(null);
     const [loading, setLoading] = useState(false);
-    const { serialize } = useForm();
+    const [departments, setDepartments] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [roles, setRoles] = useState([]);
+    const [offices, setOffices] = useState([]);
 
     const handleExport = () => {
         const worksheet = XLSX.utils.json_to_sheet(filteredData);
@@ -30,6 +30,7 @@ export const Usuarios = () => {
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(blob, "Usuarios.xlsx");
     };
+
     const translateFields = (items) => {
         return items.map((item) => ({
             Cédula: item.id,
@@ -37,35 +38,45 @@ export const Usuarios = () => {
             Apellido: item.lastName,
             Correo: item.email,
             Télefono: item.phone,
-            Rol: item.role?.description,
+            Rol: roles.find((role) => role.id === item.roleId)?.description || "Desconocido", 
             Dirección: item.address,
-            Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido",
+            Ciudad: cities.find((city) => city.id === item.cityId)?.description || "Desconocido",
+            Oficina: offices.find((office) => office.id === item.officeId)?.description || "Desconocida",
         }));
     };
-    const handleSave = (newItem) => {
-        setData((prevData) => [...prevData, newItem]);
-    };
-
-
+    console.log(translateFields(data));
+    
 
     const getData = async () => {
         setLoading(true);
-        if (MOCK_DATA === "true") {
-            setData(usersMock)
-        } else {
-            const [
-                { data: users }
-            ] = await Promise.all([
-                axios.get(`${API_ENDPOINT}/user/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+        try {
+            if (MOCK_DATA === "true") {
+                setData(usersMock);
+            } else {
+                const [usersRes, departmentsRes, citiesRes, rolesRes, officesRes] = await Promise.all([
+                    axios.get(`${API_ENDPOINT}/user/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/location/department/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/location/city/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/role/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/location/office/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                ]);
 
-            ])
-            const translatedData = translateFields(users?.result?.user ?? []);
-            setData(translatedData);
-            setFilteredData(translatedData);
+                const users = usersRes.data?.result?.items ?? [];
+                setDepartments(departmentsRes.data?.result?.items ?? []);
+                setCities(citiesRes.data?.result?.items ?? []);
+                setRoles(rolesRes.data?.result?.items ?? []);
+                setOffices(officesRes.data?.result?.items ?? []);
+
+                const translatedData = translateFields(users);
+                setData(translatedData);
+                setFilteredData(translatedData);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
-    }
-
+    };
 
     useEffect(() => {
         if (searchTerm) {
@@ -75,15 +86,15 @@ export const Usuarios = () => {
             );
             setFilteredData(filtered);
         } else {
-            setFilteredData(data); 
+            setFilteredData(data);
         }
-    }, [searchTerm, data]); 
-
+    }, [searchTerm, data]);
 
     const handleEdit = (item) => {
         setItemToEdit(item);
         setShowEditUser(true);
     };
+
     const handleUpdate = (updatedItem) => {
         const updatedData = data.map((item) =>
             item.Cédula === updatedItem.id ? { ...item, ...updatedItem } : item
@@ -94,9 +105,7 @@ export const Usuarios = () => {
 
     useEffect(() => {
         getData();
-    }, [handleSave]);
-
-
+    }, []);
 
     return (
         <>
@@ -106,10 +115,9 @@ export const Usuarios = () => {
                     <input
                         type="text"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)} // Actualizamos el valor de búsqueda
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Buscar..."
                         className="filterSearch"
-
                     />
                 </div>
                 <div className="actions">
@@ -117,7 +125,6 @@ export const Usuarios = () => {
                         <FaSyncAlt />
                     </button>
                     <Button onClick={() => setShowAddUser(true)} text="Añadir" />
-
                     <button onClick={handleExport} className="exportButton">
                         <RiFileExcel2Line className="ExportIcon" />
                         Exportar
@@ -126,20 +133,19 @@ export const Usuarios = () => {
             </div>
 
             <DynamicTable
-                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad"]}
+                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad", "Oficina"]}
                 data={filteredData}
                 onEdit={handleEdit}
                 showToggle={true}
                 onToggle={() => { }}
                 hideDeleteIcon={true}
-
             />
 
             {showAddUser && (
                 <AddNewUserModal
                     show={showAddUser}
                     onClose={() => setShowAddUser(false)}
-                    onSave={handleSave}
+                    onSave={(newItem) => setData((prevData) => [...prevData, newItem])}
                 />
             )}
             {showEditUser && itemToEdit && (
@@ -150,7 +156,6 @@ export const Usuarios = () => {
                     onSave={handleUpdate}
                 />
             )}
-
         </>
-    )
-}
+    );
+};

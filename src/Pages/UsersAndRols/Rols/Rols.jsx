@@ -20,14 +20,18 @@ export const Rols = () => {
         try {
             const response = await privateFetch.get("/role/all");
             if (response.status === 200) {
-                const rolesData = response.data.result.role;
+                const rolesData = response.data?.result?.items || []; // Validamos que response.data exista
                 setRols(rolesData);
-                setFilteredRols(rolesData); // Inicialmente no filtrado
+                setFilteredRols(rolesData);
+            } else {
+                setRols([]); // Si la respuesta no es 200, asigna un array vacío para evitar el error.
             }
         } catch (error) {
             console.error("Error fetching roles:", error);
+            setRols([]); // En caso de error, asigna un array vacío.
         }
     };
+
 
     // Filtrar roles por término de búsqueda
     useEffect(() => {
@@ -43,10 +47,11 @@ export const Rols = () => {
     const rolsColumns = ["Código", "Nombre"];
 
     // Formatear datos para la tabla
-    const formattedRols = filteredRols.map((role) => ({
+    const formattedRols = (filteredRols && filteredRols.length > 0) ? filteredRols.map((role) => ({
         Código: role.id,
         Nombre: role.description,
-    }));
+    })) : [];
+
 
     // Manejadores de eventos de la tabla
     const handleEdit = (row) => {
@@ -75,24 +80,28 @@ export const Rols = () => {
         <>
             <label>Buscar:</label>
             <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Código o Nombre"
-              className="filterSearchCities"
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Código o Nombre"
+                className="filterSearchCities"
             />
             <button onClick={handleExport} className="exportButton">
                 <RiFileExcel2Line className="ExportIcon" />
                 Exportar
             </button>
-            <DynamicTable
-                columns={rolsColumns}
-                data={formattedRols}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onToggle={handleToggle}
-                showToggle={false}
-            />
+            {formattedRols.length === 0 ? (
+                <p>No hay roles disponibles.</p>
+            ) : (
+                <DynamicTable
+                    columns={rolsColumns}
+                    data={formattedRols}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggle={handleToggle}
+                    showToggle={false}
+                />
+            )}
         </>
     );
 };
