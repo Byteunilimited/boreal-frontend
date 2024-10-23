@@ -21,11 +21,11 @@ export const StoreType = () => {
     const [showModalStoreType, setShowModalStoreType] = useState(false);
 
     const translateFields = (items) => {
-        return items.map((item) => ({
-            Código: item.id,
-            Nombre: item.description,
+        return items?.map((item) => ({
+            Código: item?.id,
+            Nombre: item?.description,
 
-        }));
+        })) ?? [];
     };
 
     const getData = async () => {
