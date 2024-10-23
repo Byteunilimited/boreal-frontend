@@ -47,7 +47,6 @@ export const Store = () => {
       const
         { data: stores } = await privateFetch.get("/location/store/item/all");
       if (stores) {
-        console.log(stores)
         const translatedData = await translateFields(stores.result.items)
         setData(translatedData);
       } else {
@@ -106,6 +105,7 @@ const getOFFICE = async (id) =>{
   // Handle edit action
   const handleEdit = (store) => {
     const storeToEdit = data.find((item) => item.Código === store.Código);
+    console.log(storeToEdit);
     if (storeToEdit) {
       setSelectedStore(storeToEdit);
       setShowEditStore(true);

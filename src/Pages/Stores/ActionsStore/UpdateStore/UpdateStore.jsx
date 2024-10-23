@@ -43,15 +43,15 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
             if (response.status === 200 && response.data.result.items.length > 0) {
                 const store = response.data.result.items[0];
                 setFormData({
-                    id: store.id,
+                    id: store?.Código,
                     description: store.description,
                     phone: store.phone,
                     email: store.email,
                     address: store.address,
-                    cityId: store.city.id,
-                    ownerId: store.owner.id,
-                    officeId: store.office.id,
-                    storeTypeId: store.storeType.id,
+                    cityId: store.cityId,
+                    //ownerId: store.owner.id,
+                    officeId: store.officeId,
+                    storeTypeId: store.storeTypeId,
                 });
             } else {
                 setError("No se encontraron datos para la bodega.");
@@ -267,7 +267,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                                 <option value="">Seleccionar ciudad</option>
                                 {cities.map((city) => (
                                     <option key={city.id} value={city.id}>
-                                        {`${city.description} (${city.department.description})`}
+                                        {`${city?.description} (${city?.department?.description})`}
                                     </option>
                                 ))}
                             </select>
