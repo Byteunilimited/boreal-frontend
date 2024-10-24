@@ -35,8 +35,8 @@ export const Store = () => {
         Email: item.email,
         Tipo: await getType(item?.storeTypeId),
         Ciudad: await getCity(item?.cityId),
-        //Propietario: await getOWNER(item?.),
-        Oficina:await getOFFICE(item?.officeId),
+        Oficina:await getOffice(item?.officeId),
+        Estado:await getState(item?.stateId),
       })
     }
     return dataToReturn;
@@ -78,19 +78,7 @@ export const Store = () => {
       return ""
     }
   }
-const getOWNER = async (id) => {
-  try {
-    const [
-      { data: owner }
-    ] = await Promise.all([
-      privateFetch.get(`/location/owner/id?id=${id}`)
-    ]);
-    return owner?.result?.items?.[0]?.description ?? ""
-  } catch (error) {
-    return ""
-  }
-}
-const getOFFICE = async (id) =>{
+const getOffice = async (id) =>{
   try {
     const [
       { data: office }
@@ -98,6 +86,18 @@ const getOFFICE = async (id) =>{
       privateFetch.get(`/location/office/id?id=${id}`)
     ]);
     return office?.result?.items?.[0]?.description ?? ""
+  } catch (error) {
+    return ""
+  }
+}
+const getState = async (id) =>{
+  try {
+    const [
+      { data: state }
+    ] = await Promise.all([
+      privateFetch.get(`/lifesycle/state/id?id=${id}`)
+    ]);
+    return state?.result?.items?.[0]?.description ?? ""
   } catch (error) {
     return ""
   }
@@ -199,7 +199,7 @@ const getOFFICE = async (id) =>{
 
             </div>
             <DynamicTable
-              columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Ciudad", "Propietario", "Oficina"]}
+              columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Estado","Ciudad", "Oficina"]}
               data={filteredData}
               onEdit={handleEdit}
               showToggle={true}

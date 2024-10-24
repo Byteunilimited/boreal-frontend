@@ -13,27 +13,27 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         email: "",
         address: "",
         cityId: "",
-        ownerId: "",
         officeId: "",
         storeTypeId: "",
+        stateId: "",
     });
     const [error, setError] = useState(null);
     const [isSuccessful, setIsSuccessful] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [cities, setCities] = useState([]);
-    const [owners, setOwners] = useState([]);
     const [storeTypes, setStoreTypes] = useState([]);
     const [offices, setOffices] = useState([]);
-
+    const [states, setStates] = useState([]);
     useEffect(() => {
         if (show && storeData?.Código) {
-            fetchOwners();
             fetchStoreTypes();
             fetchOffices();
             fetchCities();
             fetchStoreData();
+            fetchState();
         }
+
     }, [show, storeData]);
 
 
@@ -49,9 +49,9 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                     email: store.email,
                     address: store.address,
                     cityId: store.cityId,
-                    //ownerId: store.owner.id,
                     officeId: store.officeId,
                     storeTypeId: store.storeTypeId,
+                    stateId: store.stateId,
                 });
             } else {
                 setError("No se encontraron datos para la bodega.");
@@ -59,17 +59,6 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         } catch (error) {
             console.error("Error fetching store data:", error);
             setError("Ocurrió un error al obtener los datos de la bodega.");
-        }
-    };
-
-    const fetchOwners = async () => {
-        try {
-            const response = await privateFetch.get("/location/owner/all");
-            if (response.status === 200) {
-                setOwners(response.data.result.items);
-            }
-        } catch (error) {
-            console.error("Error fetching owners:", error);
         }
     };
 
@@ -105,7 +94,16 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
             console.error("Error fetching offices:", error);
         }
     };
-
+    const fetchState = async () => {
+        try {
+            const response = await privateFetch.get("/lifecycle/state/all");
+            if (response.status === 200) {
+                setStates(response.data.result.items);
+            }
+        } catch (error) {
+            console.error("Error fetching offices:", error);
+        }
+    };
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -221,23 +219,6 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                             )}
                         </select>
                     </div>
-
-                    <div className="formGroup">
-                        <label>Propietario:</label>
-                        <select name="ownerId" value={formData.ownerId} onChange={handleChange} required className="selects">
-                            <option value="">Seleccionar propietario</option>
-                            {owners && owners.length > 0 ? (
-                                owners.map((owner) => (
-                                    <option key={owner.id} value={owner.id}>
-                                        {owner.businessName}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>Cargando propietarios...</option>
-                            )}
-                        </select>
-                    </div>
-
                     <div className="formGroup">
                         <label>Tipo de Bodega:</label>
                         <select name="storeTypeId" value={formData.storeTypeId} onChange={handleChange} required className="selects">
@@ -273,7 +254,25 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                             </select>
                         </div>
                     )}
-
+                    {states && states.length > 0 && (
+                        <div className="formGroup">
+                            <label>Estado:</label>
+                            <select
+                                name="stateId"
+                                value={formData.stateId}
+                                onChange={handleChange}
+                                required
+                                className="selects"
+                            >
+                                <option value="">Seleccionar Estado</option>
+                                {states.map((state) => (
+                                    <option key={state.id} value={state.id}>
+                                        {`${state?.description}`}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                     <div className="formActions">
                         <button type="submit">Actualizar</button>
                         <button type="button" onClick={onClose}>
