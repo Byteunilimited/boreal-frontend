@@ -14,7 +14,6 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
         email: "",
         address: "",
         cityId: "",
-        ownerId: "",
         officeId: "",
         storeTypeId: "",
     });
@@ -23,37 +22,23 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [cities, setCities] = useState([]);
-    const [owners, setOwners] = useState([]);
     const [storeTypes, setStoreTypes] = useState([]);
     const [offices, setOffices] = useState([]);
 
-    // Fetch owners, store types, and offices on mount
     useEffect(() => {
         if (show) {
-            fetchOwners();
+
             fetchStoreTypes();
             fetchOffices();
             fetchCities();
         }
     }, [show]);
 
-    const fetchOwners = async () => {
-        try {
-            const response = await privateFetch.get("/location/owner/all");
-            if (response.status === 200) {
-                setOwners(response.data.result.zone);
-            }
-        } catch (error) {
-            console.error("Error fetching owners:", error);
-
-        }
-    };
-console.log (fetchOwners);
     const fetchStoreTypes = async () => {
         try {
             const response = await privateFetch.get("/location/store/type/all");
             if (response.status === 200) {
-                setStoreTypes(response.data.result.item);
+                setStoreTypes(response.data.result.items);
             }
         } catch (error) {
             console.error("Error fetching store types:", error);
@@ -61,12 +46,11 @@ console.log (fetchOwners);
         }
     };
 
-
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all");
+            const response = await privateFetch.get("/location/city/all?page=0&size=1119");
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                setCities(response.data.result.items);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
@@ -77,7 +61,7 @@ console.log (fetchOwners);
         try {
             const response = await privateFetch.get("/location/office/all");
             if (response.status === 200) {
-                setOffices(response.data.result.entity);
+                setOffices(response.data.result.items);
             }
         } catch (error) {
             console.error("Error fetching offices:", error);
@@ -200,21 +184,6 @@ console.log (fetchOwners);
                         </select>
                     </div>
 
-                    <div className="formGroup">
-                        <label>Propietario:</label>
-                        <select name="ownerId" value={formData.ownerId} onChange={handleChange} required className="selects" placeholder="Propietario">
-                            <option value="">Seleccionar propietario</option>
-                            {owners && owners.length > 0 ? (
-                                owners.map((owner) => (
-                                    <option key={owner.id} value={owner.id}>
-                                        {owner.businessName}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>Cargando propietarios...</option>
-                            )}
-                        </select>
-                    </div>
 
                     <div className="formGroup">
                         <label>Tipo de Bodega:</label>

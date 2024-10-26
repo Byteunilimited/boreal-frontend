@@ -48,10 +48,9 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                     phone: store.phone,
                     email: store.email,
                     address: store.address,
-                    cityId: store.cityId,
-                    officeId: store.officeId,
-                    storeTypeId: store.storeTypeId,
-                    stateId: store.stateId,
+                    cityId: store.city.id,
+                    officeId: store.office.id,
+                    storeTypeId: store.storeType.id,
                 });
             } else {
                 setError("No se encontraron datos para la bodega.");

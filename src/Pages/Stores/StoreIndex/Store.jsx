@@ -199,7 +199,7 @@ const getState = async (id) =>{
 
             </div>
             <DynamicTable
-              columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Estado","Ciudad", "Oficina"]}
+              columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Ciudad", "Oficina"]}
               data={filteredData}
               onEdit={handleEdit}
               showToggle={true}

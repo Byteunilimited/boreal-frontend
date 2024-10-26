@@ -43,11 +43,11 @@ export const DepartmentsAndCities = () => {
       if (response.data && response.data.result) {
         const deptData = response.data.result.items;
         setDepartments(deptData);
-        const deptNames = deptData.reduce((acc, dept) => {
+        /*const deptNames = deptData.reduce((acc, dept) => {
           acc[dept.id] = dept.description;
           return acc;
         }, {});
-        setDepartmentNames(deptNames);
+        setDepartmentNames(deptNames);*/
       } else {
         console.error("Error fetching departments data:", response);
       }
@@ -94,7 +94,7 @@ export const DepartmentsAndCities = () => {
         return (
           city.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
           city.id.toString().includes(searchTerm) ||
-          departmentName.toLowerCase().includes(searchTerm.toLowerCase())
+          city.department.description.toLowerCase().includes(searchTerm.toLowerCase())
         );
       });
       setFilteredCities(filtered);
@@ -127,7 +127,7 @@ export const DepartmentsAndCities = () => {
   const formattedCities = filteredCities.map((city) => ({
     Código: city.id,
     Nombre: city.description,
-    Departamento: departmentNames[city.departmentId] || "Desconocido",
+    Departamento: city.department.description || "Desconocido",
   }));
 
   const handleEdit = (row) => {
