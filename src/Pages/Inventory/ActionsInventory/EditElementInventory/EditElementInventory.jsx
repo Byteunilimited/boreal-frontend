@@ -15,33 +15,21 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [inventoryTypes, setInventoryTypes] = useState([]);
-  const [conditions, setConditions] = useState([]);
-  const [states, setStates] = useState([]);
-  const [statuses, setStatuses] = useState([]);
-  const [stores, setStores] = useState([]);
-  const [owners, setOwners] = useState([]);
 
   useEffect(() => {
     const fetchItemData = async () => {
       if (item && item.Código) {
         try {
-          const apiUrl = `${API_ENDPOINT}/inventory/item/find`;
-          const payload = { inventoryId: item.Código };
-          const response = await axios.post(apiUrl, payload);
+          const apiUrl = `${API_ENDPOINT}/inventory/item/find?search=${item.Código}`;
+          const response = await axios.get(apiUrl);
 
-          if (response.data && response.data.result && response.data.result.inventory.length > 0) {
-            const productData = response.data.result.inventory[0];
+          if (response.data && response.data.result && response.data.result.items.length > 0) {
+            const productData = response.data.result.items[0];
 
             setFormData({
               id: productData.id || "",
-              description: productData.inventory.description || "",
-              isEnable: productData.state.id || "", 
-              stock: productData.quantity || 0,
-              owner: productData.owner.id || "", 
-              office: productData.store.id || "", 
-              condition: productData.itemCondition.id || "", 
-              status: productData.status.id || "", 
-              type: productData.inventory.inventoryType.id || "", 
+              description: productData.description || "",
+              inventoryTypeId: productData.inventoryTypeId || "", 
             });
           } else {
             setError("No se encontraron datos del producto.");
@@ -55,21 +43,8 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
 
     const fetchFilters = async () => {
       try {
-        const [typeRes, conditionRes, stateRes, statusRes, storeRes, ownerRes] = await Promise.all([
-          privateFetch.get("/inventory/type/all"),
-          privateFetch.get("/lifecycle/condition/all"),
-          privateFetch.get("/lifecycle/state/all"),
-          privateFetch.get("/lifecycle/status/all"),
-          privateFetch.get("/location/store/item/all"), 
-          privateFetch.get("/location/owner/all")
-        ]);
-
-        setInventoryTypes(typeRes.data.result.item || []);
-        setConditions(conditionRes.data.result.entity || []);
-        setStates(stateRes.data.result.entity || []);
-        setStatuses(statusRes.data.result.entity || []);
-        setStores(storeRes.data.result.store || []);
-        setOwners(ownerRes.data.result.zone || []);
+        const typeRes = await privateFetch.get("/inventory/type/all");
+        setInventoryTypes(typeRes.data.result.items || []);
       } catch (error) {
         console.error("Error fetching filter data:", error);
         setError("Ocurrió un error al obtener los datos de los filtros.");
@@ -97,12 +72,17 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
     ev.preventDefault();
     try {
       const apiUrl = `${API_ENDPOINT}/inventory/item/update`;
-      const response = await axios.put(apiUrl, formData);
+      const payload = {
+        id: formData.id,
+        description: formData.description,
+        inventoryTypeId: formData.inventoryTypeId,
+      };
+      const response = await axios.put(apiUrl, payload);
       if (response.status === 200) {
         setIsSuccessful(true);
         setConfirmationMessage("El elemento fue actualizado exitosamente.");
         setShowConfirmationModal(true);
-        onSave(formData);
+        onSave(payload);
       } else {
         console.log("Ocurrió un error inesperado.");
       }
@@ -137,30 +117,14 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
             />
           </div>
           <div className="formGroup">
-            <label>Estado:</label>
-            <select
-              name="isEnable"
-              value={formData.isEnable || ""}
-              onChange={handleChange}
-              required
-              className="selects"
-            >
-              <option value="">Seleccionar estado</option>
-              {states.map((state) => (
-                <option key={state.id} value={state.id}>
-                  {state.description}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="formGroup">
             <label>Tipo:</label>
             <select
-              name="type"
-              value={formData.type || ""}
+              name="inventoryTypeId"
+              value={formData.inventoryTypeId || ""}
               onChange={handleChange}
               required
               className="selects"
+              disabled 
             >
               <option value="">Seleccionar tipo</option>
               {inventoryTypes.map((type) => (
@@ -169,50 +133,6 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
                 </option>
               ))}
             </select>
-          </div>
-          <div className="formGroup">
-            <label>Condición:</label>
-            <select
-              name="condition"
-              value={formData.condition || ""}
-              onChange={handleChange}
-              required
-              className="selects"
-            >
-              <option value="">Seleccionar condición</option>
-              {conditions.map((condition) => (
-                <option key={condition.id} value={condition.id}>
-                  {condition.description}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="formGroup">
-            <label>Calidad:</label>
-            <select
-              name="status"
-              value={formData.status || ""}
-              onChange={handleChange}
-              required
-              className="selects"
-            >
-              <option value="">Seleccionar calidad del artículo</option>
-              {statuses.map((status) => (
-                <option key={status.id} value={status.id}>
-                  {status.description}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="formGroup">
-            <label>Cantidad:</label>
-            <input
-              type="number"
-              name="stock"
-              value={formData.stock || 0}
-              onChange={handleChange}
-              required
-            />
           </div>
           <div className="formActions">
             <button type="submit">Guardar</button>

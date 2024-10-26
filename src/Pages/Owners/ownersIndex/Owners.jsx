@@ -31,7 +31,7 @@ export const Owners =  () =>{
       Dirección: item.address,
       Email: item.email,
       Estado: item.stateId,
-      Ciudad: item.cityId 
+      Ciudad: item.city.description
 
     }));
   };
@@ -49,6 +49,8 @@ export const Owners =  () =>{
       console.error("Error fetching zone data:", error);
     }
   };
+
+console.log(data);
 
   // Handle edit action
   const handleEdit = (owner) => {

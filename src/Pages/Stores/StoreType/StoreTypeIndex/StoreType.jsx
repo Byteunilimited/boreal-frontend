@@ -32,7 +32,7 @@ export const StoreType = () => {
         try {
             const response = await privateFetch.get("/location/store/type/all");
             if (response && response.data) {
-                const translatedData = translateFields(response.data.result.item);
+                const translatedData = translateFields(response.data.result.items);
                 setData(translatedData);
             } else {
                 console.error("Response does not contain data:", response);
