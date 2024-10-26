@@ -15,6 +15,7 @@ import { BulkUpload, ConfirmationModal, Modal } from "../../../Layouts";
 import { EditElementInventory } from "../ActionsInventory/EditElementInventory/EditElementInventory";
 import { InventoryDepends } from "../InventoryDepends/InventoryDepends";
 import { AsignedItemModal } from "../ActionsInventory/AsignedItemModal/AsignedItemModal";
+import { Assignments } from "../assignments/Assignments";
 
 export const Inventory = () => {
   const [key, setKey] = useState("inventario");
@@ -37,8 +38,7 @@ export const Inventory = () => {
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [itemType, setItemType] = useState("");
-  const [dataAsigned, setDataAsigned] = useState([]);
-  const [showModalAsigned, setShowModalAsigned] = useState(false);
+
   const getInventoryTypes = async () => {
     try {
       const response = await privateFetch.get("/inventory/type/all", {
@@ -90,33 +90,6 @@ export const Inventory = () => {
     }
   };
 
-  const getDataAsigned = async () => {
-    try {
-      const [itemsResponse, types] = await Promise.all([
-        privateFetch.get("/inventory/item/stock/all", {
-          headers: {
-            "x-custom-header": "Boreal Api",
-          },
-        }),
-      ]);
-
-      if (itemsResponse.status === 200) {
-        const data = itemsResponse.data;
-
-        if (data && data.result && Array.isArray(data.result.items)) {
-          // Si no hay tipos, pasamos un array vacío
-          const translatedData = translateFields(data.result.items, types || []);
-          setDataAsigned(translatedData);
-        } else {
-          console.error("No se encontraron datos de inventario.");
-        }
-      } else {
-        console.error("Error en la solicitud de inventario:", itemsResponse.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching inventory data:", error);
-    }
-  };
 
 
   const translateFields = (items, types) => {
@@ -260,57 +233,8 @@ export const Inventory = () => {
               </Tab>
 
               <Tab eventKey="asiganciones" title="Asignaciones y stock">
-                <div className="filtersContainer">
-                  <div className="filters">
-                    <label>Tipo:</label>
-                    <select
-                      value={itemType}
-                      onChange={(e) => setItemType(e.target.value)}
-                      className="filter"
-                    >
-                      <option value="">Todos</option>
-                      {[...new Set(data.map((item) => item.Tipo))]
-                        .filter(Boolean)
-                        .map((Tipo, index) => (
-                          <option key={index} value={Tipo}>
-                            {Tipo}
-                          </option>
-                        ))}
-                    </select>
 
-                    <label>Buscar:</label>
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      placeholder="Código o Nombre"
-                      className="filterSearch"
-                    />
-                  </div>
-                  <div className="actions">
-                    <button onClick={handleRefresh} className="iconRefresh">
-                      <FaSyncAlt />
-                    </button>
-                    <Button onClick={() => setShowModalAsigned(true)} text="Nueva asignación" />
-                    <button onClick={handleExport} className="exportButton">
-                      <RiFileExcel2Line className="ExportIcon" />
-                      Exportar
-                    </button>
-
-                  </div>
-                </div>
-
-                <DynamicTable
-                  columns={[
-                    "Código",
-                    "Nombre",
-                    "Tipo"
-                  ]}
-                  data={dataAsigned}
-                  onEdit={handleEdit}
-                  onFilter={handleFilter}
-                  hideDeleteIcon={true}
-                />
+                <Assignments />
               </Tab>
 
               <Tab eventKey="vinculaciones" title="Vinculaciones">
@@ -330,13 +254,7 @@ export const Inventory = () => {
         />
       )}
 
-      {showModalAsigned && (
-        <AsignedItemModal
-          show={showModalAsigned}
-          onClose={() => setShowModalAsigned(false)}
-          onSave={handleSave}
-        />
-      )}
+     
       {showEditElementInventory && (
         <EditElementInventory
           show={showEditElementInventory}
