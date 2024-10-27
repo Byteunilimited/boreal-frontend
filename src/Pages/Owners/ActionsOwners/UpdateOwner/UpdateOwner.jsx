@@ -20,6 +20,7 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [cities, setCities] = useState([]);
+    const [states, setStates] = useState([]);
 
     useEffect(() => {
         if (show && ownerData?.id) {
@@ -33,16 +34,18 @@ console.log(ownerData);
     const fetchStoreData = async () => {
         try {
             const response = await privateFetch.get(`/location/owner/id?id=${ownerData.id}`);
-            if (response.status === 200 && response.data.result.zone.length > 0) {
+            if (response.status === 200 && response.data.result.items.length > 0) {
                 const owner = response.data.result.items[0];
                 setFormData({
                     id: owner.id,
                     nit: owner.nit,
-                    businessName: owner.name,
+                    name: owner.name,
                     phone: owner.phone,
                     email: owner.email,
                     address: owner.address,
-                    cityId: owner.city.id
+                    cityId: owner.city.id,
+                    stateId: owner.stateId,
+
                 });
             } else {
                 setError("No se encontraron datos para la bodega.");
@@ -54,7 +57,7 @@ console.log(ownerData);
     };
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all");
+            const response = await privateFetch.get("/location/city/all?page=0&size=1119");
             if (response.status === 200) {
                 setCities(response.data.result.items);
             }
@@ -190,6 +193,23 @@ console.log(ownerData);
                             {cities.map((city) => (
                                 <option key={city.id} value={city.id}>
                                     {`${city.description} (${city.department.description})`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="formGroup">
+                        <label>Estato:</label>
+                        <select
+                            name="stateId"
+                            value={formData.stateId}
+                            onChange={handleChange}
+                            required
+                            className="selects"
+                        >
+                            <option value="">Seleccionar ciudad</option>
+                            {states.map((state) => (
+                                <option key={state.id} value={state.id}>
+                                    {`${state.description} (${state.department.description})`}
                                 </option>
                             ))}
                         </select>

@@ -34,6 +34,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
         }
     }, [show]);
 
+
     const fetchStoreTypes = async () => {
         try {
             const response = await privateFetch.get("/location/store/type/all");
@@ -134,7 +135,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            placeholder="Teléfono de la bodega"
+                            placeholder="Telefón de la bodega"
                             required
                             onKeyPress={(e) => {
                                 const regex = /^[0-9]*$/;

@@ -15,7 +15,6 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         cityId: "",
         officeId: "",
         storeTypeId: "",
-        stateId: "",
     });
     const [error, setError] = useState(null);
     const [isSuccessful, setIsSuccessful] = useState(false);
@@ -24,16 +23,15 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
     const [cities, setCities] = useState([]);
     const [storeTypes, setStoreTypes] = useState([]);
     const [offices, setOffices] = useState([]);
-    const [states, setStates] = useState([]);
+
     useEffect(() => {
         if (show && storeData?.Código) {
+
             fetchStoreTypes();
             fetchOffices();
             fetchCities();
             fetchStoreData();
-            fetchState();
         }
-
     }, [show, storeData]);
 
 
@@ -43,7 +41,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
             if (response.status === 200 && response.data.result.items.length > 0) {
                 const store = response.data.result.items[0];
                 setFormData({
-                    id: store?.Código,
+                    id: store.id,
                     description: store.description,
                     phone: store.phone,
                     email: store.email,
@@ -93,16 +91,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
             console.error("Error fetching offices:", error);
         }
     };
-    const fetchState = async () => {
-        try {
-            const response = await privateFetch.get("/lifecycle/state/all");
-            if (response.status === 200) {
-                setStates(response.data.result.items);
-            }
-        } catch (error) {
-            console.error("Error fetching offices:", error);
-        }
-    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -218,6 +207,8 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                             )}
                         </select>
                     </div>
+
+
                     <div className="formGroup">
                         <label>Tipo de Bodega:</label>
                         <select name="storeTypeId" value={formData.storeTypeId} onChange={handleChange} required className="selects">
@@ -247,31 +238,13 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                                 <option value="">Seleccionar ciudad</option>
                                 {cities.map((city) => (
                                     <option key={city.id} value={city.id}>
-                                        {`${city?.description} (${city?.department?.description})`}
+                                        {`${city.description} (${city.department.description})`}
                                     </option>
                                 ))}
                             </select>
                         </div>
                     )}
-                    {states && states.length > 0 && (
-                        <div className="formGroup">
-                            <label>Estado:</label>
-                            <select
-                                name="stateId"
-                                value={formData.stateId}
-                                onChange={handleChange}
-                                required
-                                className="selects"
-                            >
-                                <option value="">Seleccionar Estado</option>
-                                {states.map((state) => (
-                                    <option key={state.id} value={state.id}>
-                                        {`${state?.description}`}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
+
                     <div className="formActions">
                         <button type="submit">Actualizar</button>
                         <button type="button" onClick={onClose}>

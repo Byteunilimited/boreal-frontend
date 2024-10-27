@@ -24,30 +24,24 @@ export const Store = () => {
   const [showEditStore, setShowEditStore] = useState(false);
   const [selectedStore, setSelectedStore] = useState(null);
 
-  const translateFields = async (items) => {
-    const dataToReturn = [];
-    for (const item of items) {
-      dataToReturn?.push({
-        Código: item.id,
-        Nombre: item.description,
-        Teléfono: item.phone,
-        Dirección: item.address,
-        Email: item.email,
-        Tipo: await getType(item?.storeTypeId),
-        Ciudad: await getCity(item?.cityId),
-        Oficina:await getOffice(item?.officeId),
-        Estado:await getState(item?.stateId),
-      })
-    }
-    return dataToReturn;
+  const translateFields = (items) => {
+    return items.map((item) => ({
+      Código: item.id,
+      Nombre: item.description,
+      Teléfono: item.phone,
+      Dirección: item.address,
+      Email: item.email,
+      Tipo: item.storeType ? item.storeType.description : "Desconocido",
+      Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido",
+      Oficina: item.office ? item.office.description : "Sin oficina",
+    }));
   };
 
   const getData = async () => {
     try {
-      const
-        { data: stores } = await privateFetch.get("/location/store/item/all");
-      if (stores) {
-        const translatedData = await translateFields(stores.result.items)
+      const response = await privateFetch.get("/location/store/item/all");
+      if (response && response.data) {
+        const translatedData = translateFields(response.data.result.items);
         setData(translatedData);
       } else {
         console.error("Response does not contain data:", response);
@@ -57,74 +51,24 @@ export const Store = () => {
     }
   };
 
-  const getCity = async (id) => {
-    const [
-      { data: city }
-    ] = await Promise.all([
-      privateFetch.get(`/location/city/id?id=${id}`)
-    ]);
-    return city?.result?.items?.[0]?.description ?? ""
-  }
-
-  const getType = async (id) => {
-    try {
-      const [
-        { data: type }
-      ] = await Promise.all([
-        privateFetch.get(`/location/store/type/id?id=${id}`)
-      ]);
-      return type?.result?.items?.[0]?.description ?? ""
-    } catch (error) {
-      return ""
-    }
-  }
-const getOffice = async (id) =>{
-  try {
-    const [
-      { data: office }
-    ] = await Promise.all([
-      privateFetch.get(`/location/office/id?id=${id}`)
-    ]);
-    return office?.result?.items?.[0]?.description ?? ""
-  } catch (error) {
-    return ""
-  }
-}
-const getState = async (id) =>{
-  try {
-    const [
-      { data: state }
-    ] = await Promise.all([
-      privateFetch.get(`/lifesycle/state/id?id=${id}`)
-    ]);
-    return state?.result?.items?.[0]?.description ?? ""
-  } catch (error) {
-    return ""
-  }
-}
-  // Handle edit action
   const handleEdit = (store) => {
     const storeToEdit = data.find((item) => item.Código === store.Código);
-    console.log(storeToEdit);
     if (storeToEdit) {
       setSelectedStore(storeToEdit);
       setShowEditStore(true);
     }
   };
 
-
   const handleUpdate = (updatedItem) => {
     const updatedData = data.map((item) =>
       item.Código === updatedItem.id ? translateFields([updatedItem])[0] : item
     );
-    setData(updatedData);
+    setData(updatedData); 
   };
-
-
+  
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
-
 
   const handleRefresh = () => {
     getData();
@@ -135,16 +79,15 @@ const getState = async (id) =>{
     setData((prevData) => [...prevData, newItem]);
   };
 
-  // Set the document title on component mount
   useEffect(() => {
     document.title = "Bodegas";
-    getData();
   }, []);
 
+  useEffect(() => {
+    getData();
+  }, [handleSave]);
 
-
-  // Filter data based on search term
-  const filteredData = data?.filter((item) => {
+  const filteredData = data.filter((item) => {
     const codigo = item.Código ? item.Código.toString() : "";
     const nombre = item.Nombre ? item.Nombre.toLowerCase() : "";
     return (
@@ -224,7 +167,7 @@ const getState = async (id) =>{
         <UpdateStore
           show={showEditStore}
           onClose={() => setShowEditStore(false)}
-          storeData={selectedStore} // Pass the selectedStore object
+          storeData={selectedStore} 
           onUpdate={handleUpdate}
         />
       )}
