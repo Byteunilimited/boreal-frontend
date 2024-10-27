@@ -29,7 +29,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
             setFormData({
               id: productData.id || "",
               description: productData.description || "",
-              inventoryTypeId: productData.inventoryTypeId || "", 
+              inventoryTypeId: productData.inventoryType.id || "", 
             });
           } else {
             setError("No se encontraron datos del producto.");

@@ -3,7 +3,7 @@ import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { Button, DynamicTable } from '../../../Components';
 import { useAxios } from "../../../Contexts";
-
+import { AsignedItemModal } from '../ActionsInventory/AsignedItemModal/AsignedItemModal';
 
 export const Assignments = () => {
   const [dataAsigned, setDataAsigned] = useState([]);
@@ -12,12 +12,19 @@ export const Assignments = () => {
   const [itemType, setItemType] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const { privateFetch } = useAxios();
+  const [itemState, setItemState] = useState("Habilitado");
   const translateFields = (items, types) => {
     return items.map((item) => {
 
       return {
         Código: item.id,
-        Propietario: item.owner.name
+        Elemento: item.inventory.description,
+        Bodega: item.store.id,
+        Propietario: item.owner.name,
+        Condición: item.condition.description,
+        Estado: item.state.description,
+        Calidad: item.health.description,
+        Existencias: item.quantity
       };
     });
   };
@@ -53,9 +60,10 @@ export const Assignments = () => {
 
   const handleRefresh = () => {
     setSearchTerm("");
+    setItemType("");
+    setItemState("");
     getDataAsigned();
   };
-
   const handleExport = () => {
     const worksheet = XLSX.utils.json_to_sheet(filteredData);
     const workbook = XLSX.utils.book_new();
@@ -69,15 +77,16 @@ export const Assignments = () => {
     setShowEditElementInventory(true);
   };
 
-  const filteredData = data.filter((item) => {
+  const filteredData = dataAsigned.filter((item) => {
     const codigo = item.Código ? item.Código.toString() : "";
-    const nombre = item.Nombre ? item.Nombre.toLowerCase() : "";
+    const nombre = item.Elemento ? item.Elemento.toLowerCase() : "";
 
     const matchesType = itemType === "" || item.Tipo === itemType;
+    const matchesState = itemState === "" || item.Estado === itemState;
     const matchesSearchTerm =
       codigo.includes(searchTerm) || nombre.includes(searchTerm.toLowerCase());
 
-    return matchesType && matchesSearchTerm;
+    return matchesType && matchesState && matchesSearchTerm;
   });
 
 
@@ -115,6 +124,23 @@ export const Assignments = () => {
               ))}
           </select>
 
+          <label>Estado:</label>
+          <select
+            value={itemState}
+            onChange={(e) => setItemState(e.target.value)}
+            className="filter"
+          >
+            <option value="">Todos</option>
+            {[...new Set(dataAsigned.map((item) => item.Estado))]
+              .filter(Boolean)
+              .map((Estado, index) => (
+                <option key={index} value={Estado}>
+                  {Estado}
+                </option>
+              ))}
+          </select>
+
+
           <label>Buscar:</label>
           <input
             type="text"
@@ -140,9 +166,15 @@ export const Assignments = () => {
       <DynamicTable
         columns={[
           "Código",
-          "Propietario"
+          "Elemento",
+          "Bodega",
+          "Propietario",
+          "Condición",
+          "Estado",
+          "Calidad",
+          "Existencias",
         ]}
-        data={dataAsigned}
+        data={filteredData}
         onEdit={handleEdit}
         onFilter={handleFilter}
         hideDeleteIcon={true}

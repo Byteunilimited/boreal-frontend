@@ -37,7 +37,7 @@ export const Inventory = () => {
   const [confirmationAction, setConfirmationAction] = useState(null);
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
-  const [itemType, setItemType] = useState("");
+  const [itemType, setItemType] = useState("Repuesto");
 
   const getInventoryTypes = async () => {
     try {
@@ -56,10 +56,9 @@ export const Inventory = () => {
       }
     } catch (error) {
       console.error("Error fetching inventory types:", error);
-      return [];  // Devuelve un array vacío en caso de error
+      return []; 
     }
   };
-
 
   const getData = async () => {
     try {
@@ -90,15 +89,8 @@ export const Inventory = () => {
     }
   };
 
-
-
   const translateFields = (items, types) => {
     return items.map((item) => {
-      const inventoryType = types.find((type) => String(type.id) === String(item.inventoryTypeId));
-
-      if (!inventoryType) {
-        console.warn(`No se encontró tipo para el item con id ${item.inventoryTypeId}`);
-      }
 
       return {
         Código: item.id,
@@ -122,17 +114,10 @@ export const Inventory = () => {
     saveAs(blob, "Inventario.xlsx");
   };
 
-
   const handleEdit = (item) => {
     setItemToEdit(item);
     setShowEditElementInventory(true);
   };
-
-  const handleDelete = (item) => {
-    setItemToDelete(item);
-    setShowConfirmationModal(true);
-  };
-
 
   const filteredData = data.filter((item) => {
     const codigo = item.Código ? item.Código.toString() : "";
@@ -144,7 +129,6 @@ export const Inventory = () => {
 
     return matchesType && matchesSearchTerm;
   });
-
 
   const handleFilter = (value, column) => {
     setSearchTerm((prev) => ({ ...prev, [column]: value }));
@@ -169,7 +153,6 @@ export const Inventory = () => {
     getData();
   }, [handleSave]);
 
-
   return (
     <>
       <div>
@@ -182,7 +165,7 @@ export const Inventory = () => {
               onSelect={(k) => setKey(k)}
               className="mb-3 mt-4"
             >
-              <Tab eventKey="inventario" title="Inventario">
+              <Tab eventKey="inventario" title="Elementos">
                 <div className="filtersContainer">
                   <div className="filters">
                     <label>Tipo:</label>

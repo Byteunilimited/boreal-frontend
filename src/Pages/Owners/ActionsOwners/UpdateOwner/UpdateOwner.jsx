@@ -28,8 +28,6 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
             fetchStoreData();
         }
     }, [show, ownerData]);
-console.log(ownerData);
-
 
     const fetchStoreData = async () => {
         try {

@@ -63,16 +63,19 @@ export const AsignedItemModal = ({ show, onClose }) => {
     e.preventDefault();
     try {
       const response = await privateFetch.post("/inventory/item/stock/assign", formData);
-      setIsSuccessful(true);
-      setConfirmationMessage("El stock fue asignado exitosamente.");
+      if (response.status === 200) {
+        setIsSuccessful(true);
+        setConfirmationMessage("El stock fue asignado exitosamente.");
+      } else {
+        setError(`Hubo un problema. Código de respuesta: ${response.status}`);
+      }
     } catch (error) {
       console.error("Error inesperado:", error);
       setError("Ocurrió un error inesperado. Detalles: " + error.message);
     }
     setShowConfirmationModal(true);
   };
-
-  const closeModal = () => {
+    const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
     onClose();
@@ -144,9 +147,9 @@ export const AsignedItemModal = ({ show, onClose }) => {
           </div>
 
           <div className="formGroup">
-            <label>Estado de Salud:</label>
+            <label>Calidad:</label>
             <select name="healthId" onChange={handleChange} required value={formData.healthId} className="selects">
-              <option value="">Seleccionar estado de salud</option>
+              <option value="">Seleccionar calidad</option>
               {healthStatuses.map((status) => (
                 <option key={status.id} value={status.id}>
                   {status.description}
