@@ -14,7 +14,6 @@ import { API_ENDPOINT } from "../../../util";
 import { BulkUpload, ConfirmationModal, Modal } from "../../../Layouts";
 import { EditElementInventory } from "../ActionsInventory/EditElementInventory/EditElementInventory";
 import { InventoryDepends } from "../InventoryDepends/InventoryDepends";
-import { AsignedItemModal } from "../ActionsInventory/AsignedItemModal/AsignedItemModal";
 import { Assignments } from "../assignments/Assignments";
 
 export const Inventory = () => {
@@ -30,9 +29,6 @@ export const Inventory = () => {
   const [showEditElementInventory, setShowEditElementInventory] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
-  const [sucursal, setSucursal] = useState("");
-  const [itemToActivate, setItemToActivate] = useState(null);
-  const [itemToDeactivate, setItemToDeactivate] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [confirmationAction, setConfirmationAction] = useState(null);
   const [isSuccessful, setIsSuccessful] = useState(false);

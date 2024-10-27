@@ -8,28 +8,31 @@ import { API_ENDPOINT } from "../../../../util";
 export const AddNewOwner = ({ show, onClose, onSave }) => {
     const { privateFetch } = useAxios();
     const [formData, setFormData] = useState({
-        businessName: "",
+        name: "",
         nit: "",
         address: "",
         phone: "",
         email: "",
         cityId: "",
+        stateId: "",
     });
     const [error, setError] = useState(null);
     const [isSuccessful, setIsSuccessful] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [cities, setCities] = useState([]);
+    const [states, setStates] = useState([]);
 
     useEffect(() => {
         if (show) {
             fetchCities();
+            fetchStates();
         }
     }, [show]);
 
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all");
+            const response = await privateFetch.get("/location/city/all?page=0&size=1119");
             if (response.status === 200) {
                 setCities(response.data.result.items);
             }
@@ -38,6 +41,16 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
         }
     };
 
+    const fetchStates = async () => {
+        try {
+            const response = await privateFetch.get("/lifecycle/state/all");
+            if (response.status === 200) {
+                setStates(response.data.result.items);
+            }
+        } catch (error) {
+            setError("Ocurrió un error al obtener las ciudades.");
+        }
+    };
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -52,17 +65,16 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
             // Convertir el formulario a JSON
             const requestData = { ...formData };
     
-            // Realizar la solicitud POST
             const response = await fetch(`${API_ENDPOINT}/location/owner/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(requestData), // Convertir a JSON
+                body: JSON.stringify(requestData), 
             });
     
             if (response.ok) {
-                const data = await response.json(); // Parsear el JSON de la respuesta
+                const data = await response.json();
                 setIsSuccessful(true);
                 setConfirmationMessage("El dueño fue añadido exitosamente.");
                 setShowConfirmationModal(true);
@@ -104,8 +116,8 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
                         <label>Nombre del Negocio:</label>
                         <input
                             type="text"
-                            name="businessName"
-                            value={formData.businessName}
+                            name="name"
+                            value={formData.name}
                             onChange={handleChange}
                             placeholder="Nombre del negocio"
                             required
@@ -175,6 +187,23 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
                             {cities.map((city) => (
                                 <option key={city.id} value={city.id}>
                                     {`${city.description} (${city.department.description})`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="formGroup">
+                        <label>Estado:</label>
+                        <select
+                            name="stateId"
+                            value={formData.stateId}
+                            onChange={handleChange}
+                            required
+                            className="selects"
+                        >
+                            <option value="">Seleccionar estado</option>
+                            {states.map((state) => (
+                                <option key={state.id} value={state.id}>
+                                    {`${state.description}`}
                                 </option>
                             ))}
                         </select>

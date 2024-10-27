@@ -144,9 +144,9 @@ export const AsignedItemModal = ({ show, onClose }) => {
           </div>
 
           <div className="formGroup">
-            <label>Estado de Salud:</label>
+            <label>Calidad:</label>
             <select name="healthId" onChange={handleChange} required value={formData.healthId} className="selects">
-              <option value="">Seleccionar estado de salud</option>
+              <option value="">Seleccionar Calidad</option>
               {healthStatuses.map((status) => (
                 <option key={status.id} value={status.id}>
                   {status.description}

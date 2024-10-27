@@ -26,7 +26,7 @@ export const Owners =  () =>{
     return items.map((item) => ({
       Código: item.id,
       NIT: item.nit,
-      Nombre: item.name,
+      name: item.name,
       Teléfono: item.phone,
       Dirección: item.address,
       Email: item.email,
@@ -58,7 +58,7 @@ console.log(data);
     if (ownerToEdit) {
       setSelectedOwner({
         id: ownerToEdit.Código,
-        businessName: ownerToEdit.Nombre,
+        name: ownerToEdit.Nombre,
         phone: ownerToEdit.Teléfono,
         email: ownerToEdit.Correo,
         address: ownerToEdit.Dirección,

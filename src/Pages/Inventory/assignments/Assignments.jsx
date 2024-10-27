@@ -3,7 +3,7 @@ import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { Button, DynamicTable } from '../../../Components';
 import { useAxios } from "../../../Contexts";
-
+import { AsignedItemModal } from "../ActionsInventory/AsignedItemModal/AsignedItemModal";
 
 export const Assignments = () => {
   const [dataAsigned, setDataAsigned] = useState([]);
