@@ -38,10 +38,10 @@ export const Usuarios = () => {
             Apellido: item.lastName,
             Correo: item.email,
             Télefono: item.phone,
-            Rol: roles.find((role) => role.id === item.roleId)?.description || "Desconocido", 
+            Rol: item.role?.description || "Desconocido", 
             Dirección: item.address,
-            Ciudad: cities.find((city) => city.id === item.cityId)?.description || "Desconocido",
-            Oficina: offices.find((office) => office.id === item.officeId)?.description || "Desconocida",
+            Ciudad: item.city?.description || "Desconocido",
+            Oficina: item.office?.description || "Desconocida",
         }));
     };
     console.log(translateFields(data));
@@ -56,7 +56,7 @@ export const Usuarios = () => {
                 const [usersRes, departmentsRes, citiesRes, rolesRes, officesRes] = await Promise.all([
                     axios.get(`${API_ENDPOINT}/user/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
                     axios.get(`${API_ENDPOINT}/location/department/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
-                    axios.get(`${API_ENDPOINT}/location/city/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/location/city/all?page=0&size=1119`, { headers: { 'x-custom-header': 'Boreal Api' } }),
                     axios.get(`${API_ENDPOINT}/role/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
                     axios.get(`${API_ENDPOINT}/location/office/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
                 ]);
@@ -103,9 +103,13 @@ export const Usuarios = () => {
         setShowEditUser(false);
     };
 
+    const handleSave = (newItem) => {
+        setData((prevData) => [...prevData, newItem]);
+      };
+
     useEffect(() => {
         getData();
-    }, []);
+    }, [handleUpdate, handleSave]);
 
     return (
         <>
@@ -145,7 +149,7 @@ export const Usuarios = () => {
                 <AddNewUserModal
                     show={showAddUser}
                     onClose={() => setShowAddUser(false)}
-                    onSave={(newItem) => setData((prevData) => [...prevData, newItem])}
+                    onSave={handleSave}
                 />
             )}
             {showEditUser && itemToEdit && (

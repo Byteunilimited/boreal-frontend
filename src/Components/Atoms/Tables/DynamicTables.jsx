@@ -132,7 +132,7 @@ useState(() => {
                             <label className="switch">
                               <input
                                 type="checkbox"
-                                checked={row[column] === "Habilitado"}
+                                checked={row[column] === "Activo"}
                                 onChange={() => onToggle(row)}
                               />
                               <span className="slider round"></span>
@@ -203,6 +203,3 @@ DynamicTable.propTypes = {
   showToggle: PropTypes.bool,
   hideDeleteIcon: PropTypes.bool,
 };
-
-
-

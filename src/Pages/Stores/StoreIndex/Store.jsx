@@ -63,9 +63,9 @@ export const Store = () => {
     const updatedData = data.map((item) =>
       item.Código === updatedItem.id ? translateFields([updatedItem])[0] : item
     );
-    setData(updatedData); 
+    setData(updatedData);
   };
-  
+
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
@@ -111,66 +111,70 @@ export const Store = () => {
 
   return (
     <>
-      <div className='storeMain'>
-        <h2 className='storeTitle'>Bodegas</h2>
-        <Tabs
-          id="controlled-tab-example"
-          activeKey={key}
-          onSelect={(k) => setKey(k)}
-          className="mb-3 mt-4">
-          <Tab eventKey="store" title="Bodegas">
-            <div className="filtersStore">
-              <label>Buscar:</label>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Código o Nombre"
-                className="filterSearch"
-              />
-            </div>
-            <div className="actions">
-              <button onClick={handleRefresh} className="iconRefresh">
-                <FaSyncAlt />
-              </button>
-              <Button onClick={() => setShowModal(true)} text="Añadir" />
+      <div>
+        <div>
+          <div className="inventory">
+            <h1>Bodegas</h1>
+            <Tabs
+              id="controlled-tab-example"
+              activeKey={key}
+              onSelect={(k) => setKey(k)}
+              className="mb-3 mt-4">
+              <Tab eventKey="store" title="Bodegas">
+                <div className="filtersStore">
+                  <label>Buscar:</label>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder="Código o Nombre"
+                    className="filterSearch"
+                  />
+                </div>
+                <div className="actions">
+                  <button onClick={handleRefresh} className="iconRefresh">
+                    <FaSyncAlt />
+                  </button>
+                  <Button onClick={() => setShowModal(true)} text="Añadir" />
 
-              <button onClick={handleExport} className="exportButton">
-                <RiFileExcel2Line className="ExportIcon" />
-                Exportar
-              </button>
+                  <button onClick={handleExport} className="exportButton">
+                    <RiFileExcel2Line className="ExportIcon" />
+                    Exportar
+                  </button>
 
-            </div>
-            <DynamicTable
-              columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Ciudad", "Oficina"]}
-              data={filteredData}
-              onEdit={handleEdit}
-              showToggle={true}
-              onToggle={() => { }}
-              hideDeleteIcon={true}
+                </div>
+                <DynamicTable
+                  columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Ciudad", "Oficina"]}
+                  data={filteredData}
+                  onEdit={handleEdit}
+                  showToggle={true}
+                  onToggle={() => { }}
+                  hideDeleteIcon={true}
+                />
+              </Tab>
+              <Tab eventKey="storeType" title="Tipos de Bodega">
+                <StoreType />
+              </Tab>
+            </Tabs>
+          </div>
+          {showModal && (
+            <AddNewStoreModal
+              show={showModal}
+              onClose={handleCloseModal}
+              onSave={handleSave}
             />
-          </Tab>
-          <Tab eventKey="storeType" title="Tipos de Bodega">
-            <StoreType />
-          </Tab>
-        </Tabs>
-      </div>
-      {showModal && (
-        <AddNewStoreModal
-          show={showModal}
-          onClose={handleCloseModal}
-          onSave={handleSave}
-        />
-      )}
+          )}
 
-      {showEditStore && (
-        <UpdateStore
-          show={showEditStore}
-          onClose={() => setShowEditStore(false)}
-          storeData={selectedStore} 
-          onUpdate={handleUpdate}
-        />
-      )}
+          {showEditStore && (
+            <UpdateStore
+              show={showEditStore}
+              onClose={() => setShowEditStore(false)}
+              storeData={selectedStore}
+              onUpdate={handleUpdate}
+            />
+          )}
+        </div>
+      </div>
     </>
   );
 };

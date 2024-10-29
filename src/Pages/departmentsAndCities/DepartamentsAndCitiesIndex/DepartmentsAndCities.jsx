@@ -7,23 +7,19 @@ import { Tab, Tabs } from "react-bootstrap";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
-
 export const DepartmentsAndCities = () => {
   const [key, setKey] = useState("departments");
   const [departments, setDepartments] = useState([]);
   const [cities, setCities] = useState([]);
   const [filteredDepartments, setFilteredDepartments] = useState([]);
   const [filteredCities, setFilteredCities] = useState([]);
-  const [departmentNames, setDepartmentNames] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-
-
 
   useEffect(() => {
     document.title = "Departamentos y Ciudades";
-    fetchDepartments();
-    fetchCities();
-  }, []); 
+    getDepartments();
+    getCities();
+  }, []);
 
   useEffect(() => {
     if (key === "departments") {
@@ -33,21 +29,15 @@ export const DepartmentsAndCities = () => {
     }
   }, [departments, cities, searchTerm, key]);
 
-  const fetchDepartments = async () => {
+  const getDepartments = async () => {
     try {
-      const response = await axios.get(`${API_ENDPOINT}/location/department/all?page=0&size=33`, {
+      const response = await axios.get(`${API_ENDPOINT}/location/department/all?page=0&size=2000`, {
         headers: {
           "x-custom-header": "Boreal Api",
         },
       });
       if (response.data && response.data.result) {
-        const deptData = response.data.result.items;
-        setDepartments(deptData);
-        /*const deptNames = deptData.reduce((acc, dept) => {
-          acc[dept.id] = dept.description;
-          return acc;
-        }, {});
-        setDepartmentNames(deptNames);*/
+        setDepartments(response.data.result.items);
       } else {
         console.error("Error fetching departments data:", response);
       }
@@ -56,9 +46,9 @@ export const DepartmentsAndCities = () => {
     }
   };
 
-  const fetchCities = async () => {
+  const getCities = async () => {
     try {
-      const response = await axios.get(`${API_ENDPOINT}/location/city/all?page=0&size=1119`, {
+      const response = await axios.get(`${API_ENDPOINT}/location/city/all?page=0&size=2000`, {
         headers: {
           "x-custom-header": "Boreal Api",
         },
@@ -85,26 +75,6 @@ export const DepartmentsAndCities = () => {
     }
   };
 
-  const filterCities = (searchTerm) => {
-    if (!searchTerm) {
-      setFilteredCities(cities);
-    } else {
-      const filtered = cities.filter((city) => {
-        const departmentName = departmentNames[city.departmentId] || "";
-        return (
-          city.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          city.id.toString().includes(searchTerm) ||
-          city.department.description.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      });
-      setFilteredCities(filtered);
-    }
-  };
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-  };
 
   const handleExport = () => {
     const dataToExport = key === "departments" ? formattedDepartments : formattedCities;
@@ -116,19 +86,20 @@ export const DepartmentsAndCities = () => {
     saveAs(blob, key === "departments" ? "Departamentos.xlsx" : "Ciudades.xlsx");
   };
 
-  const departmentColumns = ["Código", "Nombre"];
-  const cityColumns = ["Código", "Nombre", "Departamento"];
 
-  const formattedDepartments = filteredDepartments.map((dept) => ({
-    Código: dept.id,
-    Nombre: dept.description,
-  }));
+  const filterCities = (searchTerm) => {
+    if (!searchTerm) {
+      setFilteredCities(cities);
+    } else {
+      const filtered = cities.filter((city) =>
+        city.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        city.id.toString().includes(searchTerm)
+        || city.department.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredCities(filtered);
+    }
+  };
 
-  const formattedCities = filteredCities.map((city) => ({
-    Código: city.id,
-    Nombre: city.description,
-    Departamento: city.department.description || "Desconocido",
-  }));
 
   const handleEdit = (row) => {
     console.log("Edit:", row);
@@ -142,64 +113,91 @@ export const DepartmentsAndCities = () => {
     console.log("Toggle status:", row);
   };
 
+  const departmentColumns = ["Código", "Nombre"];
+  const cityColumns = ["Código", "Nombre", "Departamento"];
+
+  const formattedDepartments = filteredDepartments.map((dept) => ({
+    Código: dept.id,
+    Nombre: dept.description,
+  }));
+
+  const formattedCities = filteredCities.map((city) => ({
+    Código: city.id,
+    Nombre: city.description,
+    Departamento: city.department.description
+  }));
+
   return (
     <>
-      <div className="departments-container">
-        <h1>Departamentos y Ciudades</h1>
-        <Tabs
-          id="controlled-tab-example"
-          activeKey={key}
-          onSelect={(k) => setKey(k)}
-          className="mb-3 mt-4"
-        >
-          <Tab eventKey="departments" title="Departamentos">
-            <label>Buscar:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              placeholder="Código o Nombre"
-              className="filterSearchCities"
-            />
+      <div>
+        <div>
+          <div className="inventory">
+            <h1>Departamentos y Ciudades</h1>
+            <Tabs
+              id="controlled-tab-example"
+              activeKey={key}
+              onSelect={(k) => setKey(k)}
+              className="mb-3 mt-4"
+            >
 
-            <button onClick={handleExport} className="exportButton">
-              <RiFileExcel2Line className="ExportIcon" />
-              Exportar
-            </button>
-            <DynamicTable
-              columns={departmentColumns}
-              data={formattedDepartments}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onToggle={handleToggle}
-              showToggle={false}
-            />
-          </Tab>
+              <Tab eventKey="departments" title="Departamentos">
+                <div className="filtersContainer">
+                  <div className="filters">
+                    <label>Buscar:</label>
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Código o Nombre"
+                      className="filterSearchCities"
+                    />
 
-          <Tab eventKey="cities" title="Ciudades">
-            <label>Buscar:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              placeholder="Código, Nombre o Departamento"
-              className="filterSearchCities"
-            />
-            <button onClick={handleExport} className="exportButton">
-              <RiFileExcel2Line className="ExportIcon" />
-              Exportar
-            </button>
+                    <button onClick={handleExport} className="exportButton">
+                      <RiFileExcel2Line className="ExportIcon" />
+                      Exportar
+                    </button>
+                  </div>
+                </div>
+                <DynamicTable
+                  columns={departmentColumns}
+                  data={formattedDepartments}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onToggle={handleToggle}
+                  showToggle={false}
+                />
+              </Tab>
 
-            <DynamicTable
-              columns={cityColumns}
-              data={formattedCities}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onToggle={handleToggle}
-              showToggle={false}
-            />
-          </Tab>
-        </Tabs>
+              <Tab eventKey="cities" title="Ciudades">
+                <div className="filtersContainer">
+                  <div className="filters">
+                    <label>Buscar:</label>
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Código o Nombre"
+                      className="filterSearchCities"
+                    />
+                    <button onClick={handleExport} className="exportButton">
+                      <RiFileExcel2Line className="ExportIcon" />
+                      Exportar
+                    </button>
+                  </div>
+                </div>
+
+                <DynamicTable
+                  columns={cityColumns}
+                  data={formattedCities}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onToggle={handleToggle}
+                  showToggle={false}
+                />
+              </Tab>
+            </Tabs>
+          </div>
+        </div>
       </div>
     </>
   );

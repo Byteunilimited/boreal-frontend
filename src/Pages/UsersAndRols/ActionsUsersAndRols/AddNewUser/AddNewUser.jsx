@@ -25,6 +25,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
     const [offices, setOffices] = useState([]);
     const [roles, setRoles] = useState([]);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [departments, setDepartments] = useState([]); 
 
 
     useEffect(() => {
@@ -38,7 +39,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
 
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all");
+            const response = await privateFetch.get("/location/city/all?page=0&size=2000");
             if (response.status === 200) {
                 const citiesData = response.data.result.items;
                 setCities(citiesData);
@@ -50,14 +51,10 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
 
     const fetchDepartments = async () => {
         try {
-            const response = await privateFetch.get("/location/department/all");
+            const response = await privateFetch.get("/location/department/all?page=0&size=2000");
             if (response.status === 200) {
                 const deptData = response.data.result.items;
-                const deptNames = deptData.reduce((acc, dept) => {
-                    acc[dept.id] = dept.description;
-                    return acc;
-                }, {});
-                setDepartments(deptNames);
+                setDepartments(deptData);
             }
         } catch (error) {
             console.error("Error al obtener los departamentos:", error);
@@ -77,7 +74,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
 
     const fetchOffices = async () => {
         try {
-            const response = await privateFetch.get("/location/office/all");
+            const response = await privateFetch.get("/location/office/all?page=0&size=2000");
             if (response.status === 200) {
                 setOffices(response.data.result.items);
             }
@@ -237,7 +234,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                             <option value="">Seleccionar ciudad</option>
                             {cities.map(city => (
                                 <option key={city.id} value={city.id}>
-                                    {`${city.description} (Dept: ${departments[city.departmentId]})`}
+                                    {`${city.description} - ${city.department.description}`}
                                 </option>
                             ))}
                         </select>
@@ -271,7 +268,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                             <option value="">Seleccionar rol</option>
                             {roles.map((role) => (
                                 <option key={role.id} value={role.id}>
-                                    {role.name}
+                                    {role.description}
                                 </option>
                             ))}
                         </select>

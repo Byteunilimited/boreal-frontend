@@ -8,7 +8,7 @@ import { saveAs } from "file-saver";
 import { AddNewOwner } from '../ActionsOwners/AddNewOwner/AddNewOwner';
 import { UpdateOwner } from '../ActionsOwners/UpdateOwner/UpdateOwner';
 
-export const Owners =  () =>{
+export const Owners = () => {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { privateFetch } = useAxios();
@@ -50,7 +50,7 @@ export const Owners =  () =>{
     }
   };
 
-console.log(data);
+  console.log(data);
 
   // Handle edit action
   const handleEdit = (owner) => {
@@ -129,62 +129,66 @@ console.log(data);
 
   return (
     <>
-      <div className='storeMain'>
-        <h2 className='storeTitle'>Propietarios</h2>
-        <div className="filtersContainer">
-          <div className="filters">
-            <label>Buscar:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Buscar..."
-              className="filterSearch"
-            />
-          </div>
-          <div className="actions">
-            <button onClick={handleRefresh} className="iconRefresh">
-              <FaSyncAlt />
-            </button>
-            <Button onClick={() => setShowAddOwner(true)} text="Añadir" />
+      <div>
+        <div>
+          <div className="inventory">
+            <h1>Propietarios</h1>
+            <div className="filtersContainer">
+              <div className="filters">
+                <label>Buscar:</label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Buscar..."
+                  className="filterSearch"
+                />
+              </div>
+              <div className="actions">
+                <button onClick={handleRefresh} className="iconRefresh">
+                  <FaSyncAlt />
+                </button>
+                <Button onClick={() => setShowAddOwner(true)} text="Añadir" />
 
-            <button onClick={handleExport} className="exportButton">
-              <RiFileExcel2Line className="ExportIcon" />
-              Exportar
-            </button>
-          </div>
+                <button onClick={handleExport} className="exportButton">
+                  <RiFileExcel2Line className="ExportIcon" />
+                  Exportar
+                </button>
+              </div>
+            </div>
+            <DynamicTable
+              columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Estado", "Ciudad"]}
+              data={filterData}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              hideDeleteIcon={true}
+            />
+          </div >
+          {showAddOwner && (
+            <AddNewOwner
+              show={showAddOwner}
+              onClose={() => setShowAddOwner(false)}
+              onSave={handleSave}
+            />
+          )}
+          {showEditOwner && itemToEdit && (
+            <UpdateNewOwner
+              show={showEditOwner}
+              onClose={() => setShowEditOwner(false)}
+              user={itemToEdit}
+              onSave={handleUpdate}
+            />
+          )}
+          {showUpdateOwner && selectedOwner && (
+            <UpdateOwner
+              show={showUpdateOwner}
+              onClose={() => setShowUpdateOwner(false)}
+              onUpdate={handleUpdate}
+              ownerData={selectedOwner}
+            />
+          )}
         </div>
-        <DynamicTable
-          columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Estado", "Ciudad"]}
-          data={filterData}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          hideDeleteIcon={true}
-        />
-      </div >
-      {showAddOwner && (
-        <AddNewOwner
-          show={showAddOwner}
-          onClose={() => setShowAddOwner(false)}
-          onSave={handleSave}
-        />
-      )}
-      {showEditOwner && itemToEdit && (
-        <UpdateNewOwner
-          show={showEditOwner}
-          onClose={() => setShowEditOwner(false)}
-          user={itemToEdit}
-          onSave={handleUpdate}
-        />
-      )}
-      {showUpdateOwner && selectedOwner && (
-        <UpdateOwner
-          show={showUpdateOwner}
-          onClose={() => setShowUpdateOwner(false)}
-          onUpdate={handleUpdate}
-          ownerData={selectedOwner}
-        />
-      )}
+      </div>
     </>
   );
 }

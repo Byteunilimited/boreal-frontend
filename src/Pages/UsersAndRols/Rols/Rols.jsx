@@ -18,7 +18,7 @@ export const Rols = () => {
     // Obtener los roles desde la API
     const fetchRols = async () => {
         try {
-            const response = await privateFetch.get("/role/all");
+            const response = await privateFetch.get("/role/all?page=0&size=2000");
             if (response.status === 200) {
                 const rolesData = response.data?.result?.items || []; // Validamos que response.data exista
                 setRols(rolesData);
@@ -78,18 +78,22 @@ export const Rols = () => {
 
     return (
         <>
-            <label>Buscar:</label>
-            <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Código o Nombre"
-                className="filterSearchCities"
-            />
-            <button onClick={handleExport} className="exportButton">
-                <RiFileExcel2Line className="ExportIcon" />
-                Exportar
-            </button>
+            <div className="filtersContainer">
+                <div className="filters">
+                    <label>Buscar:</label>
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Código o Nombre"
+                        className="filterSearchCities"
+                    />
+                    <button onClick={handleExport} className="exportButton">
+                        <RiFileExcel2Line className="ExportIcon" />
+                        Exportar
+                    </button>
+                </div>
+            </div>
             {formattedRols.length === 0 ? (
                 <p>No hay roles disponibles.</p>
             ) : (
@@ -101,6 +105,7 @@ export const Rols = () => {
                     onToggle={handleToggle}
                     showToggle={false}
                 />
+
             )}
         </>
     );

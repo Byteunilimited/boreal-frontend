@@ -15,6 +15,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
         password: "",
         address: "",
         cityId: "",
+        officeId: "",
         roleId: "",
     });
 
@@ -25,6 +26,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [offices, setOffices] = useState([]);
 
     // Invoca fetchUserData al mostrar el modal
     useEffect(() => {
@@ -32,6 +34,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
             fetchUserData();
             fetchCities(); // Cargar las ciudades al abrir el modal
             fetchRoles(); // Cargar los roles al abrir el modal
+            fetchOffices();
         }
     }, [show, user]);
 
@@ -39,7 +42,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
         try {
             const response = await privateFetch.get(`/user/id?id=${user.Cédula}`);
             if (response.status === 200) {
-                const userData = response.data.result.user[0];
+                const userData = response.data.result.items[0];
                 setFormData({
                     id: userData.id,
                     name: userData.name,
@@ -49,6 +52,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                     password: userData.password,
                     address: userData.address,
                     cityId: userData.city.id,
+                    officeId: userData.office.id,
                     roleId: userData.role.id,
                 });
             } else {
@@ -62,9 +66,9 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
 
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get('/location/city/all');
+            const response = await privateFetch.get('/location/city/all?page=0&size=2000');
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                setCities(response.data.result.items);
             }
         } catch (error) {
             console.error("Error fetching cities:", error);
@@ -72,11 +76,21 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
         }
     };
 
+    const fetchOffices = async () => {
+        try {
+            const response = await privateFetch.get("/location/office/all?page=0&size=2000");
+            if (response.status === 200) {
+                setOffices(response.data.result.items);
+            }
+        } catch (error) {
+            setError("Ocurrió un error al obtener las oficinas.");
+        }
+    };
     const fetchRoles = async () => {
         try {
-            const response = await privateFetch.get('/role/all'); // Cambia la URL según tu API
+            const response = await privateFetch.get('/role/all');
             if (response.status === 200) {
-                setRoles(response.data.result.role); // Asumiendo que los roles vienen en el campo result
+                setRoles(response.data.result.items);
             }
         } catch (error) {
             console.error("Error fetching roles:", error);
@@ -157,11 +171,23 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                             <option value="">Selecciona una ciudad</option>
                             {cities.map(city => (
                                 <option key={city.id} value={city.id}>
-                                {`${city.description} (${city.department.description})`}
-                            </option>
+                                    {`${city.description} (${city.department.description})`}
+                                </option>
                             ))}
                         </select>
                     </div>
+                    <div className="formGroup">
+                        <label>Oficina:</label>
+                        <select name="officeId" value={formData.officeId} onChange={handleChange} required className="selects">
+                            <option value="">Selecciona una oficina</option>
+                            {offices.map(office => (
+                                <option key={office.id} value={office.id}>
+                                    {office.description}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
                     <div className="formGroup">
                         <label>Rol:</label>
                         <select name="roleId" value={formData.roleId} onChange={handleChange} required className="selects">
