@@ -11,7 +11,7 @@ export const InventoryDepends = () => {
 
   const fetchConditions = async () => {
     try {
-      const response = await privateFetch.get('/lifecycle/condition/all');
+      const response = await privateFetch.get('/lifecycle/condition/all?page=0&size=2000');
       handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Condiciones:', error);
@@ -21,7 +21,7 @@ export const InventoryDepends = () => {
 
   const fetchStates = async () => {
     try {
-      const response = await privateFetch.get('/lifecycle/state/all');
+      const response = await privateFetch.get('/lifecycle/state/all?page=0&size=2000');
       handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Estados:', error);
@@ -31,7 +31,7 @@ export const InventoryDepends = () => {
 
   const fetchCircumstances = async () => {
     try {
-      const response = await privateFetch.get('/lifecycle/health/all');
+      const response = await privateFetch.get('/lifecycle/health/all?page=0&size=2000');
       handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Calidad:', error);
@@ -41,7 +41,7 @@ export const InventoryDepends = () => {
 
   const fetchTypes = async () => {
     try {
-      const response = await privateFetch.get('/inventory/type/all');
+      const response = await privateFetch.get('/inventory/type/all?page=0&size=2000');
       handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Tipo de elemento:', error);

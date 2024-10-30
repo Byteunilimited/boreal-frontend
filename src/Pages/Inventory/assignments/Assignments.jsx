@@ -19,7 +19,7 @@ export const Assignments = () => {
       return {
         Código: item.id,
         Elemento: item.inventory.description,
-        Bodega: item.store.id,
+        Bodega: `${item.store.warehouse.description} (${item.store.warehouse.storeType.description})`,
         Propietario: item.owner.name,
         Condición: item.condition.description,
         Estado: item.state.description,
@@ -33,7 +33,7 @@ export const Assignments = () => {
   const getDataAsigned = async () => {
     try {
       const [itemsResponse, types] = await Promise.all([
-        privateFetch.get("/inventory/stock/all", {
+        privateFetch.get("/inventory/stock/all?page=0&size=2000", {
           headers: {
             "x-custom-header": "Boreal Api",
           },

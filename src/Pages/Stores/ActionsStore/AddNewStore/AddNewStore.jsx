@@ -37,7 +37,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
 
     const fetchStoreTypes = async () => {
         try {
-            const response = await privateFetch.get("/location/store/type/all");
+            const response = await privateFetch.get("/location/store/type/all?page=0&size=2000");
             if (response.status === 200) {
                 setStoreTypes(response.data.result.items);
             }
@@ -60,7 +60,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
 
     const fetchOffices = async () => {
         try {
-            const response = await privateFetch.get("/location/office/all");
+            const response = await privateFetch.get("/location/office/all?page=0&size=2000");
             if (response.status === 200) {
                 setOffices(response.data.result.items);
             }

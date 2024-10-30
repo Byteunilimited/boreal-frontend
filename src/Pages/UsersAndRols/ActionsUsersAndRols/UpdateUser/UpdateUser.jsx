@@ -3,6 +3,7 @@ import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
 import { Eye, EyeOff } from "react-feather";
+import Select from "react-select";
 
 export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
     const { privateFetch } = useAxios();
@@ -28,15 +29,19 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [offices, setOffices] = useState([]);
 
-    // Invoca fetchUserData al mostrar el modal
     useEffect(() => {
         if (show && user?.Cédula) {
             fetchUserData();
-            fetchCities(); // Cargar las ciudades al abrir el modal
-            fetchRoles(); // Cargar los roles al abrir el modal
+            fetchCities();
+            fetchRoles();
             fetchOffices();
         }
     }, [show, user]);
+
+
+    const handleSelectChange = (selectedOption, field) => {
+        setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
+    };
 
     const fetchUserData = async () => {
         try {
@@ -63,12 +68,16 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
             setError("Ocurrió un error al obtener los datos del usuario.");
         }
     };
-
     const fetchCities = async () => {
         try {
             const response = await privateFetch.get('/location/city/all?page=0&size=2000');
             if (response.status === 200) {
-                setCities(response.data.result.items);
+                const cities = response.data.result.items || [];
+                const options = cities.map((city) => ({
+                    value: city.id,
+                    label: `${city.description}, - ${city.department.description}`,
+                }));
+                setCities(options);
             }
         } catch (error) {
             console.error("Error fetching cities:", error);
@@ -80,7 +89,12 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
         try {
             const response = await privateFetch.get("/location/office/all?page=0&size=2000");
             if (response.status === 200) {
-                setOffices(response.data.result.items);
+                const offices = response.data.result.items || [];
+                const options = offices.map((office) => ({
+                    value: office.id,
+                    label: office.description
+                }));
+                setOffices(options);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las oficinas.");
@@ -88,9 +102,14 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
     };
     const fetchRoles = async () => {
         try {
-            const response = await privateFetch.get('/role/all');
+            const response = await privateFetch.get('/role/all?page=0&size=2000');
             if (response.status === 200) {
-                setRoles(response.data.result.items);
+                const roles = response.data.result.items || [];
+                const options = roles.map((role) => ({
+                    value: role.id,
+                    label: role.description
+                }));
+                setRoles(options);
             }
         } catch (error) {
             console.error("Error fetching roles:", error);
@@ -110,12 +129,14 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
         ev.preventDefault();
         try {
             const response = await privateFetch.put(`/user/update`, formData);
+            
             if (response.status === 200) {
-                const data = response.data;
                 setIsSuccessful(true);
-                setConfirmationMessage("El usuario fue actualizado exitosamente.");
                 setShowConfirmationModal(true);
+                setConfirmationMessage("El usuario fue actualizado exitosamente.");
+                const data = response.data;
                 onSave(data);
+
             } else {
                 throw new Error("Error en la actualización del usuario.");
             }
@@ -125,7 +146,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
             setShowConfirmationModal(true);
         }
     };
-
+    
     const toggleShowConfirmPassword = () => {
         setShowConfirmPassword(!showConfirmPassword);
     };
@@ -167,35 +188,61 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                     </div>
                     <div className="formGroup">
                         <label>Ciudad:</label>
-                        <select name="cityId" value={formData.cityId} onChange={handleChange} required className="selects">
-                            <option value="">Selecciona una ciudad</option>
-                            {cities.map(city => (
-                                <option key={city.id} value={city.id}>
-                                    {`${city.description} (${city.department.description})`}
-                                </option>
-                            ))}
-                        </select>
+                        <Select
+                            options={cities}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "cityId")}
+                            placeholder="Seleccionar ciudad"
+                            value={cities.find(option => option.value === formData.cityId)}
+                            required
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
                     <div className="formGroup">
-                        <label>Oficina:</label>
-                        <select name="officeId" value={formData.officeId} onChange={handleChange} required className="selects">
-                            <option value="">Selecciona una oficina</option>
-                            {offices.map(office => (
-                                <option key={office.id} value={office.id}>
-                                    {office.description}
-                                </option>
-                            ))}
-                        </select>
+                        <label>Sucursal:</label>
+                        <Select
+                            options={offices}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "officeId")}
+                            placeholder="Seleccionar sucursal"
+                            value={offices.find(option => option.value === formData.officeId)}
+                            isClearable
+                            required
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
 
                     <div className="formGroup">
                         <label>Rol:</label>
-                        <select name="roleId" value={formData.roleId} onChange={handleChange} required className="selects">
-                            <option value="">Selecciona un rol</option>
-                            {roles.map(role => (
-                                <option key={role.id} value={role.id}>{role.description}</option>
-                            ))}
-                        </select>
+                        <Select
+                            options={roles}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "roleId")}
+                            placeholder="Seleccionar rol"
+                            value={roles.find(option => option.value.toString() === formData.roleId.toString())}
+                            isClearable
+                            required
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
                     <div className="formGroup">
                         <label>Contraseña:</label>
@@ -206,6 +253,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 className="passwordInput"
+                                required
                             />
                             <span
                                 className="passwordToggleUser"
@@ -219,8 +267,6 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                             </span>
                         </div>
                     </div>
-
-
                     <div className="formActions">
                         <button type="submit">Guardar</button>
                         <button type="button" onClick={onClose}>Cancelar</button>
@@ -228,14 +274,14 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                 </form>
             </div>
             {showConfirmationModal && (
-                <Modal
-                    title={isSuccessful ? "Éxito" : "Error"}
-                    text={isSuccessful ? confirmationMessage : error}
-                    modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
-                    onClose={closeModal}
-                    showCloseButton
-                />
-            )}
+                    <Modal
+                        title={isSuccessful ? "Éxito" : "Error"}
+                        text={isSuccessful ? confirmationMessage : error}
+                        modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
+                        onClose={closeModal}
+                        showCloseButton
+                    />
+                )}
         </div>
     );
 };

@@ -41,7 +41,7 @@ export const Inventory = () => {
 
   const getInventoryTypes = async () => {
     try {
-      const response = await privateFetch.get("/inventory/type/all", {
+      const response = await privateFetch.get("/inventory/type/all?page=0&size=2000", {
         headers: {
           "x-custom-header": "Boreal Api",
         },
@@ -63,7 +63,7 @@ export const Inventory = () => {
   const getData = async () => {
     try {
       const [itemsResponse, types] = await Promise.all([
-        privateFetch.get("/inventory/item/all", {
+        privateFetch.get("/inventory/item/all?page=0&size=2000", {
           headers: {
             "x-custom-header": "Boreal Api",
           },

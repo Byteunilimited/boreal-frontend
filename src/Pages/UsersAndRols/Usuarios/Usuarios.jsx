@@ -17,10 +17,8 @@ export const Usuarios = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [itemToEdit, setItemToEdit] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [departments, setDepartments] = useState([]);
-    const [cities, setCities] = useState([]);
     const [roles, setRoles] = useState([]);
-    const [offices, setOffices] = useState([]);
+    const [selectedRole, setSelectedRole] = useState("");
 
     const handleExport = () => {
         const worksheet = XLSX.utils.json_to_sheet(filteredData);
@@ -38,14 +36,12 @@ export const Usuarios = () => {
             Apellido: item.lastName,
             Correo: item.email,
             Télefono: item.phone,
-            Rol: item.role?.description || "Desconocido", 
+            Rol: item.role?.description || "Desconocido",
             Dirección: item.address,
-            Ciudad: item.city?.description || "Desconocido",
+            Ciudad: `${item.city.description},  (${item.city.department.description})`|| "Desconocido",
             Oficina: item.office?.description || "Desconocida",
         }));
     };
-    console.log(translateFields(data));
-    
 
     const getData = async () => {
         setLoading(true);
@@ -53,23 +49,19 @@ export const Usuarios = () => {
             if (MOCK_DATA === "true") {
                 setData(usersMock);
             } else {
-                const [usersRes, departmentsRes, citiesRes, rolesRes, officesRes] = await Promise.all([
-                    axios.get(`${API_ENDPOINT}/user/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
-                    axios.get(`${API_ENDPOINT}/location/department/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
-                    axios.get(`${API_ENDPOINT}/location/city/all?page=0&size=1119`, { headers: { 'x-custom-header': 'Boreal Api' } }),
-                    axios.get(`${API_ENDPOINT}/role/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
-                    axios.get(`${API_ENDPOINT}/location/office/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                const [usersRes, rolesRes] = await Promise.all([
+                    axios.get(`${API_ENDPOINT}/user/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/role/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }) // Llamada para obtener roles
                 ]);
 
                 const users = usersRes.data?.result?.items ?? [];
-                setDepartments(departmentsRes.data?.result?.items ?? []);
-                setCities(citiesRes.data?.result?.items ?? []);
-                setRoles(rolesRes.data?.result?.items ?? []);
-                setOffices(officesRes.data?.result?.items ?? []);
-
                 const translatedData = translateFields(users);
                 setData(translatedData);
                 setFilteredData(translatedData);
+
+                // Guardar los roles obtenidos
+                const rolesData = rolesRes.data?.result?.items ?? [];
+                setRoles(rolesData);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -79,16 +71,21 @@ export const Usuarios = () => {
     };
 
     useEffect(() => {
+        let filtered = data;
+
         if (searchTerm) {
-            const filtered = data.filter((user) =>
+            filtered = filtered.filter((user) =>
                 user.Nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.Cédula.toString().includes(searchTerm)
             );
-            setFilteredData(filtered);
-        } else {
-            setFilteredData(data);
         }
-    }, [searchTerm, data]);
+
+        if (selectedRole) {
+            filtered = filtered.filter((user) => user.Rol === selectedRole);
+        }
+
+        setFilteredData(filtered);
+    }, [searchTerm, selectedRole, data]);
 
     const handleEdit = (item) => {
         setItemToEdit(item);
@@ -101,20 +98,37 @@ export const Usuarios = () => {
         );
         setData(updatedData);
         setShowEditUser(false);
+        getData();
     };
 
     const handleSave = (newItem) => {
         setData((prevData) => [...prevData, newItem]);
-      };
+        getData();
+    };
 
     useEffect(() => {
         getData();
-    }, [handleUpdate, handleSave]);
+    }, []);
 
     return (
         <>
             <div className="filtersContainer">
                 <div className="filters">
+
+                    <label>Rol:</label>
+                    <select
+                        value={selectedRole}
+                        onChange={(e) => setSelectedRole(e.target.value)}
+                        placeholder="Filtrar por rol"
+                        className="filter"
+                    >
+                        <option value="">Todos</option>
+                        {roles.map((role) => (
+                            <option key={role.id} value={role.description}>
+                                {role.description}
+                            </option>
+                        ))}
+                    </select>
                     <label>Buscar:</label>
                     <input
                         type="text"

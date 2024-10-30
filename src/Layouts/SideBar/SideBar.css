@@ -56,12 +56,16 @@
   border-radius: 1.5rem;
 }
 
-.imgLogo {
-  width: 13em;
+.containLogo{
   justify-content: center;
   align-items: center;
   display: flex;
   flex-direction: column;
+  text-align: center;
+}
+
+.imgLogo {
+  width: 14em;
 }
 
 .submenu {

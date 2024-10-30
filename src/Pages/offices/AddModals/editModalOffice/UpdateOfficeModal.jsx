@@ -90,7 +90,7 @@ useEffect(() => {
 
   const fetchOwners = async () => {
     try {
-      const response = await privateFetch.get("/location/owner/all");
+      const response = await privateFetch.get("/location/owner/all?page=0&size=2000");
       if (response.status === 200) {
         setOwners(response.data.result.zone);
       }
@@ -101,7 +101,7 @@ useEffect(() => {
 
   const fetchCities = async () => {
     try {
-      const response = await privateFetch.get("/location/city/all");
+      const response = await privateFetch.get("/location/city/all?page=0&size=2000");
       if (response.status === 200) {
         setCities(response.data.result.city);
       }

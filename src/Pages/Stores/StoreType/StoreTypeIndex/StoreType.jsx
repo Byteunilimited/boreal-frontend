@@ -30,7 +30,7 @@ export const StoreType = () => {
 
     const getData = async () => {
         try {
-            const response = await privateFetch.get("/location/store/type/all");
+            const response = await privateFetch.get("/location/store/type/all?page=0&size=2000");
             if (response && response.data) {
                 const translatedData = translateFields(response.data.result.items);
                 setData(translatedData);

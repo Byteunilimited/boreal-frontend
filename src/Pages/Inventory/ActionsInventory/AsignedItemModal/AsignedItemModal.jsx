@@ -35,12 +35,12 @@ export const AsignedItemModal = ({ show, onClose }) => {
   const fetchFilters = async () => {
     try {
       const [inventoryRes, conditionRes, stateRes, storeRes, ownerRes, healthRes] = await Promise.all([
-        privateFetch.get("/inventory/item/all"),
-        privateFetch.get("/lifecycle/condition/all"),
-        privateFetch.get("/lifecycle/state/all"),
-        privateFetch.get("/location/store/item/all"),
-        privateFetch.get("/location/owner/all"),
-        privateFetch.get("/lifecycle/health/all"),
+        privateFetch.get("/inventory/item/all?page=0&size=2000"),
+        privateFetch.get("/lifecycle/condition/all?page=0&size=2000"),
+        privateFetch.get("/lifecycle/state/all?page=0&size=2000"),
+        privateFetch.get("/location/store/item/all?page=0&size=2000"),
+        privateFetch.get("/location/owner/all?page=0&size=2000"),
+        privateFetch.get("/lifecycle/health/all?page=0&size=2000"),
       ]);
       setInventoryItems(inventoryRes.data.result.items || []);
       setConditions(conditionRes.data.result.items || []);

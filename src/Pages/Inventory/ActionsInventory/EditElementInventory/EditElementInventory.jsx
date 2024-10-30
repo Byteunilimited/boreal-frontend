@@ -43,7 +43,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
 
     const fetchFilters = async () => {
       try {
-        const typeRes = await privateFetch.get("/inventory/type/all");
+        const typeRes = await privateFetch.get("/inventory/type/all?page=0&size=2000");
         setInventoryTypes(typeRes.data.result.items || []);
       } catch (error) {
         console.error("Error fetching filter data:", error);

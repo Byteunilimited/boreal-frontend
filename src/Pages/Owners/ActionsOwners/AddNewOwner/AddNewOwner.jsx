@@ -43,7 +43,7 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
 
     const fetchStates = async () => {
         try {
-            const response = await privateFetch.get("/lifecycle/state/all");
+            const response = await privateFetch.get("/lifecycle/state/all?page=0&size=2000");
             if (response.status === 200) {
                 setStates(response.data.result.items);
             }
