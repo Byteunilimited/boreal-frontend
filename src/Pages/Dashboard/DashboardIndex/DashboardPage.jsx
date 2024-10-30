@@ -4,6 +4,8 @@ import "./Dashboard.css";
 import { useAuth } from "../../../Contexts";
 import { Button } from "../../../Components";
 import { Link } from "react-router-dom";
+import { imgDashboard } from "../../../assets";
+
 
 const yearlyData = [
   { year: "2019", valor: 310 },
@@ -48,7 +50,7 @@ export const Dashboard = () => {
       </div>
       <div className="dashboardPageMain">
         <div className="dashboardImageContainer">
-          <img src="../src/assets/images/inventoryPicture.png" alt="Ilustración inventario" className="dashboardImage" />
+          <img src={imgDashboard} alt="Ilustración inventario" className="dashboardImage" />
         </div>
         <div className="dashboardText">
           <h2>Consulta y gestiona tu inventario al instante. Mantén el control y optimiza cada movimiento de tus productos.</h2>

@@ -6,6 +6,7 @@ import ModalIconCorrect from './Images/ModalIconCorrect.png';
 import BorealBackgroundLogin from './Images/BorealBackgroundLogin.png';
 import UserImg from './Images/user.png'
 import robot404 from './Images/robot_404.png'
+import imgDashboard from './Images/inventoryPicture.png'
 export {
     BorealLogo,
     ModalIconMistake,
@@ -14,5 +15,6 @@ export {
     ModalIconCorrect,
     BorealBackgroundLogin,
     UserImg,
-    robot404
+    robot404,
+    imgDashboard
 }

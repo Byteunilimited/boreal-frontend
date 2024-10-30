@@ -23,9 +23,9 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
     const [cities, setCities] = useState([]);
     const [roles, setRoles] = useState([]);
     const [error, setError] = useState(null);
-    const [isSuccessful, setIsSuccessful] = useState(false);
-    const [confirmationMessage, setConfirmationMessage] = useState("");
-    const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [isSuccessfulAdd, setIsSuccessfulAdd] = useState(false);
+    const [confirmationMessageAdd, setConfirmationMessageAdd] = useState("");
+    const [showConfirmationModalAdd, setShowConfirmationModalAdd] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [offices, setOffices] = useState([]);
 
@@ -131,9 +131,9 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
             const response = await privateFetch.put(`/user/update`, formData);
             
             if (response.status === 200) {
-                setIsSuccessful(true);
-                setShowConfirmationModal(true);
-                setConfirmationMessage("El usuario fue actualizado exitosamente.");
+                setIsSuccessfulAdd(true);
+                setShowConfirmationModalAdd(true);
+                setConfirmationMessageAdd("El usuario fue actualizado exitosamente.");
                 const data = response.data;
                 onSave(data);
 
@@ -141,9 +141,9 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                 throw new Error("Error en la actualización del usuario.");
             }
         } catch (error) {
-            setIsSuccessful(false);
+            setIsSuccessfulAdd(false);
             setError("Ocurrió un error en el servidor, por favor, intenta de nuevo.");
-            setShowConfirmationModal(true);
+            setShowConfirmationModalAdd(true);
         }
     };
     
@@ -152,7 +152,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
     };
 
     const closeModal = () => {
-        setShowConfirmationModal(false);
+        setShowConfirmationModalAdd(false);
         setError(null);
         onClose();
     };
@@ -273,11 +273,11 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                     </div>
                 </form>
             </div>
-            {showConfirmationModal && (
+            {showConfirmationModalAdd && (
                     <Modal
-                        title={isSuccessful ? "Éxito" : "Error"}
-                        text={isSuccessful ? confirmationMessage : error}
-                        modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
+                        title={isSuccessfulAdd ? "Éxito" : "Error"}
+                        text={isSuccessfulAdd ? confirmationMessageAdd : error}
+                        modalIcon={isSuccessfulAdd ? ModalIconCorrect : ModalIconMistake}
                         onClose={closeModal}
                         showCloseButton
                     />
