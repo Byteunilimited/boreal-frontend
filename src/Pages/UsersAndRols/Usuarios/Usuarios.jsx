@@ -19,6 +19,8 @@ export const Usuarios = () => {
     const [loading, setLoading] = useState(false);
     const [roles, setRoles] = useState([]);
     const [selectedRole, setSelectedRole] = useState("");
+    const [states, setStates] = useState([]); 
+
 
     const handleExport = () => {
         const worksheet = XLSX.utils.json_to_sheet(filteredData);
@@ -30,18 +32,27 @@ export const Usuarios = () => {
     };
 
     const translateFields = (items) => {
-        return items.map((item) => ({
-            Cédula: item.id,
-            Nombre: item.name,
-            Apellido: item.lastName,
-            Correo: item.email,
-            Télefono: item.phone,
-            Rol: item.role?.description || "Desconocido",
-            Dirección: item.address,
-            Ciudad: `${item.city.description},  (${item.city.department.description})`|| "Desconocido",
-            Oficina: item.office?.description || "Desconocida",
-        }));
+        return items.map((item) => {
+            // Convertimos stateId a string para comparación
+            const stateIdAsString = item.stateId.toString();
+            const state = states.find(state => state.id === stateIdAsString);
+            return {
+                Cédula: item.id,
+                Nombre: item.name,
+                Apellido: item.lastName,
+                Correo: item.email,
+                Télefono: item.phone,
+                Rol: item.role?.description || "Desconocido",
+                Dirección: item.address,
+                Ciudad: `${item.city.description}, (${item.city.department.description})` || "Desconocido",
+                Oficina: item.office?.description || "Desconocida",
+                Estado: state ? state.description : "Desconocido",
+            };
+        });
     };
+    
+    
+        
 
     const getData = async () => {
         setLoading(true);
@@ -49,9 +60,11 @@ export const Usuarios = () => {
             if (MOCK_DATA === "true") {
                 setData(usersMock);
             } else {
-                const [usersRes, rolesRes] = await Promise.all([
+                const [usersRes, rolesRes,statesRes] = await Promise.all([
                     axios.get(`${API_ENDPOINT}/user/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }),
-                    axios.get(`${API_ENDPOINT}/role/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }) // Llamada para obtener roles
+                    axios.get(`${API_ENDPOINT}/role/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/lifecycle/state/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    
                 ]);
 
                 const users = usersRes.data?.result?.items ?? [];
@@ -59,9 +72,11 @@ export const Usuarios = () => {
                 setData(translatedData);
                 setFilteredData(translatedData);
 
-                // Guardar los roles obtenidos
                 const rolesData = rolesRes.data?.result?.items ?? [];
                 setRoles(rolesData);
+
+                const statesData = statesRes.data?.result?.items ?? [];
+                setStates(statesData); 
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -69,6 +84,8 @@ export const Usuarios = () => {
             setLoading(false);
         }
     };
+
+
 
     useEffect(() => {
         let filtered = data;
@@ -110,6 +127,7 @@ export const Usuarios = () => {
         getData();
     }, []);
 
+    console.log(data);
     return (
         <>
             <div className="filtersContainer">
@@ -151,7 +169,7 @@ export const Usuarios = () => {
             </div>
 
             <DynamicTable
-                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad", "Oficina"]}
+                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad", "Oficina", "Estado"]}
                 data={filteredData}
                 onEdit={handleEdit}
                 showToggle={true}

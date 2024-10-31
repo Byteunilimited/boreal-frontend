@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { RiEdit2Line, RiCloseFill } from "react-icons/ri";
+import { RiEdit2Line, RiCloseFill, RiArrowLeftRightFill } from "react-icons/ri";
 import Pagination from "react-bootstrap/Pagination";
 import Table from "react-bootstrap/Table";
 import "./DynamicTables.css";
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+
 
 export const DynamicTable = ({
   columns,
@@ -14,6 +16,8 @@ export const DynamicTable = ({
   showToggle = true,
   hideDeleteIcon = false,
   hideEditIcon = false,
+  showExchangeIcon = false,
+  onExchange = () => { }
 }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
@@ -133,7 +137,7 @@ export const DynamicTable = ({
                               <label className="switch">
                                 <input
                                   type="checkbox"
-                                  checked={row[column] === "Activo"}
+                                  checked={row[column] === "Habilitado"}
                                   onChange={() => onToggle(row)}
                                 />
                                 <span className="slider round"></span>
@@ -146,16 +150,43 @@ export const DynamicTable = ({
                         {showToggle && (
                           <td>
                             {!hideEditIcon && (
-                              <RiEdit2Line
-                                className="actionIcon editIcon"
-                                onClick={() => onEdit(row)}
-                              />
+                              <OverlayTrigger
+                                placement="top"
+                                overlay={<Tooltip>Editar</Tooltip>}
+                              >
+                                <span>
+                                  <RiEdit2Line
+                                    className="actionIcon editIcon"
+                                    onClick={() => onEdit(row)}
+                                  />
+                                </span>
+                              </OverlayTrigger>
                             )}
                             {!hideDeleteIcon && (
-                              <RiCloseFill
-                                className="actionIcon deleteIcon"
-                                onClick={() => onDelete(row)}
-                              />
+                              <OverlayTrigger
+                                placement="top"
+                                overlay={<Tooltip>Eliminar</Tooltip>}
+                              >
+                                <span>
+                                  <RiCloseFill
+                                    className="actionIcon deleteIcon"
+                                    onClick={() => onDelete(row)}
+                                  />
+                                </span>
+                              </OverlayTrigger>
+                            )}
+                            {showExchangeIcon && (
+                              <OverlayTrigger
+                                placement="top"
+                                overlay={<Tooltip>Ceder</Tooltip>}
+                              >
+                                <span>
+                                  <RiArrowLeftRightFill
+                                    className="actionIcon exchangeIcon"
+                                    onClick={() => onExchange(row)}
+                                  />
+                                </span>
+                              </OverlayTrigger>
                             )}
                           </td>
                         )}

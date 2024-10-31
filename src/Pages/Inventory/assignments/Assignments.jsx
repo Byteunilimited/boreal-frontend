@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { Button, DynamicTable } from '../../../Components';
-import { useAxios } from "../../../Contexts";
 import { AsignedItemModal } from '../ActionsInventory/AsignedItemModal/AsignedItemModal';
+import { ExChangeStockModal } from './ExChangeStockModal';
+import { useAxios } from '../../../Contexts';
 
 export const Assignments = () => {
   const [dataAsigned, setDataAsigned] = useState([]);
@@ -13,6 +14,9 @@ export const Assignments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { privateFetch } = useAxios();
   const [itemState, setItemState] = useState("Habilitado");
+  const [itemToEdit, setItemToEdit] = useState(null);
+  const [showExchange, setShowExchange] = useState(false);
+  const [itemToExchange, setItemToExchange] = useState(null);
   const translateFields = (items, types) => {
     return items.map((item) => {
 
@@ -47,6 +51,7 @@ export const Assignments = () => {
           // Si no hay tipos, pasamos un array vacío
           const translatedDataAsigned = translateFields(data.result.items || []);
           setDataAsigned(translatedDataAsigned);
+          getDataAsigned();
         } else {
           console.error("No se encontraron datos de inventario.");
         }
@@ -88,6 +93,41 @@ export const Assignments = () => {
 
     return matchesType && matchesState && matchesSearchTerm;
   });
+  const toggleItemState = async (item) => {
+    try {
+      const isHabilitado = item.Estado === "Habilitado";
+      const endpoint = isHabilitado
+        ? `/inventory/stock/delete?id=${item.Código}`
+        : `/inventory/stock/enable?id=${item.Código}`;
+      const method = isHabilitado ? "delete" : "put";
+
+      const response = await privateFetch({
+        url: endpoint,
+        method: method,
+        headers: {
+          "x-custom-header": "Boreal Api",
+        },
+      });
+
+      if (response && response.status === 200) {
+        const newState = isHabilitado ? "Deshabilitado" : "Habilitado";
+        setDataAsigned((prevData) =>
+          prevData.map((prevItem) =>
+            prevItem.Código === item.Código ? { ...prevItem, Estado: newState } : prevItem
+          )
+        );
+      } else {
+        console.error("Error en la respuesta de la API:", response?.statusText || "Sin respuesta");
+      }
+    } catch (error) {
+      if (error.code === "ERR_NETWORK") {
+        console.error("Error de red: No se puede conectar con el servidor. Verifica tu conexión.");
+      } else {
+        console.error("Error en toggleItemState:", error);
+      }
+    }
+  };
+
 
 
   const handleFilter = (value, column) => {
@@ -100,9 +140,14 @@ export const Assignments = () => {
   const handleSave = (newItem) => {
     setData([...data, newItem]);
   };
+  const handleExchange = (item) => {
+    setItemToExchange(item);
+    setShowExchange(true);
+  };
+
   useEffect(() => {
     getDataAsigned();
-  }, [handleSave]);
+  }, []);
 
   return (
     <>
@@ -176,9 +221,21 @@ export const Assignments = () => {
         ]}
         data={filteredData}
         onEdit={handleEdit}
-        onFilter={handleFilter}
+        onToggle={toggleItemState}
         hideDeleteIcon={true}
+        showExchangeIcon={true}
+        onExchange={handleExchange}
       />
+
+      {showExchange && (
+        <ExChangeStockModal
+          show={showExchange}
+          onClose={() => setShowExchange(false)}
+          onSave={handleSave}
+          itemToExchange={itemToExchange} 
+        />
+      )}
+
 
       {showModalAsigned && (
         <AsignedItemModal
