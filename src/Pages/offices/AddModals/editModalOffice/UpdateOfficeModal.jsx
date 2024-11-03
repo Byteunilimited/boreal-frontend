@@ -60,9 +60,9 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
 
   const fetchOfficeData = async () => {
     try {
-      console.log("Fetching office data for ID:", officeData.id);
-      const response = await privateFetch.get(`/location/office/id?id=${officeData.id}`);
 
+      const response = await privateFetch.get(`/location/office/id?id=${officeData.id}`);
+      
       if (response.status === 200 && response.data.result.items.length > 0) {
         const office = response.data.result.items[0];
 
@@ -137,7 +137,6 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
   const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
-    onClose();
   };
 
   const handleSubmit = async (ev) => {
@@ -166,6 +165,10 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
         setConfirmationMessage("La sucursal fue actualizada exitosamente.");
         setShowConfirmationModal(true);
         onUpdate(data);
+        setTimeout(() => {
+          setShowConfirmationModal(false);
+          onClose();
+      }, 3000);
       } else if (response.status === 422) {
         setError("Verifica la información proporcionada.");
         setShowConfirmationModal(true);

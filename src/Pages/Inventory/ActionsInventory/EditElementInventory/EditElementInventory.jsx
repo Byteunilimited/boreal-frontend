@@ -65,7 +65,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
   const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
-    onClose();
+  
   };
 
   const handleSubmit = async (ev) => {
@@ -83,6 +83,10 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
         setConfirmationMessage("El elemento fue actualizado exitosamente.");
         setShowConfirmationModal(true);
         onSave(payload);
+        setTimeout(() => {
+          setShowConfirmationModal(false);
+          onClose();
+      }, 3000);
       } else {
         console.log("Ocurrió un error inesperado.");
       }

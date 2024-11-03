@@ -109,6 +109,10 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                 setConfirmationMessage("La bodega fue añadida exitosamente.");
                 setShowConfirmationModal(true);
                 onSave(data);
+                setTimeout(() => {
+                    setShowConfirmationModal(false);
+                    onClose();
+                }, 3000);
             } else {
                 throw new Error("Error en la creación de la bodega.");
             }
@@ -122,7 +126,6 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
-        onClose();
     };
 
     const handleKeyPress = (e) => {

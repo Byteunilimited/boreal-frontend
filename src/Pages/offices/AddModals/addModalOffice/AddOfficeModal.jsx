@@ -109,7 +109,6 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
-        onClose();
     };
 
     const handleSubmit = async (ev) => {
@@ -138,6 +137,10 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
                 setConfirmationMessage("La sucursal fue añadida exitosamente.");
                 setShowConfirmationModal(true);
                 onSave(data);
+                setTimeout(() => {
+                    setShowConfirmationModal(false);
+                    onClose();
+                }, 3000);
             } else if (response.status === 422) {
                 setError("Verifica la información proporcionada.");
                 setShowConfirmationModal(true);

@@ -4,17 +4,18 @@ import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import Select from "react-select";
 
-export const AsignedItemModal = ({ show, onClose }) => {
+export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
   const { privateFetch } = useAxios();
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
+    id: "",
     inventoryId: "",
     conditionId: "",
+    stateId: "",
     storeId: "",
     ownerId: "",
     healthId: "",
     quantity: "",
-    stateId: "",
   });
   const [inventoryItems, setInventoryItems] = useState([]);
   const [conditions, setConditions] = useState([]);
@@ -26,12 +27,33 @@ export const AsignedItemModal = ({ show, onClose }) => {
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
 
+  
   useEffect(() => {
-    if (show) {
+    if (show && item?.Código) {
+      fetchItemData();
       fetchFilters();
     }
-  }, [show]);
+  }, [show, item]);
 
+  const fetchItemData = async () => {
+    try {
+      const response = await privateFetch.get(`/inventory/stock/id?id=${item.Código}&page=0&size=1`);
+      const itemData = response.data.result.items[0]; 
+      setFormData({
+        id: itemData.id || "",
+        inventoryId: itemData.inventory.id || "",
+        conditionId: itemData.condition.id || "",
+        stateId: itemData.state.id || "",
+        storeId: itemData.store.id || "",
+        ownerId: itemData.owner.id || "",
+        healthId: itemData.health.id || "",
+        quantity: itemData.quantity || "",
+      });
+    } catch (error) {
+      console.error("Error fetching item data:", error);
+      setError("Ocurrió un error al obtener los datos del item.");
+    }
+  };
   const fetchFilters = async () => {
     try {
       const [inventoryRes, conditionRes, stateRes, storeRes, ownerRes, healthRes] = await Promise.all([
@@ -41,8 +63,8 @@ export const AsignedItemModal = ({ show, onClose }) => {
         privateFetch.get("/location/store/item/all?page=0&size=2000"),
         privateFetch.get("/location/owner/all?page=0&size=2000"),
         privateFetch.get("/lifecycle/health/all?page=0&size=2000"),
-
       ]);
+
       const inventories = inventoryRes.data.result.items || [];
       const filteredInventories = inventories.filter(inventory => inventory.inventoryType.id !== 2);
       
@@ -54,7 +76,7 @@ export const AsignedItemModal = ({ show, onClose }) => {
 
       const conditions = conditionRes.data.result.items || [];
       const optionsConditions = conditions.map((condition) => ({
-        value: condition.id,
+        value: Number(condition.id),
         label: condition.description,
       }));
       setConditions(optionsConditions);
@@ -62,7 +84,7 @@ export const AsignedItemModal = ({ show, onClose }) => {
 
       const states = stateRes.data.result.items || [];
       const optionsStates = states.map((state) => ({
-        value: state.id,
+        value: Number(state.id),
         label: state.description,
       }));
       setStates(optionsStates); 
@@ -70,7 +92,7 @@ export const AsignedItemModal = ({ show, onClose }) => {
 
       const stores = storeRes.data.result.items || [];
       const optionsStores = stores.map((store) => ({
-        value: store.id,
+        value: Number(store.id),
         label: `${store.description} - ${store.storeType.description}`,
       }));
       setStores(optionsStores);
@@ -78,14 +100,14 @@ export const AsignedItemModal = ({ show, onClose }) => {
 
       const owners = ownerRes.data.result.items || [];
       const optionsOwners = owners.map((owner) => ({
-        value: owner.id,
+        value: Number(owner.id),
         label: owner.name,
       }));
       setOwners(optionsOwners);
       
       const healthStatuses = healthRes.data.result.items || [];
       const optionsHealthStatuses = healthStatuses.map((healthStatus) => ({
-        value: healthStatus.id,
+        value: Number(healthStatus.id),
         label: healthStatus.description,
       }));
       setHealthStatuses(optionsHealthStatuses);
@@ -95,65 +117,51 @@ export const AsignedItemModal = ({ show, onClose }) => {
       setError("Ocurrió un error al obtener los filtros.");
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (selectedOption, field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: selectedOption ? Number(selectedOption.value) : null,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await privateFetch.post("/inventory/stock/assign", formData);
-      console.log('Datos a enviar:', formData);
+      const response = await privateFetch.put("/inventory/stock/update", { id: formData.id, ...formData });
 
       if (response && response.status === 200) {
         setIsSuccessful(true);
-        setConfirmationMessage("El stock fue asignado exitosamente.");
+        setConfirmationMessage("El stock fue actualizado exitosamente.");
         setTimeout(() => {
           setShowConfirmationModal(false);
           onClose();
-
         }, 3000);
       } else {
         setError(`Hubo un problema. Código de respuesta: ${response?.status || "Desconocido"}`);
       }
     } catch (error) {
-      if (error.code === 'ERR_NETWORK') {
-        setError("Error de red: Verifica tu conexión o intenta nuevamente más tarde.");
-      } else {
-        console.error("Error inesperado:", error);
-        setError("Ocurrió un error inesperado. Detalles: " + error.message);
-      }
+      console.error("Error inesperado:", error);
+      setError("Ocurrió un error inesperado. Detalles: " + error.message);
     }
-    
     setShowConfirmationModal(true);
   };
-  
 
   const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
   };
-const handleSelectChange = (selectedOption, field) => {
-    setFormData((prev) => ({
-        ...prev,
-        [field]: selectedOption
-            ? 
-              ["conditionId", "healthId", "storeId", "ownerId", "stateId", "quantity"].includes(field)
-                ? Number(selectedOption.value)
-                : selectedOption.value
-            : null
-    }));
-};
-
 
   return (
     <div className={`modalOverlay ${show ? "visible" : ""}`}>
       <div className="modalContent">
-        <h2>Asignar Stock</h2>
+        <h2>Editar Stock</h2>
         <form onSubmit={handleSubmit}>
-          <div className="formGroup">
+        <div className="formGroup">
             <label>Elemento:</label>
             <Select
               options={inventoryItems}
@@ -161,17 +169,11 @@ const handleSelectChange = (selectedOption, field) => {
               placeholder="Seleccionar elemento"
               value={inventoryItems.find(option => option.value === formData.inventoryId)}
               isClearable
+              isDisabled
               className="selects"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: "1em",
-                  textAlign: "start",
-                }),
-              }}
+              styles={{ control: base => ({ ...base, borderRadius: "1em", textAlign: "start" }) }}
             />
           </div>
-
           <div className="formGroup">
             <label>Condición:</label>
             <Select
@@ -181,17 +183,11 @@ const handleSelectChange = (selectedOption, field) => {
               value={conditions.find(option => option.value === formData.conditionId)}
               isClearable
               className="selects"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: "1em",
-                  textAlign: "start",
-                }),
-              }}
+              styles={{ control: base => ({ ...base, borderRadius: "1em", textAlign: "start" }) }}
             />
           </div>
 
-           <div className="formGroup">
+          <div className="formGroup">
             <label>Estado:</label>
             <Select
               options={states}
@@ -200,32 +196,20 @@ const handleSelectChange = (selectedOption, field) => {
               value={states.find(option => option.value === formData.stateId)}
               isClearable
               className="selects"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: "1em",
-                  textAlign: "start",
-                }),
-              }}
+              styles={{ control: base => ({ ...base, borderRadius: "1em", textAlign: "start" }) }}
             />
-          </div> 
+          </div>
 
           <div className="formGroup">
             <label>Bodega:</label>
             <Select
               options={stores}
               onChange={(selectedOption) => handleSelectChange(selectedOption, "storeId")}
-              placeholder="Seleccionar elemento"
+              placeholder="Seleccionar bodega"
               value={stores.find(option => option.value === formData.storeId)}
               isClearable
               className="selects"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: "1em",
-                  textAlign: "start",
-                }),
-              }}
+              styles={{ control: base => ({ ...base, borderRadius: "1em", textAlign: "start" }) }}
             />
           </div>
 
@@ -234,17 +218,11 @@ const handleSelectChange = (selectedOption, field) => {
             <Select
               options={owners}
               onChange={(selectedOption) => handleSelectChange(selectedOption, "ownerId")}
-              placeholder="Seleccionar elemento"
+              placeholder="Seleccionar propietario"
               value={owners.find(option => option.value === formData.ownerId)}
               isClearable
               className="selects"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: "1em",
-                  textAlign: "start",
-                }),
-              }}
+              styles={{ control: base => ({ ...base, borderRadius: "1em", textAlign: "start" }) }}
             />
           </div>
 
@@ -257,15 +235,10 @@ const handleSelectChange = (selectedOption, field) => {
               value={healthStatuses.find(option => option.value === formData.healthId)}
               isClearable
               className="selects"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: "1em",
-                  textAlign: "start",
-                }),
-              }}
+              styles={{ control: base => ({ ...base, borderRadius: "1em", textAlign: "start" }) }}
             />
           </div>
+
           <div className="formGroup">
             <label>Cantidad:</label>
             <input
@@ -279,10 +252,8 @@ const handleSelectChange = (selectedOption, field) => {
           </div>
 
           <div className="formActions">
-            <button type="submit">Asignar</button>
-            <button type="button" onClick={onClose}>
-              Cancelar
-            </button>
+            <button type="submit">Actualizar</button>
+            <button type="button" onClick={onClose}>Cancelar</button>
           </div>
         </form>
 

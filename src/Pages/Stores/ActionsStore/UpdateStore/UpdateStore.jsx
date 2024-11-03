@@ -34,12 +34,14 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         }
     }, [show, storeData]);
 
+    console.log(storeData);
 
     const fetchStoreData = async () => {
         try {
             const response = await privateFetch.get(`/location/store/item/id?id=${storeData.Código}`);
             if (response.status === 200 && response.data.result.items.length > 0) {
                 const store = response.data.result.items[0];
+                console.log(store);
                 setFormData({
                     id: store.id,
                     description: store.description,
@@ -130,6 +132,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                 setConfirmationMessage("La bodega fue actualizada exitosamente.");
                 setShowConfirmationModal(true);
                 onUpdate(data);
+                
             } else {
                 throw new Error("Error en la actualización de la bodega.");
             }
@@ -143,7 +146,6 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
-        onClose();
     };
 
 

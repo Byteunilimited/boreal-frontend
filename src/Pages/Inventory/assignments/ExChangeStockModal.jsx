@@ -16,6 +16,9 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [isSuccessful, setIsSuccessful] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
+    const [ itemInventory, setItemInventory ] = useState({});
+  
+
 
     // State for current quantity and remitter details
     const [currentQuantity, setCurrentQuantity] = useState("");
@@ -43,9 +46,10 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
 
     const fetchCurrentQuantity = async (codigo) => {
         try {
-            const response = await privateFetch.get(`/inventory/stock/find?search=${codigo}&page=0&size=1`);
+            const response = await privateFetch.get(`/inventory/stock/id?id=${codigo}&page=0&size=1`);
             if (response.status === 200 && response.data.result.items.length > 0) {
                 const item = response.data.result.items[0];
+                setItemInventory(`${item.inventory.id} - ${item.inventory.description}`);
                 setCurrentQuantity(item.quantity);
                 setFormData((prev) => ({
                     ...prev,
@@ -124,13 +128,21 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
         
     };
 
-
     return (
         <div className={`modalOverlay ${show ? "visible" : ""}`}>
             <div className="modalContent">
                 <h2>Ceder Inventario</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="formGroup">
+                    <div className="formGroup">
+                        <label>Elemento a ceder:</label>
+                        <input
+                            type="text"
+                            value={itemInventory || ""}
+                            readOnly
+                            className="readonlyInput"
+                        />
+                    </div>
                         <label>Bodega Remitente:</label>
                         <Select
                             name="remitter"

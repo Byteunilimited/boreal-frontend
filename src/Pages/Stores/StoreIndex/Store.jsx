@@ -69,6 +69,7 @@ export const Store = () => {
     );
     setData(updatedData);
   };
+  
 
   const handleSearch = (value) => {
     setSearchTerm(value);

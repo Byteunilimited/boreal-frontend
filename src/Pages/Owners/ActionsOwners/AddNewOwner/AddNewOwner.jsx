@@ -83,7 +83,11 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
                 setIsSuccessful(true);
                 setConfirmationMessage("El dueño fue añadido exitosamente.");
                 setShowConfirmationModal(true);
-                onSave(data); // Notificar el éxito
+                onSave(data);
+                setTimeout(() => {
+                    setShowConfirmationModal(false);
+                    onClose();
+                }, 3000);
             } else if (response.status === 422) {
                 setIsSuccessful(false);
                 setError("El Nombre del negocio y el NIT deben tener al menos 3 caracteres.");
@@ -106,7 +110,6 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
-        onClose();
     };
     const handleSelectChange = (selectedOption, field) => {
         setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));

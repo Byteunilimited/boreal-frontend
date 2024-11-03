@@ -136,6 +136,10 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                 setConfirmationMessageAdd("El usuario fue actualizado exitosamente.");
                 const data = response.data;
                 onSave(data);
+                setTimeout(() => {
+                    setShowConfirmationModal(false);
+                    onClose();
+                }, 3000);
 
             } else {
                 throw new Error("Error en la actualización del usuario.");
@@ -154,7 +158,6 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
     const closeModal = () => {
         setShowConfirmationModalAdd(false);
         setError(null);
-        onClose();
     };
 
     return (

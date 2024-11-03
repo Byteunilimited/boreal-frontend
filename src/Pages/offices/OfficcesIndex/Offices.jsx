@@ -51,6 +51,7 @@ export const Offices = () => {
     setData([...data, newItem]);
     setFilteredData([...data, newItem]);
   };
+  
   const handleUpdate = (updatedItem) => {
     const updatedData = data.map((item) =>
       item.Código === updatedItem.id ? translateFields([updatedItem])[0] : item

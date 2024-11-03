@@ -5,7 +5,10 @@ import { Button, DynamicTable } from '../../../Components';
 import { AsignedItemModal } from '../ActionsInventory/AsignedItemModal/AsignedItemModal';
 import { ExChangeStockModal } from './ExChangeStockModal';
 import { useAxios } from '../../../Contexts';
-
+import { AsignedItemUpdate } from '../ActionsInventory/AsignedItemUpdate/AsignedItemUpdate';
+import { ConfirmationModal } from '../../../Layouts';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 export const Assignments = () => {
   const [dataAsigned, setDataAsigned] = useState([]);
   const [showModalAsigned, setShowModalAsigned] = useState(false);
@@ -17,6 +20,12 @@ export const Assignments = () => {
   const [itemToEdit, setItemToEdit] = useState(null);
   const [showExchange, setShowExchange] = useState(false);
   const [itemToExchange, setItemToExchange] = useState(null);
+  const [showModalAsignedUpdate, setShowModalAsignedUpdate] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [itemToToggle, setItemToToggle] = useState(null);
+  const [tempItemStates, setTempItemStates] = useState({});
+  const [loading, setLoading] = useState(false);
   const translateFields = (items, types) => {
     return items.map((item) => {
 
@@ -36,8 +45,9 @@ export const Assignments = () => {
 
 
   const getDataAsigned = async () => {
+    setLoading(true);
     try {
-      const [itemsResponse, types] = await Promise.all([
+      const [itemsResponse] = await Promise.all([
         privateFetch.get("/inventory/stock/all?page=0&size=2000", {
           headers: {
             "x-custom-header": "Boreal Api",
@@ -49,10 +59,8 @@ export const Assignments = () => {
         const data = itemsResponse.data;
 
         if (data && data.result && Array.isArray(data.result.items)) {
-          // Si no hay tipos, pasamos un array vacío
           const translatedDataAsigned = translateFields(data.result.items || []);
           setDataAsigned(translatedDataAsigned);
-          getDataAsigned();
         } else {
           console.error("No se encontraron datos de inventario.");
         }
@@ -61,8 +69,11 @@ export const Assignments = () => {
       }
     } catch (error) {
       console.error("Error fetching inventory data:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   const handleRefresh = () => {
     setSearchTerm("");
@@ -78,10 +89,12 @@ export const Assignments = () => {
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, "Asignaciones.xlsx");
   };
+
   const handleEdit = (item) => {
     setItemToEdit(item);
-    setShowEditElementInventory(true);
+    setShowModalAsignedUpdate(true);
   };
+
 
   const filteredData = dataAsigned.filter((item) => {
     const codigo = item.Código ? item.Código.toString() : "";
@@ -94,14 +107,36 @@ export const Assignments = () => {
 
     return matchesType && matchesState && matchesSearchTerm;
   });
-  const toggleItemState = async (item) => {
-    try {
-      const isHabilitado = item.Estado === "Habilitado";
-      const endpoint = isHabilitado
-        ? `/inventory/stock/delete?id=${item.Código}`
-        : `/inventory/stock/enable?id=${item.Código}`;
-      const method = isHabilitado ? "delete" : "put";
+  const handleToggleConfirmation = (item) => {
+    const action = item.Estado === "Habilitado" ? "deshabilitar" : "habilitar";
+    setConfirmationMessage(`¿Deseas ${action} el elemento ${item.Elemento}?`);
+    setItemToToggle(item);
+    setShowConfirmationModal(true);
+  };
 
+  const handleConfirmToggle = () => {
+    toggleItemState(itemToToggle);
+    setShowConfirmationModal(false);
+  };
+
+  const toggleItemState = async (item) => {
+    const isHabilitado = item.Estado === "Habilitado";
+    const newState = isHabilitado ? "Deshabilitado" : "Habilitado";
+
+    // Actualiza temporalmente el estado
+    setTempItemStates((prev) => ({
+      ...prev,
+      [item.Código]: newState,
+    }));
+
+    // Configura la URL y el método para la llamada a la API
+    const endpoint = isHabilitado
+      ? `/inventory/stock/delete?id=${item.Código}`
+      : `/inventory/stock/enable?id=${item.Código}`;
+    const method = isHabilitado ? "delete" : "put";
+
+    try {
+      // Realiza la llamada a la API
       const response = await privateFetch({
         url: endpoint,
         method: method,
@@ -110,8 +145,9 @@ export const Assignments = () => {
         },
       });
 
+      // Si la respuesta es un error, revertir el estado local
       if (response && response.status === 200) {
-        const newState = isHabilitado ? "Deshabilitado" : "Habilitado";
+        // Actualiza el estado en base de datos correctamente
         setDataAsigned((prevData) =>
           prevData.map((prevItem) =>
             prevItem.Código === item.Código ? { ...prevItem, Estado: newState } : prevItem
@@ -119,16 +155,22 @@ export const Assignments = () => {
         );
       } else {
         console.error("Error en la respuesta de la API:", response?.statusText || "Sin respuesta");
+        // Revertir el estado local al estado anterior
+        setTempItemStates((prev) => ({
+          ...prev,
+          [item.Código]: item.Estado,
+        }));
       }
     } catch (error) {
-      if (error.code === "ERR_NETWORK") {
-        console.error("Error de red: No se puede conectar con el servidor. Verifica tu conexión.");
-      } else {
-        console.error("Error en toggleItemState:", error);
-      }
+      // Manejo de errores
+      console.error("Error en toggleItemState:", error);
+      // Revertir el estado local al estado anterior
+      setTempItemStates((prev) => ({
+        ...prev,
+        [item.Código]: item.Estado,
+      }));
     }
   };
-
 
 
   const handleFilter = (value, column) => {
@@ -151,100 +193,105 @@ export const Assignments = () => {
   }, []);
 
   return (
-    <>
-      <div className="filtersContainer">
-        <div className="filters">
-          <label>Tipo:</label>
-          <select
-            value={itemType}
-            onChange={(e) => setItemType(e.target.value)}
-            className="filter"
-          >
-            <option value="">Todos</option>
-            {[...new Set(dataAsigned.map((item) => item.Tipo))] 
-              .filter(Boolean)
-              .map((Tipo, index) => (
-                <option key={index} value={Tipo}>
-                  {Tipo}
-                </option>
-              ))}
-          </select>
+        <>
+          <div className="filtersContainer">
+            <div className="filters">
 
-          <label>Estado:</label>
-          <select
-            value={itemState}
-            onChange={(e) => setItemState(e.target.value)}
-            className="filter"
-          >
-            <option value="">Todos</option>
-            {[...new Set(dataAsigned.map((item) => item.Estado))]
-              .filter(Boolean)
-              .map((Estado, index) => (
-                <option key={index} value={Estado}>
-                  {Estado}
-                </option>
-              ))}
-          </select>
+              <label>Estado:</label>
+              <select
+                value={itemState}
+                onChange={(e) => setItemState(e.target.value)}
+                className="filter"
+              >
+                <option value="">Todos</option>
+                {[...new Set(dataAsigned.map((item) => item.Estado))]
+                  .filter(Boolean)
+                  .map((Estado, index) => (
+                    <option key={index} value={Estado}>
+                      {Estado}
+                    </option>
+                  ))}
+              </select>
 
 
-          <label>Buscar:</label>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Código o Nombre"
-            className="filterSearch"
+              <label>Buscar:</label>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Código o Nombre"
+                className="filterSearch"
+              />
+            </div>
+            <div className="actions">
+              <button onClick={handleRefresh} className="iconRefresh">
+                <FaSyncAlt />
+              </button>
+              <Button onClick={() => setShowModalAsigned(true)} text="Nueva asignación" />
+              <button onClick={handleExport} className="exportButton">
+                <RiFileExcel2Line className="ExportIcon" />
+                Exportar
+              </button>
+
+            </div>
+          </div>
+          {loading ? ( 
+        <div className="loadingIndicator">Cargando información...</div>
+      ) : (
+        <>  
+          <DynamicTable
+            columns={[
+              "Código",
+              "Elemento",
+              "Bodega",
+              "Propietario",
+              "Condición",
+              "Estado",
+              "Calidad",
+              "Existencias",
+            ]}
+            data={filteredData}
+            onEdit={handleEdit}
+            onToggle={handleToggleConfirmation}
+            hideDeleteIcon={true}
+            showExchangeIcon={true}
+            onExchange={handleExchange}
           />
-        </div>
-        <div className="actions">
-          <button onClick={handleRefresh} className="iconRefresh">
-            <FaSyncAlt />
-          </button>
-          <Button onClick={() => setShowModalAsigned(true)} text="Nueva asignación" />
-          <button onClick={handleExport} className="exportButton">
-            <RiFileExcel2Line className="ExportIcon" />
-            Exportar
-          </button>
 
-        </div>
-      </div>
-
-      <DynamicTable
-        columns={[
-          "Código",
-          "Elemento",
-          "Bodega",
-          "Propietario",
-          "Condición",
-          "Estado",
-          "Calidad",
-          "Existencias",
-        ]}
-        data={filteredData}
-        onEdit={handleEdit}
-        onToggle={toggleItemState}
-        hideDeleteIcon={true}
-        showExchangeIcon={true}
-        onExchange={handleExchange}
-      />
-
-      {showExchange && (
-        <ExChangeStockModal
-          show={showExchange}
-          onClose={() => setShowExchange(false)}
-          onSave={handleSave}
-          itemToExchange={itemToExchange}
-        />
-      )}
+          {showExchange && (
+            <ExChangeStockModal
+              show={showExchange}
+              onClose={() => setShowExchange(false)}
+              onSave={handleSave}
+              itemToExchange={itemToExchange}
+            />
+          )}
 
 
-      {showModalAsigned && (
-        <AsignedItemModal
-          show={showModalAsigned}
-          onClose={() => setShowModalAsigned(false)}
-          onSave={handleSave}
-        />
+          {showModalAsigned && (
+            <AsignedItemModal
+              show={showModalAsigned}
+              onClose={() => setShowModalAsigned(false)}
+              onSave={handleSave}
+            />
+          )}
+
+          {showModalAsignedUpdate && (
+            <AsignedItemUpdate
+              show={showModalAsignedUpdate}
+              onClose={() => setShowModalAsignedUpdate(false)}
+              item={itemToEdit}
+              onSave={handleSave}
+            />
+          )}
+          <ConfirmationModal
+            show={showConfirmationModal}
+            onClose={() => setShowConfirmationModal(false)}
+            onConfirm={handleConfirmToggle}
+            message={confirmationMessage}
+          />
+        </>
       )}
     </>
-  )
-}
+  );
+};
