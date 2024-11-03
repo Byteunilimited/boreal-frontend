@@ -3,17 +3,18 @@ import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
 import { API_ENDPOINT } from "../../../../util";
-
+import Select from "react-select";
 export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
     const { privateFetch } = useAxios();
     const [formData, setFormData] = useState({
         id: ownerData.id,
-        businessName: "",
         nit: "",
+        name: "",
         address: "",
         phone: "",
         email: "",
         cityId: "",
+        //stateId: "",
     });
     const [error, setError] = useState(null);
     const [isSuccessful, setIsSuccessful] = useState(false);
@@ -42,7 +43,7 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
                     email: owner.email,
                     address: owner.address,
                     cityId: owner.city.id,
-                    stateId: owner.stateId,
+                    //stateId: owner.stateId,
 
                 });
             } else {
@@ -55,9 +56,14 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
     };
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all?page=0&size=1119");
+            const response = await privateFetch.get("/location/city/all?page=0&size=2000");
             if (response.status === 200) {
-                setCities(response.data.result.items);
+                const cities = response.data.result.items || [];
+                const options = cities.map((city) => ({
+                    value: city.id,
+                    label:`${city.description}, - ${city.department.description}`,
+                }));
+                setCities(options);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
@@ -111,6 +117,9 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
         onClose(); 
     };
 
+    const handleSelectChange = (selectedOption, field) => {
+        setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
+    };
     return (
         <div className="modalOverlay">
             <div className="modalContent">
@@ -180,23 +189,24 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
                     </div>
                     <div className="formGroup">
                         <label>Ciudad:</label>
-                        <select
-                            name="cityId"
-                            value={formData.cityId}
-                            onChange={handleChange}
-                            required
+                        <Select
+                            options={cities}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "cityId")}
+                            placeholder="Seleccionar ciudad"
+                            value={cities.find(option => option.value === formData.cityId)}
+                            isClearable
                             className="selects"
-                        >
-                            <option value="">Seleccionar ciudad</option>
-                            {cities.map((city) => (
-                                <option key={city.id} value={city.id}>
-                                    {`${city.description} (${city.department.description})`}
-                                </option>
-                            ))}
-                        </select>
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
-                    <div className="formGroup">
-                        <label>Estato:</label>
+                    {/* <div className="formGroup">
+                        <label>Estado:</label>
                         <select
                             name="stateId"
                             value={formData.stateId}
@@ -204,14 +214,14 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
                             required
                             className="selects"
                         >
-                            <option value="">Seleccionar ciudad</option>
+                            <option value="">Seleccionar estado</option>
                             {states.map((state) => (
                                 <option key={state.id} value={state.id}>
                                     {`${state.description} (${state.department.description})`}
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </div> */}
                     <div className="formActions">
                         <button type="submit">Guardar</button>
                         <button type="button" onClick={onClose}>

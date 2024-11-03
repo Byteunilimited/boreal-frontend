@@ -4,7 +4,7 @@ import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
 import { Eye, EyeOff } from "react-feather";
 import { API_ENDPOINT } from "../../../../util";
-
+import Select from "react-select";
 export const AddNewOwner = ({ show, onClose, onSave }) => {
     const { privateFetch } = useAxios();
     const [formData, setFormData] = useState({
@@ -26,7 +26,7 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
     useEffect(() => {
         if (show) {
             fetchCities();
-            fetchStates();
+            //fetchStates();
         }
     }, [show]);
 
@@ -34,14 +34,19 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
         try {
             const response = await privateFetch.get("/location/city/all?page=0&size=1119");
             if (response.status === 200) {
-                setCities(response.data.result.items);
+                const cities = response.data.result.items || [];
+                const options = cities.map((city) => ({
+                    value: city.id,
+                    label:`${city.description}, - ${city.department.description}`,
+                }));
+                setCities(options);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
         }
     };
 
-    const fetchStates = async () => {
+    /*const fetchStates = async () => {
         try {
             const response = await privateFetch.get("/lifecycle/state/all?page=0&size=2000");
             if (response.status === 200) {
@@ -50,7 +55,7 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
         }
-    };
+    };*/
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -102,6 +107,9 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
         setShowConfirmationModal(false);
         setError(null);
         onClose();
+    };
+    const handleSelectChange = (selectedOption, field) => {
+        setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
     };
 
     return (
@@ -173,22 +181,23 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
                     </div>
                     <div className="formGroup">
                         <label>Ciudad:</label>
-                        <select
-                            name="cityId"
-                            value={formData.cityId}
-                            onChange={handleChange}
-                            required
+                        <Select
+                            options={cities}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "cityId")}
+                            placeholder="Seleccionar ciudad"
+                            value={cities.find(option => option.value === formData.cityId)}
+                            isClearable
                             className="selects"
-                        >
-                            <option value="">Seleccionar ciudad</option>
-                            {cities.map((city) => (
-                                <option key={city.id} value={city.id}>
-                                    {`${city.description} (${city.department.description})`}
-                                </option>
-                            ))}
-                        </select>
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
-                    <div className="formGroup">
+                   {/*  <div className="formGroup">
                         <label>Estado:</label>
                         <select
                             name="stateId"
@@ -204,7 +213,7 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </div> */}
                     <div className="formActions">
                         <button type="submit">Guardar</button>
                         <button type="button" onClick={onClose}>
