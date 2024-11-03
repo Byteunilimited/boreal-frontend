@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAxios } from "../../../../Contexts";
 import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
-import { API_ENDPOINT } from "../../../../util";
+import Select from "react-select";
 
 export const AsignedItemModal = ({ show, onClose }) => {
   const { privateFetch } = useAxios();

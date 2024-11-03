@@ -77,9 +77,10 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
         e.preventDefault();
         try {
             const payload = {
-                remitter: { id: itemToExchange.Código, quantity: currentQuantity },
+                remitter: { id: itemToExchange.Código, quantity: parseInt(formData.quantity) },
                 receiver: { storeId: formData.receiverStoreId },
             };
+            console.log(payload);
             const response = await privateFetch.post("/inventory/stock/give", payload);
 
             if (response.status === 200) {

@@ -3,6 +3,7 @@ import { useAxios } from "../../../../Contexts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { API_ENDPOINT } from "../../../../util";
 import { Modal } from "../../../../Layouts";
+import Select from "react-select";
 
 export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
   const { privateFetch } = useAxios();
@@ -12,26 +13,34 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [owners, setOwners] = useState([]);
   const [cities, setCities] = useState([]);
+  const [states, setStates] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     id: officeData?.id || "",
     description: "",
     phone: "",
     email: "",
-    address:"",
+    address: "",
     cityId: "",
-    ownerId:"",
-});
+    ownerId: "",
+    //stateId: "",
+  });
 
-useEffect(() => {
-  if (show && officeData?.id) {
-    fetchOwners();
-    fetchCities();
-    fetchOfficeData();
-  }
-}, [show, officeData]);
+  useEffect(() => {
+    if (show && officeData?.id) {
+      const loadData = async () => {
+        await fetchOwners();
+        await fetchCities();
+        await fetchStates();
+        await fetchOfficeData(); 
+      };
+      loadData();
+    }
+  }, [show, officeData]);
 
-  
+
+
+
 
 
   const handleKeyPress = (e) => {
@@ -49,32 +58,30 @@ useEffect(() => {
       formData.address &&
       formData.ownerId &&
       formData.cityId
-      
+
     );
   };
 
-  
+
   const fetchOfficeData = async () => {
     try {
       console.log("Fetching office data for ID:", officeData.id);
       const response = await privateFetch.get(`/location/office/id?id=${officeData.id}`);
-      
-      console.log("Datos recibidos:", response.data); // Imprime los datos para verificar
-  
-      // Accede al array en result.entity y toma el primer elemento (siempre que haya datos)
-      if (response.status === 200 && response.data.result.entity.length > 0) {
-        const office = response.data.result.entity[0]; // Accede al primer objeto del array
-  
-        // Actualiza el estado con los datos de la oficina
+
+      if (response.status === 200 && response.data.result.items.length > 0) {
+        const office = response.data.result.items[0];
+
         setFormData({
           id: office.id,
-          description: office.description, 
+          description: office.description,
           phone: office.phone,
           email: office.email,
           address: office.address,
           cityId: office.city.id,
           ownerId: office.owner.id,
+          //stateId: office.stateId,
         });
+
       } else {
         setError("No se encontraron datos para la oficina.");
       }
@@ -83,16 +90,17 @@ useEffect(() => {
       setError("Ocurrió un error al obtener los datos de la oficina.");
     }
   };
-  
-  
-  
-  
 
   const fetchOwners = async () => {
     try {
       const response = await privateFetch.get("/location/owner/all?page=0&size=2000");
       if (response.status === 200) {
-        setOwners(response.data.result.zone);
+        const owners = response.data.result.items || [];
+        const options = owners.map((owner) => ({
+          value: owner.id,
+          label: owner.name
+        }));
+        setOwners(options);
       }
     } catch (error) {
       setError("Ocurrió un error al obtener los propietarios.");
@@ -103,7 +111,28 @@ useEffect(() => {
     try {
       const response = await privateFetch.get("/location/city/all?page=0&size=2000");
       if (response.status === 200) {
-        setCities(response.data.result.city);
+        const cities = response.data.result.items || [];
+        const options = cities.map((city) => ({
+          value: city.id,
+          label: `${city.description}, - ${city.department.description}`,
+        }));
+        setCities(options);
+      }
+    } catch (error) {
+      setError("Ocurrió un error al obtener las ciudades.");
+    }
+  };
+
+  const fetchStates = async () => {
+    try {
+      const response = await privateFetch.get("/lifecycle/state/all?page=0&size=2000");
+      if (response.status === 200) {
+        const states = response.data.result.items || [];
+        const options = states.map((state) => ({
+          value: state.id,
+          label: state.description,
+        }));
+        setStates(options);
       }
     } catch (error) {
       setError("Ocurrió un error al obtener las ciudades.");
@@ -163,10 +192,20 @@ useEffect(() => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
-        ...prev,
-        [name]: value,
+      ...prev,
+      [name]: value,
     }));
-};
+  };
+
+  const handleSelectChange = (selectedOption, field) => {
+    setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
+  };
+
+  useEffect(() => {
+    console.log("formData:", formData);
+    console.log("states:", states);
+  }, [formData, states]);
+  
   return (
     <div className="modalOverlay">
       <div className="modalContent">
@@ -227,45 +266,63 @@ useEffect(() => {
               maxLength="50"
             />
           </div>
-          {owners && owners.length > 0 && (
-            <div className="formGroup">
-              <label>Propietario:</label>
-              <select
-                name="ownerId"
-                value={formData.ownerId || ""}
-                onChange={handleChange}
-                required
-                className="selects"
-              >
-                <option value="">Seleccionar propietario</option>
-                {owners.map((owner) => (
-                  <option key={owner.id} value={owner.id}>
-                    {owner.businessName}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="formGroup">
+            <label>Propietario:</label>
+            <Select
+              options={owners}
+              onChange={(selectedOption) => handleSelectChange(selectedOption, "ownerId")}
+              placeholder="Seleccionar propietario"
+              value={owners.find(option => option.value === formData.ownerId)}
+              required
+              isClearable
+              className="selects"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: "1em",
+                  textAlign: "start",
+                }),
+              }}
+            />
+          </div>
+         {/*  <Select
+            options={states}
+            onChange={(selectedOption) => handleSelectChange(selectedOption, "stateId")}
+            placeholder="Seleccionar estado"
+            value={states.find(option => option.value === String(formData.stateId))}
+            required
+            isClearable
+            className="selects"
+            styles={{
+              control: (base) => ({
+                ...base,
+                borderRadius: "1em",
+                textAlign: "start",
+              }),
+            }}
+          />
+ */}
 
-{cities && cities.length > 0 && (
-            <div className="formGroup">
-              <label>Ciudad:</label>
-              <select
-                name="cityId"
-                value={formData.cityId || ""}
-                onChange={handleChange}
-                required
-                className="selects"
-              >
-                <option value="">Seleccionar ciudad</option>
-                {cities.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {`${city.description} (${city.department.description})`}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="formGroup">
+            <label>Ciudad:</label>
+            <Select
+              options={cities}
+              onChange={(selectedOption) => handleSelectChange(selectedOption, "cityId")}
+              placeholder="Seleccionar ciudad"
+              value={cities.find(option => option.value === formData.cityId)}
+              required
+              isClearable
+              className="selects"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: "1em",
+                  textAlign: "start",
+                }),
+              }}
+            />
+          </div>
+
           <div className="formActions">
             <button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Actualizando..." : "Actualizar"}

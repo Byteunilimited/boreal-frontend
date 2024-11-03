@@ -56,9 +56,6 @@
     color: var(--MainBlue);
 }
 
-.MainButton {
-    margin-top: 1rem;
-}
 
 .passwordToggle {
     cursor: pointer;

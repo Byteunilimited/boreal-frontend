@@ -98,7 +98,6 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
     
     const handleSubmit = async (ev) => {
         ev.preventDefault();
-        console.log("Data to submit:", formData); // Verifica los datos aquí
         try {
             const response = await privateFetch.post("/user/create", formData);
             if (response.status === 200) {

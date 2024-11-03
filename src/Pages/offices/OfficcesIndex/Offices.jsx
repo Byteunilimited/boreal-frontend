@@ -69,7 +69,8 @@ export const Offices = () => {
       Teléfono: item.phone,
       Correo: item.email,
       Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido",
-      Propietario: item.owner ? item.owner.businessName : "Desconocido",
+      Propietario: item.owner ? item.owner.name : "Desconocido",
+      //Estado: item.stateId,
     }));
   };
 
