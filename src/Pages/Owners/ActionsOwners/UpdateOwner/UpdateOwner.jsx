@@ -130,7 +130,7 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
                         <input
                             type="text"
                             name="businessName"
-                            value={formData.businessName}
+                            value={formData.name}
                             onChange={handleChange}
                             placeholder="Nombre del negocio"
                             required
