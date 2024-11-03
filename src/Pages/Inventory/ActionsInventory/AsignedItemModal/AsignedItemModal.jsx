@@ -42,12 +42,52 @@ export const AsignedItemModal = ({ show, onClose }) => {
         privateFetch.get("/location/owner/all?page=0&size=2000"),
         privateFetch.get("/lifecycle/health/all?page=0&size=2000"),
       ]);
-      setInventoryItems(inventoryRes.data.result.items || []);
-      setConditions(conditionRes.data.result.items || []);
-      setStates(stateRes.data.result.items || []);
-      setStores(storeRes.data.result.items || []);
-      setOwners(ownerRes.data.result.items || []);
-      setHealthStatuses(healthRes.data.result.items || []);
+      const inventories = inventoryRes.data.result.items || [];
+      const optionItemsInventory = inventories.map((inventory) => ({
+        value: inventory.id,
+        label: `${inventory.id} - ${inventory.description}`
+      }));
+      setInventoryItems(optionItemsInventory);
+
+
+      const conditions = conditionRes.data.result.items || [];
+      const optionsConditions = conditions.map((condition) => ({
+        value: condition.id,
+        label: condition.description,
+      }));
+      setConditions(optionsConditions);
+
+
+      const states = stateRes.data.result.items || [];
+      const optionsStates = states.map((state) => ({
+        value: state.id,
+        label: state.description,
+      }));
+      setStates(optionsStates);
+
+
+      const stores = storeRes.data.result.items || [];
+      const optionsStores = stores.map((store) => ({
+        value: store.id,
+        label: `${store.description} - ${store.storeType.description}`,
+      }));
+      setStores(optionsStores);
+
+
+      const owners = ownerRes.data.result.items || [];
+      const optionsOwners = owners.map((owner) => ({
+        value: owner.id,
+        label: owner.name,
+      }));
+      setOwners(optionsOwners);
+      
+      const healthStatuses = healthRes.data.result.items || [];
+      const optionsHealthStatuses = healthStatuses.map((healthStatus) => ({
+        value: healthStatus.id,
+        label: healthStatus.description,
+      }));
+      setHealthStatuses(optionsHealthStatuses);
+
     } catch (error) {
       console.error("Error fetching filters:", error);
       setError("Ocurrió un error al obtener los filtros.");
@@ -63,23 +103,44 @@ export const AsignedItemModal = ({ show, onClose }) => {
     e.preventDefault();
     try {
       const response = await privateFetch.post("/inventory/item/stock/assign", formData);
-      if (response.status === 200) {
+
+      if (response && response.status === 200) {
         setIsSuccessful(true);
         setConfirmationMessage("El stock fue asignado exitosamente.");
+        setTimeout(() => {
+          setShowConfirmationModal(false);
+          onClose();
+      }, 3000);
       } else {
-        setError(`Hubo un problema. Código de respuesta: ${response.status}`);
+        setError(`Hubo un problema. Código de respuesta: ${response?.status || "Desconocido"}`);
       }
     } catch (error) {
-      console.error("Error inesperado:", error);
-      setError("Ocurrió un error inesperado. Detalles: " + error.message);
+      if (error.code === 'ERR_NETWORK') {
+        setError("Error de red: Verifica tu conexión o intenta nuevamente más tarde.");
+      } else {
+        console.error("Error inesperado:", error);
+        setError("Ocurrió un error inesperado. Detalles: " + error.message);
+      }
     }
     setShowConfirmationModal(true);
-  };
-    const closeModal = () => {
+};
+
+  const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
-    onClose();
   };
+const handleSelectChange = (selectedOption, field) => {
+    setFormData((prev) => ({
+        ...prev,
+        [field]: selectedOption
+            ? 
+              ["conditionId", "stateId", "healthId", "storeId", "ownerId", "quantity"].includes(field)
+                ? Number(selectedOption.value)
+                : selectedOption.value
+            : null
+    }));
+};
+
 
   return (
     <div className={`modalOverlay ${show ? "visible" : ""}`}>
@@ -87,77 +148,117 @@ export const AsignedItemModal = ({ show, onClose }) => {
         <h2>Asignar Stock</h2>
         <form onSubmit={handleSubmit}>
           <div className="formGroup">
-            <label>Inventario:</label>
-            <select name="inventoryId" onChange={handleChange} required value={formData.inventoryId} className="selects">
-              <option value="">Seleccionar inventario</option>
-              {inventoryItems.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.id}-{item.description} 
-                </option>
-              ))}
-            </select>
+            <label>Elemento:</label>
+            <Select
+              options={inventoryItems}
+              onChange={(selectedOption) => handleSelectChange(selectedOption, "inventoryId")}
+              placeholder="Seleccionar elemento"
+              value={inventoryItems.find(option => option.value === formData.inventoryId)}
+              isClearable
+              className="selects"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: "1em",
+                  textAlign: "start",
+                }),
+              }}
+            />
           </div>
 
           <div className="formGroup">
             <label>Condición:</label>
-            <select name="conditionId" onChange={handleChange} required value={formData.conditionId} className="selects">
-              <option value="">Seleccionar condición</option>
-              {conditions.map((condition) => (
-                <option key={condition.id} value={condition.id}>
-                  {condition.description}
-                </option>
-              ))}
-            </select>
+            <Select
+              options={conditions}
+              onChange={(selectedOption) => handleSelectChange(selectedOption, "conditionId")}
+              placeholder="Seleccionar condición"
+              value={conditions.find(option => option.value === formData.conditionId)}
+              isClearable
+              className="selects"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: "1em",
+                  textAlign: "start",
+                }),
+              }}
+            />
           </div>
 
           <div className="formGroup">
             <label>Estado:</label>
-            <select name="stateId" onChange={handleChange} required value={formData.stateId} className="selects">
-              <option value="">Seleccionar estado</option>
-              {states.map((state) => (
-                <option key={state.id} value={state.id}>
-                  {state.description}
-                </option>
-              ))}
-            </select>
+            <Select
+              options={states}
+              onChange={(selectedOption) => handleSelectChange(selectedOption, "stateId")}
+              placeholder="Seleccionar estado"
+              value={states.find(option => option.value === formData.stateId)}
+              isClearable
+              className="selects"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: "1em",
+                  textAlign: "start",
+                }),
+              }}
+            />
           </div>
-
           <div className="formGroup">
             <label>Bodega:</label>
-            <select name="storeId" onChange={handleChange} required value={formData.storeId} className="selects">
-              <option value="">Seleccionar bodega</option>
-              {stores.map((store) => (
-                <option key={store.id} value={store.id}>
-                  {store.description}
-                </option>
-              ))}
-            </select>
+            <Select
+              options={stores}
+              onChange={(selectedOption) => handleSelectChange(selectedOption, "storeId")}
+              placeholder="Seleccionar elemento"
+              value={stores.find(option => option.value === formData.storeId)}
+              isClearable
+              className="selects"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: "1em",
+                  textAlign: "start",
+                }),
+              }}
+            />
           </div>
 
           <div className="formGroup">
             <label>Propietario:</label>
-            <select name="ownerId" onChange={handleChange} required value={formData.ownerId} className="selects">
-              <option value="">Seleccionar propietario</option>
-              {owners.map((owner) => (
-                <option key={owner.id} value={owner.id}>
-                  {owner.name}
-                </option>
-              ))}
-            </select>
+            <Select
+              options={owners}
+              onChange={(selectedOption) => handleSelectChange(selectedOption, "ownerId")}
+              placeholder="Seleccionar elemento"
+              value={owners.find(option => option.value === formData.ownerId)}
+              isClearable
+              className="selects"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: "1em",
+                  textAlign: "start",
+                }),
+              }}
+            />
           </div>
 
           <div className="formGroup">
             <label>Calidad:</label>
-            <select name="healthId" onChange={handleChange} required value={formData.healthId} className="selects">
-              <option value="">Seleccionar calidad</option>
-              {healthStatuses.map((status) => (
-                <option key={status.id} value={status.id}>
-                  {status.description}
-                </option>
-              ))}
-            </select>
+            <Select
+              options={healthStatuses}
+              onChange={(selectedOption) => handleSelectChange(selectedOption, "healthId")}
+              placeholder="Seleccionar calidad"
+              value={healthStatuses.find(option => option.value === formData.healthId)}
+              isClearable
+              className="selects"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: "1em",
+                  textAlign: "start",
+                }),
+              }}
+            />
           </div>
-
           <div className="formGroup">
             <label>Cantidad:</label>
             <input

@@ -17,6 +17,7 @@ export const DynamicTable = ({
   hideDeleteIcon = false,
   hideEditIcon = false,
   showExchangeIcon = false,
+  isEditable = () => true,
   onExchange = () => { }
 }) => {
   const [pageNumber, setPageNumber] = useState(0);
@@ -149,7 +150,7 @@ export const DynamicTable = ({
                         ))}
                         {showToggle && (
                           <td>
-                            {!hideEditIcon && (
+                            {!hideEditIcon && isEditable(row) && ( // Verificar si es editable
                               <OverlayTrigger
                                 placement="top"
                                 overlay={<Tooltip>Editar</Tooltip>}
@@ -222,8 +223,9 @@ export const DynamicTable = ({
             </div>
           </div>
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 

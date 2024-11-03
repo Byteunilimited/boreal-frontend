@@ -34,9 +34,13 @@ export const Store = () => {
       Tipo: item.storeType ? item.storeType.description : "Desconocido",
       Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido",
       Oficina: item.office ? item.office.description : "Sin oficina",
+      TipoUno: item.storeType? item.storeType.id : "Desconocido",
     }));
   };
 
+  const isEditable = (item) => {
+    return item.TipoUno !== 1; 
+  };
   const getData = async () => {
     try {
       const response = await privateFetch.get("/location/store/item/all?page=0&size=2000");
@@ -147,6 +151,7 @@ export const Store = () => {
                   columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Ciudad", "Oficina"]}
                   data={filteredData}
                   onEdit={handleEdit}
+                  isEditable={isEditable} 
                   showToggle={true}
                   onToggle={() => { }}
                   hideDeleteIcon={true}

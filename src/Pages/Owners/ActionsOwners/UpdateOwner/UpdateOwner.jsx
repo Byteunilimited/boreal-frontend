@@ -97,7 +97,7 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
                 setShowConfirmationModal(true);
             } else if (response.status === 409) {
                 setIsSuccessful(false);
-                setError("El Nombre del negocio y el NIT ya existen. Por favor, elija otro.");
+                setError("El Nombre del negocio y/o el NIT ya existen. Por favor, elija otro.");
                 setShowConfirmationModal(true);
             } else {
                 throw new Error("Error en la actualización del dueño.");

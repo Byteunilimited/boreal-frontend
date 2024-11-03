@@ -80,9 +80,12 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
                 remitter: { id: itemToExchange.Código, quantity: parseInt(formData.quantity) },
                 receiver: { storeId: formData.receiverStoreId },
             };
-            console.log(payload);
+            console.log("Payload:", payload);
+    
             const response = await privateFetch.post("/inventory/stock/give", payload);
-
+            console.log("Response:", response); // Para ver la respuesta en caso de éxito
+    
+            // Verificar la respuesta
             if (response.status === 200) {
                 setIsSuccessful(true);
                 setConfirmationMessage("El inventario fue cedido exitosamente.");
@@ -93,15 +96,32 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
                 }, 3000);
             }
         } catch (error) {
-            console.error("Error inesperado:", error);
-            setError("Ocurrió un error al ceder el inventario.");
+            // Aquí revisamos si el error es por una respuesta del servidor
+            if (error.response) {
+                // Si el servidor responde, muestra la información de error
+                console.log("Error Response:", error.response);
+                const status = error.response.status;
+    
+                if (status === 409) {
+                    setError("La cantidad a ceder excede la cantidad existente del remitente");
+                } else {
+                    setError("Ocurrió un error al ceder el inventario. Código de estado: " + status);
+                }
+            } else {
+                console.error("Error inesperado:", error);
+                setError("La cantidad a ceder excede la cantidad existente del remitente");
+            }
+    
             setShowConfirmationModal(true);
         }
     };
+    
+    
 
     const closeModal = () => {
+        setShowConfirmationModal(false);
         setError(null);
-        onClose();
+        
     };
 
 

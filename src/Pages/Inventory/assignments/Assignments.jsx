@@ -22,14 +22,14 @@ export const Assignments = () => {
 
       return {
         Código: item.id,
-        //Elemento: `${item.inventory.id}- ${item.inventory.description}`,
-        Elemento: item.inventory.description,
+        Elemento: `${item.inventory.id}- ${item.inventory.description}`,
         Bodega: `${item.store.warehouse.description} (${item.store.warehouse.storeType.description})`,
         Propietario: item.owner.name,
         Condición: item.condition.description,
         Estado: item.state.description,
         Calidad: item.health.description,
-        Existencias: item.quantity
+        Existencias: item.quantity,
+        Tipo: item.inventory.inventoryType.description,
       };
     });
   };
@@ -161,7 +161,7 @@ export const Assignments = () => {
             className="filter"
           >
             <option value="">Todos</option>
-            {[...new Set(data.map((item) => item.Tipo))]
+            {[...new Set(dataAsigned.map((item) => item.Tipo))] 
               .filter(Boolean)
               .map((Tipo, index) => (
                 <option key={index} value={Tipo}>
@@ -233,7 +233,7 @@ export const Assignments = () => {
           show={showExchange}
           onClose={() => setShowExchange(false)}
           onSave={handleSave}
-          itemToExchange={itemToExchange} 
+          itemToExchange={itemToExchange}
         />
       )}
 

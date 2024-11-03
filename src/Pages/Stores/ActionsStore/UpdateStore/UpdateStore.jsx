@@ -3,7 +3,7 @@ import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { API_ENDPOINT } from "../../../../util";
 import { useAxios } from "../../../../Contexts";
-
+import Select from "react-select";
 export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
     const { privateFetch } = useAxios();
     const [formData, setFormData] = useState({
@@ -61,20 +61,34 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
 
     const fetchStoreTypes = async () => {
         try {
-            const response = await privateFetch.get("/location/store/type/all?page=0&size=2000");
+            const response = await privateFetch.get("/location/store/type/all?page=0&size=100");
             if (response.status === 200) {
-                setStoreTypes(response.data.result.items);
+                const storeTypes = response.data.result.items || [];
+                const options = storeTypes
+                    .filter(type => type.id !== 1)  
+                    .map((type) => ({
+                        value: type.id,
+                        label: type.description,
+                    }));
+    
+                setStoreTypes(options);
             }
         } catch (error) {
             console.error("Error fetching store types:", error);
         }
     };
+    
 
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all?page=0&size=2000");
+            const response = await privateFetch.get("/location/city/all?page=0&size=1119");
             if (response.status === 200) {
-                setCities(response.data.result.items);
+                const cities = response.data.result.items || [];
+                const options = cities.map((city) => ({
+                    value: city.id,
+                    label:`${city.description}, - ${city.department.description}`,
+                }));
+                setCities(options);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
@@ -85,12 +99,18 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         try {
             const response = await privateFetch.get("/location/office/all?page=0&size=2000");
             if (response.status === 200) {
-                setOffices(response.data.result.items);
+                const offices = response.data.result.items || [];
+                const options = offices.map((office) => ({
+                    value: office.id,
+                    label:office.description,
+                }));
+                setOffices(options);
             }
         } catch (error) {
             console.error("Error fetching offices:", error);
         }
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -132,6 +152,10 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         if (!regex.test(e.key)) {
             e.preventDefault();
         }
+    };
+
+    const handleSelectChange = (selectedOption, field) => {
+        setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
     };
 
     return (
@@ -195,56 +219,59 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                     </div>
                     <div className="formGroup">
                         <label>Sucursal:</label>
-                        <select name="officeId" value={formData.officeId} onChange={handleChange} required className="selects">
-                            <option value="">Seleccionar sucursal</option>
-                            {offices && offices.length > 0 ? (
-                                offices.map((office) => (
-                                    <option key={office.id} value={office.id}>
-                                        {office.description}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>Cargando sucursales...</option>
-                            )}
-                        </select>
+                        <Select
+                            options={offices}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "officeId")}
+                            placeholder="Seleccionar sucursal"
+                            value={offices.find(option => option.value === formData.officeId)}
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
-
 
                     <div className="formGroup">
-                        <label>Tipo de Bodega:</label>
-                        <select name="storeTypeId" value={formData.storeTypeId} onChange={handleChange} required className="selects">
-                            <option value="">Seleccionar tipo</option>
-                            {storeTypes && storeTypes.length > 0 ? (
-                                storeTypes.map((type) => (
-                                    <option key={type.id} value={type.id}>
-                                        {type.description}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>Cargando tipos de bodega...</option>
-                            )}
-                        </select>
+                        <label>Tipo de bodega:</label>
+                        <Select
+                            options={storeTypes}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "storeTypeId")}
+                            placeholder="Seleccionar tipos de bodega"
+                            value={storeTypes.find(option => option.value === formData.storeTypeId)}
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
-
-                    {cities && cities.length > 0 && (
-                        <div className="formGroup">
-                            <label>Ciudad:</label>
-                            <select
-                                name="cityId"
-                                value={formData.cityId}
-                                onChange={handleChange}
-                                required
-                                className="selects"
-                            >
-                                <option value="">Seleccionar ciudad</option>
-                                {cities.map((city) => (
-                                    <option key={city.id} value={city.id}>
-                                        {`${city.description} (${city.department.description})`}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
+                    <div className="formGroup">
+                        <label>Ciudad:</label>
+                        <Select
+                            options={cities}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "cityId")}
+                            placeholder="Seleccionar ciudad"
+                            value={cities.find(option => option.value === formData.cityId)}
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
+                    </div>
 
                     <div className="formActions">
                         <button type="submit">Actualizar</button>
