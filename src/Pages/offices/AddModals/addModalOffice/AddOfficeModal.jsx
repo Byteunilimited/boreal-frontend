@@ -15,7 +15,7 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
         ownerId: "",
         roleId: "",
         cityId: "",
-        stateId: "",
+        //stateId: "",
     });
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
@@ -30,7 +30,7 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
         if (show) {
             fetchOwners();
             fetchCities();
-            fetchStates();
+           // fetchStates();
         }
     }, [show]);
 
@@ -90,7 +90,7 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
         }
     };
 
-    const fetchStates = async () => {
+    /* const fetchStates = async () => {
         try {
             const response = await privateFetch.get("/lifecycle/state/all?page=0&size=2000");
             if (response.status === 200) {
@@ -104,7 +104,7 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
         }
-    };
+    }; */
 
     const closeModal = () => {
         setShowConfirmationModal(false);
@@ -135,14 +135,14 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
             if (response.ok) {
                 const data = await response.json();
                 setIsSuccessful(true);
-                setConfirmationMessage("La oficina fue añadida exitosamente.");
+                setConfirmationMessage("La sucursal fue añadida exitosamente.");
                 setShowConfirmationModal(true);
                 onSave(data);
             } else if (response.status === 422) {
-                setError("Verifica la infromación proporcionada.");
+                setError("Verifica la información proporcionada.");
                 setShowConfirmationModal(true);
             } else if (response.status === 409) {
-                setError("Verifica la información, ya existen oficinas con estos datos");
+                setError("Verifica la información, ya existen sucursales con estos datos");
                 setShowConfirmationModal(true);
             } else {
                 throw new Error("Respuesta inesperada del servidor.");
@@ -249,7 +249,8 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
                             }}
                         />
                     </div>
-                    <div className="formGroup">
+
+                    {/* <div className="formGroup">
                         <label>Estado:</label>
                         <Select
                             options={states}
@@ -266,7 +267,8 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
                                 }),
                             }}
                         />
-                    </div>
+                    </div> */}
+
                     <div className="formActions">
                         <button type="submit" disabled={isSubmitting}>
                             {isSubmitting ? "Guardando..." : "Guardar"}

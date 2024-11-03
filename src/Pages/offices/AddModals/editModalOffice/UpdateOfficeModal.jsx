@@ -163,7 +163,7 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
       if (response.ok) {
         const data = await response.json();
         setIsSuccessful(true);
-        setConfirmationMessage("La oficina fue actualizada exitosamente.");
+        setConfirmationMessage("La sucursal fue actualizada exitosamente.");
         setShowConfirmationModal(true);
         onUpdate(data);
       } else if (response.status === 422) {

@@ -26,7 +26,7 @@ export const Owners = () => {
     return items.map((item) => ({
       Código: item.id,
       NIT: item.nit,
-      name: item.name,
+      Nombre: item.name,
       Teléfono: item.phone,
       Dirección: item.address,
       Email: item.email,
