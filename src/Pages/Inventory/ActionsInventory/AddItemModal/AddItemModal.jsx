@@ -91,8 +91,6 @@ export const AddItemModal = ({ show, onClose }) => {
       setShowConfirmationModal(true);
     }
   };
-  
-  
 
   const closeModal = () => {
     setError(null);

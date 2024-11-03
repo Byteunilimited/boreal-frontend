@@ -22,6 +22,7 @@ export const Assignments = () => {
 
       return {
         Código: item.id,
+        //Elemento: `${item.inventory.id}- ${item.inventory.description}`,
         Elemento: item.inventory.description,
         Bodega: `${item.store.warehouse.description} (${item.store.warehouse.storeType.description})`,
         Propietario: item.owner.name,

@@ -35,8 +35,9 @@ export const UpdateStoreType = ({ show, onClose, storeType, onUpdate }) => {
     };
 
 
+
     const handleKeyPress = (e) => {
-        const regex = /^[a-zA-Z0-9\s]*$/;
+        const regex = /^[a-zA-Z0-9-ÑñÁÉÍÓÚáéíóú\s]*$/;
         if (!regex.test(e.key)) {
             e.preventDefault();
         }

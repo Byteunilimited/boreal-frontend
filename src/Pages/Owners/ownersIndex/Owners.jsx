@@ -30,7 +30,7 @@ export const Owners = () => {
       Teléfono: item.phone,
       Dirección: item.address,
       Email: item.email,
-      Estado: item.stateId,
+      //Estado: item.stateId,
       Ciudad: item.city.description
 
     }));
@@ -157,7 +157,7 @@ export const Owners = () => {
               </div>
             </div>
             <DynamicTable
-              columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Estado", "Ciudad"]}
+              columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Ciudad"]}
               data={filterData}
               onEdit={handleEdit}
               onDelete={handleDelete}

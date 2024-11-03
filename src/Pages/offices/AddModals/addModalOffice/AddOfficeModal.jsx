@@ -47,11 +47,12 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
         setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
     };
     const handleKeyPress = (e) => {
-        const regex = /^[a-zA-Z0-9\s]*$/;
+        const regex = /^[a-zA-Z0-9-ÑñÁÉÍÓÚáéíóú\s]*$/;
         if (!regex.test(e.key)) {
             e.preventDefault();
         }
     };
+    
     const validateForm = () => {
         // Check if all required fields are filled
         return formData.description && formData.phone && formData.email && formData.address && formData.ownerId && formData.cityId;

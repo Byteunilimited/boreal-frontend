@@ -31,24 +31,19 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
       const loadData = async () => {
         await fetchOwners();
         await fetchCities();
-        await fetchStates();
+        //await fetchStates();
         await fetchOfficeData(); 
       };
       loadData();
     }
   }, [show, officeData]);
 
-
-
-
-
-
   const handleKeyPress = (e) => {
-    const regex = /^[a-zA-Z0-9\s]*$/;
+    const regex = /^[a-zA-Z0-9-ÑñÁÉÍÓÚáéíóú\s]*$/;
     if (!regex.test(e.key)) {
-      e.preventDefault();
+        e.preventDefault();
     }
-  };
+};
 
   const validateForm = () => {
     return (
@@ -123,7 +118,7 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
     }
   };
 
-  const fetchStates = async () => {
+ /*  const fetchStates = async () => {
     try {
       const response = await privateFetch.get("/lifecycle/state/all?page=0&size=2000");
       if (response.status === 200) {
@@ -137,7 +132,7 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
     } catch (error) {
       setError("Ocurrió un error al obtener las ciudades.");
     }
-  };
+  }; */
 
   const closeModal = () => {
     setShowConfirmationModal(false);
@@ -302,7 +297,6 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
             }}
           />
  */}
-
           <div className="formGroup">
             <label>Ciudad:</label>
             <Select

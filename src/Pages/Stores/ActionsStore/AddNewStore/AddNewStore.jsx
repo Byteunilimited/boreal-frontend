@@ -104,12 +104,12 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
     };
 
     const handleKeyPress = (e) => {
-        const regex = /^[a-zA-Z0-9\s]*$/;
+        const regex = /^[a-zA-Z0-9-ÑñÁÉÍÓÚáéíóú\s]*$/;
         if (!regex.test(e.key)) {
             e.preventDefault();
         }
     };
-
+    
     return (
         <div className="modalOverlay">
             <div className="modalContent">
