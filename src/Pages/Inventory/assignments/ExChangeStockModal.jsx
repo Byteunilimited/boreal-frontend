@@ -95,7 +95,7 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange, onSave }) =>
                 setIsSuccessful(true);
                 setConfirmationMessage("El inventario fue cedido exitosamente.");
                 setShowConfirmationModal(true);
-                setData(data);
+                onSave(data);
                 setTimeout(() => {
                     setShowConfirmationModal(false);
                     onClose();
@@ -127,7 +127,6 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange, onSave }) =>
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
-        onSave(data);
     };
 
     return (

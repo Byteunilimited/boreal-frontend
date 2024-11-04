@@ -55,10 +55,11 @@ export const Assignments = () => {
         }),
       ]);
 
+      console.log(itemsResponse);
       if (itemsResponse.status === 200) {
         const data = itemsResponse.data;
 
-        if (data && data.result && Array.isArray(data.result.items)) {
+        if (data && data.result && Array.isArray(data.result.items )) {
           const translatedDataAsigned = translateFields(data.result.items || []);
           setDataAsigned(translatedDataAsigned);
         } else {
@@ -190,7 +191,7 @@ export const Assignments = () => {
 
   useEffect(() => {
     getDataAsigned();
-  }, [data]);
+  }, []);
 
   return (
         <>
