@@ -4,7 +4,7 @@ import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import Select from "react-select";
 
-export const AsignedItemModal = ({ show, onClose }) => {
+export const AsignedItemModal = ({ show, onClose, onSave }) => {
   const { privateFetch } = useAxios();
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
@@ -25,6 +25,7 @@ export const AsignedItemModal = ({ show, onClose }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     if (show) {
@@ -108,8 +109,10 @@ export const AsignedItemModal = ({ show, onClose }) => {
       console.log('Datos a enviar:', formData);
 
       if (response && response.status === 200) {
+        const data = response.data.result.items[0];
         setIsSuccessful(true);
         setConfirmationMessage("El stock fue asignado exitosamente.");
+        setData(data);
         setTimeout(() => {
           setShowConfirmationModal(false);
           onClose();
@@ -130,10 +133,10 @@ export const AsignedItemModal = ({ show, onClose }) => {
     setShowConfirmationModal(true);
   };
   
-
   const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
+    onSave(data);
   };
 const handleSelectChange = (selectedOption, field) => {
     setFormData((prev) => ({

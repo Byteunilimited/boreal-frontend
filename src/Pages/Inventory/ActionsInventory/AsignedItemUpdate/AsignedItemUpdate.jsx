@@ -26,8 +26,8 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [data, setData] = useState([]);
 
-  
   useEffect(() => {
     if (show && item?.Código) {
       fetchItemData();
@@ -38,7 +38,7 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
   const fetchItemData = async () => {
     try {
       const response = await privateFetch.get(`/inventory/stock/id?id=${item.Código}&page=0&size=1`);
-      const itemData = response.data.result.items[0]; 
+      const itemData = response.data.result.items[0];
       setFormData({
         id: itemData.id || "",
         inventoryId: itemData.inventory.id || "",
@@ -67,7 +67,7 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
 
       const inventories = inventoryRes.data.result.items || [];
       const filteredInventories = inventories.filter(inventory => inventory.inventoryType.id !== 2);
-      
+
       const optionItemsInventory = filteredInventories.map((inventory) => ({
         value: inventory.id,
         label: `${inventory.id} - ${inventory.description}`
@@ -87,7 +87,7 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
         value: Number(state.id),
         label: state.description,
       }));
-      setStates(optionsStates); 
+      setStates(optionsStates);
 
 
       const stores = storeRes.data.result.items || [];
@@ -104,7 +104,7 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
         label: owner.name,
       }));
       setOwners(optionsOwners);
-      
+
       const healthStatuses = healthRes.data.result.items || [];
       const optionsHealthStatuses = healthStatuses.map((healthStatus) => ({
         value: Number(healthStatus.id),
@@ -135,14 +135,16 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
       const response = await privateFetch.put("/inventory/stock/update", { id: formData.id, ...formData });
 
       if (response && response.status === 200) {
+        const data = response.data.result.items[0];
         setIsSuccessful(true);
         setConfirmationMessage("El stock fue actualizado exitosamente.");
+        setData(data);
         setTimeout(() => {
           setShowConfirmationModal(false);
           onClose();
         }, 3000);
       } else {
-        setError(`Hubo un problema. Código de respuesta: ${response?.status || "Desconocido"}`);
+        setError("No se modificó ningun campo");
       }
     } catch (error) {
       console.error("Error inesperado:", error);
@@ -154,6 +156,7 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
   const closeModal = () => {
     setShowConfirmationModal(false);
     setError(null);
+    onSave(data);
   };
 
   return (
@@ -161,7 +164,7 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
       <div className="modalContent">
         <h2>Editar Stock</h2>
         <form onSubmit={handleSubmit}>
-        <div className="formGroup">
+          <div className="formGroup">
             <label>Elemento:</label>
             <Select
               options={inventoryItems}
@@ -246,6 +249,7 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
               name="quantity"
               onChange={handleChange}
               required
+              disabled
               value={formData.quantity}
               placeholder="Cantidad"
             />

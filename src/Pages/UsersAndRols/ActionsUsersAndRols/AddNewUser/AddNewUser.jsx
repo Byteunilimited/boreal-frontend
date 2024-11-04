@@ -4,7 +4,6 @@ import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
 import { Eye, EyeOff } from "react-feather";
 import Select from "react-select";
-
 export const AddNewUserModal = ({ show, onClose, onSave }) => {
     const { privateFetch } = useAxios();
     const [formData, setFormData] = useState({

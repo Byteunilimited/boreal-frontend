@@ -132,7 +132,7 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
                         <label>Nombre del Negocio:</label>
                         <input
                             type="text"
-                            name="businessName"
+                            name="name"
                             value={formData.name}
                             onChange={handleChange}
                             placeholder="Nombre del negocio"

@@ -4,7 +4,7 @@ import Select from "react-select";
 import { useAxios } from "../../../Contexts";
 import { Modal } from "../../../Layouts";
 
-export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
+export const ExChangeStockModal = ({ show, onClose, itemToExchange, onSave }) => {
     const { privateFetch } = useAxios();
     const [error, setError] = useState(null);
     const [formData, setFormData] = useState({
@@ -17,6 +17,7 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
     const [isSuccessful, setIsSuccessful] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [ itemInventory, setItemInventory ] = useState({});
+    const [data, setData] = useState([]);
   
 
 
@@ -87,22 +88,23 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
             console.log("Payload:", payload);
     
             const response = await privateFetch.post("/inventory/stock/give", payload);
-            console.log("Response:", response); // Para ver la respuesta en caso de éxito
-    
-            // Verificar la respuesta
+            console.log("Response:", response); 
+
             if (response.status === 200) {
+                const data = response.data.result.items[0];
                 setIsSuccessful(true);
                 setConfirmationMessage("El inventario fue cedido exitosamente.");
                 setShowConfirmationModal(true);
+                setData(data);
                 setTimeout(() => {
                     setShowConfirmationModal(false);
                     onClose();
                 }, 3000);
             }
         } catch (error) {
-            // Aquí revisamos si el error es por una respuesta del servidor
+
             if (error.response) {
-                // Si el servidor responde, muestra la información de error
+
                 console.log("Error Response:", error.response);
                 const status = error.response.status;
     
@@ -125,7 +127,7 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange }) => {
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
-        
+        onSave(data);
     };
 
     return (

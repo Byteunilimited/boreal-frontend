@@ -129,14 +129,14 @@ export const Assignments = () => {
       [item.Código]: newState,
     }));
 
-    // Configura la URL y el método para la llamada a la API
+ 
     const endpoint = isHabilitado
       ? `/inventory/stock/delete?id=${item.Código}`
       : `/inventory/stock/enable?id=${item.Código}`;
     const method = isHabilitado ? "delete" : "put";
 
     try {
-      // Realiza la llamada a la API
+
       const response = await privateFetch({
         url: endpoint,
         method: method,
@@ -190,7 +190,7 @@ export const Assignments = () => {
 
   useEffect(() => {
     getDataAsigned();
-  }, []);
+  }, [data]);
 
   return (
         <>

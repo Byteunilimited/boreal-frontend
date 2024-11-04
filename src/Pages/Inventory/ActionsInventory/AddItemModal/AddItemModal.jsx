@@ -6,18 +6,19 @@ import "./AddItemModal.css";
 import { API_ENDPOINT } from "../../../../util";
 import Select from "react-select";
 
-export const AddItemModal = ({ show, onClose }) => {
+export const AddItemModal = ({ show, onClose, onSave }) => {
   const { privateFetch } = useAxios();
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     id: "",
     description: "",
-    inventoryTypeId: "", 
+    inventoryTypeId: "",
   });
   const [inventoryTypes, setInventoryTypes] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     if (show) {
@@ -29,7 +30,6 @@ export const AddItemModal = ({ show, onClose }) => {
     try {
       const response = await privateFetch.get("/inventory/type/all?page=0&size=2000");
       const types = response.data.result.items || [];
-      // Mapear las opciones para adaptarlas a react-select
       const options = types.map((type) => ({
         value: type.id,
         label: type.description
@@ -59,31 +59,33 @@ export const AddItemModal = ({ show, onClose }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: formData ? JSON.stringify(formData) : null,
       });
   
-      if (!response.status === 200) {
-
-      const data = await response.json();
-      setIsSuccessful(true);
-      setConfirmationMessage("El elemento fue añadido exitosamente.");
-      setShowConfirmationModal(true);
-      onSave(data);
-      setTimeout(() => {
-        setShowConfirmationModal(false);
-      }, 3000);
-
-        if (response.status === 422) {
-          setError("El código y/o nombre debe tener al menos 6 caracteres.");
-        } else if (response.status === 409) {
-          setError("El código y/o nombre  ya existe. Por favor, elija otro.");
-        } else {
-          setError("Ocurrió un error inesperado del servidor.");
-        }
+      const jsonResponse = await response.json(); 
+  
+      if (response.status === 200) {
+        const data = jsonResponse.result.items[0];
+        setIsSuccessful(true);
+        setConfirmationMessage("El elemento fue añadido exitosamente.");
         setShowConfirmationModal(true);
-        return; 
+        setData(data);
+        setTimeout(() => {
+          onClose();
+        }, 3000);
+      } else if (response.status === 422) {
+        setIsSuccessful(false);
+        setError("El código y/o nombre debe tener al menos 6 caracteres.");
+      } else if (response.status === 409) {
+        setIsSuccessful(false);
+        setError("El código y/o nombre ya existe. Por favor, elija otro.");
+      } else {
+        setIsSuccessful(false);
+        setError("Ocurrió un error inesperado del servidor.");
       }
-
+  
+      setShowConfirmationModal(true);
+      return;
   
     } catch (error) {
       console.error("Error inesperado:", error);
@@ -91,10 +93,12 @@ export const AddItemModal = ({ show, onClose }) => {
       setShowConfirmationModal(true);
     }
   };
+  
 
   const closeModal = () => {
+    setShowConfirmationModal(false);
     setError(null);
-    onClose();
+    onSave(data);
   };
 
   return (
@@ -136,8 +140,8 @@ export const AddItemModal = ({ show, onClose }) => {
               styles={{
                 control: (base) => ({
                   ...base,
-                  borderRadius: "1em", 
-                  textAlign: "start", 
+                  borderRadius: "1em",
+                  textAlign: "start",
                 }),
               }}
             />
