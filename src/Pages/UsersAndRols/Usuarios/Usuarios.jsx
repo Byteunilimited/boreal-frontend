@@ -46,7 +46,7 @@ export const Usuarios = () => {
                 Dirección: item.address,
                 Ciudad: `${item.city.description}, (${item.city.department.description})` || "Desconocido",
                 Oficina: item.office?.description || "Desconocida",
-                Estado: state ? state.description : "Desconocido",
+                //Estado: state ? state.description : "Desconocido",
             };
         });
     };
@@ -169,7 +169,7 @@ export const Usuarios = () => {
             </div>
 
             <DynamicTable
-                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad", "Oficina", "Estado"]}
+                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad", "Oficina"]}
                 data={filteredData}
                 onEdit={handleEdit}
                 showToggle={true}
