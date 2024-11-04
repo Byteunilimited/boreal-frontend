@@ -37,6 +37,8 @@
         "header  header"  4rem
         "sidebar   main"  auto /
         14rem    auto;
+        margin-top: 0.7em;
+    
     }
 }
 
@@ -44,6 +46,7 @@
     .sidebar {
         position: fixed;
         width: 90%;
+        margin-top: 0.7em;
         top: 4em;
         right: 100%;
         transition: right 0.3s;
