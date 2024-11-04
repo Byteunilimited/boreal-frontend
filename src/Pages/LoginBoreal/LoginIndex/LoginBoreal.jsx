@@ -81,7 +81,7 @@ export const LoginBoreal = () => {
                 setShowSuccessModal(true);
                 setTimeout(() => {
                     navigate("/boreal/panel");
-                }, 3000);
+                }, 1000);
             } else {
                 setShowErrorModal(true);
             }

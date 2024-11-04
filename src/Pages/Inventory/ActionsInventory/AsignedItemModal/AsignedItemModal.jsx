@@ -117,7 +117,7 @@ export const AsignedItemModal = ({ show, onClose, onSave }) => {
           setShowConfirmationModal(false);
           onClose();
 
-        }, 3000);
+        }, 1000);
       } else {
         setError(`Hubo un problema. Código de respuesta: ${response?.status || "Desconocido"}`);
       }

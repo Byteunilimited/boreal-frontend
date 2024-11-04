@@ -83,17 +83,8 @@ export const InventoryDepends = () => {
   const handleAddItem = async () => {
     let endpoint = '';
     switch (itemType) {
-      case 'Condiciones':
-        endpoint = '/lifecycle/condition/create';
-        break;
-      case 'Estados':
-        endpoint = '/lifecycle/state/create';
-        break;
       case 'Calidad':
         endpoint = '/lifecycle/health/create';
-        break;
-      case 'Tipo':
-        endpoint = '/inventory/type/create';
         break;
       default:
         console.error('No valid endpoint for the selected item type.');
@@ -137,7 +128,7 @@ export const InventoryDepends = () => {
                     </select>
                 </div>
 
-                {itemType && (
+                {itemType === 'Calidad' && (
                     <div className="actions">
                         <Button onClick={() => setShowModal(true)} text="Añadir Dependencia" />
                     </div>

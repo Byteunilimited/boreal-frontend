@@ -202,7 +202,7 @@ export const Inventory = () => {
                       <RiFileExcel2Line className="ExportIcon" />
                       Exportar
                     </button>
-                    <Button onClick={() => setShowBulkUploadModal(true)} text={"Cargue Masivo"} />
+                    {/* <Button onClick={() => setShowBulkUploadModal(true)} text={"Cargue Masivo"} /> */}
                   </div>
                 </div>
                 <DynamicTable

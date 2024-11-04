@@ -112,7 +112,7 @@ export const AddNewStoreModal = ({ show, onClose, onSave }) => {
                 setTimeout(() => {
                     setShowConfirmationModal(false);
                     onClose();
-                }, 3000);
+                }, 1000);
             } else {
                 throw new Error("Error en la creación de la bodega.");
             }

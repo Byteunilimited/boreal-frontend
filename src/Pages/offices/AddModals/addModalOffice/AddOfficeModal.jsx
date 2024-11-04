@@ -140,7 +140,7 @@ export const AddOfficeModal = ({ show, onClose, onSave }) => {
                 setTimeout(() => {
                     setShowConfirmationModal(false);
                     onClose();
-                }, 3000);
+                }, 1000);
             } else if (response.status === 422) {
                 setError("Verifica la información proporcionada.");
                 setShowConfirmationModal(true);

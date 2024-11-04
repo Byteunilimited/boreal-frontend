@@ -87,7 +87,7 @@ export const AddNewOwner = ({ show, onClose, onSave }) => {
                 setTimeout(() => {
                     setShowConfirmationModal(false);
                     onClose();
-                }, 3000);
+                }, 1000);
             } else if (response.status === 422) {
                 setIsSuccessful(false);
                 setError("El Nombre del negocio y el NIT deben tener al menos 3 caracteres.");

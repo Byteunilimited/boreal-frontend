@@ -139,7 +139,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                 setTimeout(() => {
                     setShowConfirmationModal(false);
                     onClose();
-                }, 3000);
+                }, 1000);
 
             } else {
                 throw new Error("Error en la actualización del usuario.");

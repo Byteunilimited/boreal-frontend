@@ -142,7 +142,7 @@ export const AsignedItemUpdate = ({ show, onClose, item, onSave }) => {
         setTimeout(() => {
           setShowConfirmationModal(false);
           onClose();
-        }, 3000);
+        }, 1000);
       } else {
         setError("No se modificó ningun campo");
       }

@@ -86,7 +86,7 @@ export const EditElementInventory = ({ show, item, onClose, onSave }) => {
         setTimeout(() => {
           setShowConfirmationModal(false);
           onClose();
-      }, 3000);
+      }, 1000);
       } else {
         console.log("Ocurrió un error inesperado.");
       }

@@ -72,7 +72,7 @@ export const AddItemModal = ({ show, onClose, onSave }) => {
         setData(data);
         setTimeout(() => {
           onClose();
-        }, 3000);
+        }, 1000);
       } else if (response.status === 422) {
         setIsSuccessful(false);
         setError("El código y/o nombre debe tener al menos 6 caracteres.");

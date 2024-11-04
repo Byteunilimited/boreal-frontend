@@ -168,7 +168,7 @@ export const UpdateOfficeModal = ({ show, onClose, onUpdate, officeData }) => {
         setTimeout(() => {
           setShowConfirmationModal(false);
           onClose();
-      }, 3000);
+      }, 1000);
       } else if (response.status === 422) {
         setError("Verifica la información proporcionada.");
         setShowConfirmationModal(true);

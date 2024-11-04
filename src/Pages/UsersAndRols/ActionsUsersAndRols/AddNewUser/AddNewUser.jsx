@@ -107,7 +107,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                 onSave(data);
                 setTimeout(() => {
                     onClose();
-                }, 3000);
+                }, 1000);
             } else {
                 throw new Error("Error en la creación del usuario.");
             }

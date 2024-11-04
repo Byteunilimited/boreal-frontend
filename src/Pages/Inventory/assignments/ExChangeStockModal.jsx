@@ -99,7 +99,7 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange, onSave }) =>
                 setTimeout(() => {
                     setShowConfirmationModal(false);
                     onClose();
-                }, 3000);
+                }, 1000);
             }
         } catch (error) {
 
