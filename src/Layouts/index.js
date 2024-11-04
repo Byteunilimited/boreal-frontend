@@ -1,8 +1,8 @@
-export * from './BasePanel'
+export * from './Dashboard'
 export * from './Modal'
-export * from './SideBar'
+export * from './Menu'
 export * from './Error404'
-export * from './NavBar'
+export * from './Header'
 
 import { BulkUpload } from './BulkUpload/BulkUpload'
 

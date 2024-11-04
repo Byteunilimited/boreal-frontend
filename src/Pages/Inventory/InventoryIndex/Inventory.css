@@ -11,12 +11,6 @@
     --AlternateDarkBlue: #5881C3;
   }
 
-body {
-    margin: 0;
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
-    font-weight: lighter;
-  }
-  
   .container {
     display: flex;
     margin-left: 18%;
@@ -25,14 +19,6 @@ body {
   }
   
   
-  .content {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: #f9f9f9;
-    max-height: calc(100vh - 20px); 
-    overflow-y: auto; 
-}
-
 
 .inventory {
   max-width: 1200px;
