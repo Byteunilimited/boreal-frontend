@@ -42,6 +42,7 @@ export const Owners = () => {
       if (response && response.data) {
         const translatedData = translateFields(response.data.result.items);
         setData(translatedData);
+        setFilteredData(translatedData); 
       } else {
         console.error("Response does not contain data:", response);
       }
@@ -50,9 +51,7 @@ export const Owners = () => {
     }
   };
 
-  console.log(data);
 
-  // Handle edit action
   const handleEdit = (owner) => {
     const ownerToEdit = data.find((item) => item.Código === owner.Código);
     if (ownerToEdit) {
