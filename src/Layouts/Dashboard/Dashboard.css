@@ -7,7 +7,7 @@
     grid-template:
     "header  header"  5rem
     "sidebar  main"    auto /
-    20rem    auto;
+    15rem    auto;
 }
 
 .sidebar {
