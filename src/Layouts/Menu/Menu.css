@@ -44,10 +44,10 @@
     background-color: var(--MainWhite);
     border-radius: 1.5rem;
 }
-.logoCotainer:hover {
-    border-radius: 1.5rem 1.5rem 1.5rem 1.5rem;
-}
 
+.logoCotainer:hover {
+    border-radius: 1.5rem;
+}
 
 .menu ul a.active {
     color: var(--DarkBlue);
@@ -76,13 +76,8 @@
     border: 2px solid var(--DarkBlue);
 }
 
-.itemSub {
+.itemSub, .itemSub a {
     margin-left: 1em;
-}
-
-.itemSub a {
-    margin-left: 1em;
-
 }
 
 .itemSub a:hover {
