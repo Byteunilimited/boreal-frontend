@@ -41,7 +41,7 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
             const response = await privateFetch.get(`/location/store/item/id?id=${storeData.Código}`);
             if (response.status === 200 && response.data.result.items.length > 0) {
                 const store = response.data.result.items[0];
-                console.log(store);
+                console.log("Store data:", store);
                 setFormData({
                     id: store.id,
                     description: store.description,

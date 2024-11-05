@@ -26,22 +26,26 @@ export const Assignments = () => {
   const [itemToToggle, setItemToToggle] = useState(null);
   const [tempItemStates, setTempItemStates] = useState({});
   const [loading, setLoading] = useState(false);
-  const translateFields = (items, types) => {
+  const translateFields = (items) => {
     return items.map((item) => {
-
       return {
-        Código: item.id,
-        Elemento: `${item.inventory.id}- ${item.inventory.description}`,
-        Bodega: `${item.store.warehouse.description} (${item.store.warehouse.storeType.description})`,
-        Propietario: item.owner.name,
-        Condición: item.condition.description,
-        Estado: item.state.description,
-        Calidad: item.health.description,
-        Existencias: item.quantity,
-        Tipo: item.inventory.inventoryType.description,
+        Código: item.id || '',
+        Elemento: item.inventory?.id && item.inventory?.description
+          ? `${item.inventory.id} - ${item.inventory.description}`
+          : "Descripción no disponible",
+        Bodega: item.store?.warehouse?.description && item.store?.warehouse?.storeType?.description
+          ? `${item.store.warehouse.description} (${item.store.warehouse.storeType.description})`
+          : "Bodega no disponible",
+        Propietario: item.owner?.name || "Propietario desconocido",
+        Condición: item.condition?.description || "Condición no disponible",
+        Estado: item.state?.description || "Estado no disponible",
+        Calidad: item.health?.description || "Calidad no disponible",
+        Existencias: item.quantity || 0,
+        Tipo: item.inventory?.inventoryType?.description || "Tipo no disponible",
       };
     });
   };
+  
 
 
   const getDataAsigned = async () => {
