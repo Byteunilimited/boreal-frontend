@@ -12,9 +12,9 @@
 
 .sidebar {
     grid-area: sidebar;
-    border-radius: 0 5rem 0 0;
+    border-radius: 0 2rem 0 0;
     background-color: var(--DarkBlue);
-    margin-top: -5rem;
+    margin-top: -5.2rem;
 }
 
 .header {

@@ -6,7 +6,7 @@
 }
 
 .logo {
-    width: 80%;
+    width: 90%;
 }
 
 .menu ul {
@@ -45,7 +45,7 @@
     border-radius: 1.5rem;
 }
 .logoCotainer:hover {
-    border-radius: 1.5rem 5rem 1.5rem 1.5rem;
+    border-radius: 1.5rem 1.5rem 1.5rem 1.5rem;
 }
 
 
