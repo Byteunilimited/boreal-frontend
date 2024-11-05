@@ -19,9 +19,6 @@ export const ExChangeStockModal = ({ show, onClose, itemToExchange, onSave }) =>
     const [ itemInventory, setItemInventory ] = useState({});
     const [data, setData] = useState([]);
   
-
-
-    // State for current quantity and remitter details
     const [currentQuantity, setCurrentQuantity] = useState("");
 
     useEffect(() => {

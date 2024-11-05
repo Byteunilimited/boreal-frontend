@@ -108,8 +108,10 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                 setTimeout(() => {
                     onClose();
                 }, 1000);
-            } else {
-                throw new Error("Error en la creación del usuario.");
+            }else if (response.status === 422) {
+                setIsSuccessful(false);
+                setError("La contraseña debe tener entre 4 a 10 caracteres.");
+                setShowConfirmationModal(true);
             }
         } catch (error) {
             console.error("Error creando el usuario:", error);
@@ -141,6 +143,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                             onChange={handleChange}
                             placeholder="Documento del usuario"
                             required
+                            maxLength="12"
                         />
                     </div>
                     <div className="formGroup">
@@ -205,6 +208,8 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                                 placeholder="Contraseña"
                                 required
                                 className="passwordInput"
+                                minLength={4}
+                                maxLength={10}
                             />
                             <span
                                 className="passwordToggleUser"

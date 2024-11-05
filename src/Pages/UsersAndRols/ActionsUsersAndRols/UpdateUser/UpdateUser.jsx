@@ -167,7 +167,7 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                 <form onSubmit={handleSubmit}>
                     <div className="formGroup">
                         <label>Cédula:</label>
-                        <input type="text" name="id" value={formData.id} disabled required />
+                        <input type="text" name="id" value={formData.id} disabled required maxLength={12}/>
                     </div>
                     <div className="formGroup">
                         <label>Nombre:</label>
@@ -257,6 +257,8 @@ export const UpdateUserModal = ({ show, onClose, user, onSave }) => {
                                 onChange={handleChange}
                                 className="passwordInput"
                                 required
+                                maxLength={10}
+                                minLength={4}
                             />
                             <span
                                 className="passwordToggleUser"
