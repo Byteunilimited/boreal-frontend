@@ -7,13 +7,14 @@
     grid-template:
     "header  header"  5rem
     "sidebar  main"    auto /
-    20rem    auto;
+    15rem    auto;
 }
 
 .sidebar {
     grid-area: sidebar;
     border-radius: 0 5rem 0 0;
     background-color: var(--DarkBlue);
+    margin-top: -5rem;
 }
 
 .header {
@@ -32,11 +33,14 @@
 
 @media (max-width: 1100px) {
     .dashboard {
+        gap: 0;
         grid-template:
         "header  header"  4rem
         "sidebar   main"  auto /
         14rem    auto;
-    
+    }
+    .sidebar {
+        margin-top: -4rem;
     }
 }
 
@@ -44,20 +48,16 @@
     .sidebar {
         position: fixed;
         width: 90%;
-        margin-top: 0.7em;
-        top: 4em;
         right: 100%;
         transition: right 0.3s;
         border-radius: 0 5rem 0 0;
         border-top: 0.2em solid var(--c3);
         padding: 0;
         height: calc(100% - 1em);
+        margin-top: 0rem;
     }
     .main {
         margin: 0 0 0 -14rem;
-    }
-    .dashboard {
-        gap: 0;
     }
     .menuVisible {
         z-index: 10;
