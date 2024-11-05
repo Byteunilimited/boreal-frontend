@@ -14,7 +14,6 @@
     grid-area: sidebar;
     border-radius: 0 5rem 0 0;
     background-color: var(--DarkBlue);
-    margin-top: -5.5em;
 }
 
 .header {
@@ -37,7 +36,6 @@
         "header  header"  4rem
         "sidebar   main"  auto /
         14rem    auto;
-        margin-top: 0.7em;
     
     }
 }
