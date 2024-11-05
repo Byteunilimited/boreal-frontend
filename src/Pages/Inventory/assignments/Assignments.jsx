@@ -83,7 +83,7 @@ export const Assignments = () => {
   const handleRefresh = () => {
     setSearchTerm("");
     setItemType("");
-    setItemState("");
+    setItemState("Habilitado");
     getDataAsigned();
   };
   const handleExport = () => {

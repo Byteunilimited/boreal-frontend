@@ -105,12 +105,10 @@ export const Owners = () => {
     saveAs(blob, "Propietarios.xlsx");
   };
 
-  // Set the document title on component mount
   useEffect(() => {
     document.title = "Propietarios";
   }, []);
 
-  // Fetch data on component mount
   useEffect(() => {
     getData();
   }, [handleSave]);
