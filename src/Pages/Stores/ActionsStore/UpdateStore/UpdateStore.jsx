@@ -132,6 +132,10 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                 setConfirmationMessage("La bodega fue actualizada exitosamente.");
                 setShowConfirmationModal(true);
                 onUpdate(data);
+                setTimeout(() => {
+                    setShowConfirmationModal(false);
+                    onClose();
+                }, 1000);
                 
             } else {
                 throw new Error("Error en la actualización de la bodega.");
