@@ -76,12 +76,6 @@ ul.submenu {
     border-radius: 1.5rem 0 0 1.5rem; 
 }
 
-.submenu {
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--MainHover) var(--DarkBlue);
-}
-
 .submenu::-webkit-scrollbar {
     width: 8px;
 }
