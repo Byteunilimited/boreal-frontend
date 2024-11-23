@@ -5,31 +5,44 @@ import { ChevronDown } from "react-feather";
 import { BorealLogo } from "../../assets";
 import "./Menu.css";
 
-const sideBarItems = [
-    {
-        label: "Administrativo", path: "", icon: <RiListCheck2 />,
-        submenu: [
-            { label: "Usuarios y roles", path: "/boreal/usuariosYRoles", icon: <RiAdminLine /> },
-            { label: "Inventario", path: "/boreal/inventario", icon: <RiTable2 /> },
-            { label: "Departamentos y ciudades", path: "/boreal/departamentosYCiudades", icon: <RiRoadMapLine /> },
-            { label: "Sucursales", path: "/boreal/sucursales", icon: <RiBuilding2Line /> },
-            { label: "Propietarios", path: "/boreal/propietarios", icon: <RiTableLine /> },
-            { label: "Bodegas", path: "/boreal/bodegas", icon: <RiDashboardHorizontalLine /> },
-        ],
-    },
-];
-
 export const Menu = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const [activeIndex, setActiveIndex] = useState(null);
+    const [prevActiveIndex, setPrevActiveIndex] = useState(null);
+    const [nextActiveIndex, setNextActiveIndex] = useState(null);
+
+    const sideBarItems = [
+        {
+            label: "Administrativo", path: "", icon: <RiListCheck2 />,
+            submenu: [
+                { label: "Usuarios y roles", path: "/boreal/usuariosYRoles", icon: <RiAdminLine /> },
+                { label: "Inventario", path: "/boreal/inventario", icon: <RiTable2 /> },
+                { label: "Departamentos y ciudades", path: "/boreal/departamentosYCiudades", icon: <RiRoadMapLine /> },
+                { label: "Sucursales", path: "/boreal/sucursales", icon: <RiBuilding2Line /> },
+                { label: "Propietarios", path: "/boreal/propietarios", icon: <RiTableLine /> },
+                { label: "Bodegas", path: "/boreal/bodegas", icon: <RiDashboardHorizontalLine /> },
+            ],
+        },
+    ];
+
+    const menuActiveHandler = index => {
+        setActiveIndex(index);
+        setPrevActiveIndex(index - 1);
+        setNextActiveIndex(index + 1);
+    };
 
     return (
         <div className='menu'>
-            <Link to="/boreal/panel" className="logoCotainer">
+            <Link
+                to="/boreal/panel"
+                onClick={() => menuActiveHandler(-2)}
+                className="logoCotainer"
+            >
                 <img src={BorealLogo} alt="" className="logo" />
             </Link>
-            <ul>
+            <ul className='menuContainer'>
                 {sideBarItems.map((item, index) => (
                     <li key={index} className={item.submenu ? "relative" : ""}>
                         {item.submenu ? (
@@ -42,12 +55,14 @@ export const Menu = () => {
                                 {isMenuOpen && (
                                     <ul className="submenu">
                                         {item.submenu.map((subitem, subindex) => (
-                                            <li className="itemSub" key={subindex}>
+                                            <li 
+                                                key={subindex}
+                                                className={`itemSub ${subindex === prevActiveIndex ? 'prevActive' : subindex === nextActiveIndex ? 'nextActive' : ''}`}
+                                            >
                                                 <Link
                                                     to={subitem.path}
-                                                    className={
-                                                        location.pathname === subitem.path ? "active" : ""
-                                                    }
+                                                    onClick={(event) => menuActiveHandler(subindex)}
+                                                    className={subindex === activeIndex ? 'active' : ''}
                                                 >
                                                     <span className="icon">{subitem.icon}</span>
                                                     {subitem.label}

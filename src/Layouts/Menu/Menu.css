@@ -3,6 +3,7 @@
     width: 80%;
     margin: 1.5rem auto 2rem auto;
     justify-content: center;
+    padding: 0.5rem;
 }
 
 .logo {
@@ -16,25 +17,27 @@
 }
 
 .menu li {
-    margin-bottom: 0.5rem;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     position: relative;
+    background: var(--DarkBlue);
+}
+
+.menu > ul li.relative > a {
+    font-size: 1.2rem;
 }
 
 .menu ul a {
     display: flex;
+    gap: 0.5em;
     align-items: center;
-    padding: 0.5rem 1rem;
-    margin: 0 0.5rem; 
+    padding: 0.4rem 0.6rem;
     color: var(--MainWhite);
     text-decoration: none;
     transition: color 0.3s, background-color 0.3s, border-radius 0.3s;
 }
 
 .menu ul a .icon {
-    margin-right: 0.5rem;
-    align-items: center;
-    font-size: 1.2em;
+    font-size: 1.8em;
 }
 
 .logoCotainer:hover,
@@ -43,6 +46,24 @@
     color: var(--DarkBlue);
     background-color: var(--MainWhite);
     border-radius: 1.5rem;
+    border: 5px solid var(--DarkBlue);
+}
+
+.menu ul a.active:hover {
+    border: none;
+}
+
+ul.submenu {
+    background: linear-gradient(to right, transparent 50%, white 50%);
+    max-height: 20rem;
+}
+
+.prevActive {
+    border-radius: 0 0 1.5rem 0;
+}
+
+.nextActive {
+    border-radius: 0 1.5rem 0 0;
 }
 
 .logoCotainer:hover {
@@ -52,7 +73,7 @@
 .menu ul a.active {
     color: var(--DarkBlue);
     background-color: var(--MainWhite); 
-    border-radius: 1.5rem; 
+    border-radius: 1.5rem 0 0 1.5rem; 
 }
 
 .submenu {
@@ -77,12 +98,10 @@
 }
 
 .itemSub, .itemSub a {
-    margin-left: 1em;
+    margin-left: 0.5em;
 }
 
 .itemSub a:hover {
     color: var(--DarkBlue);
     background-color: var(--MainWhite);
-    border-radius: 1.5rem; 
 }
-

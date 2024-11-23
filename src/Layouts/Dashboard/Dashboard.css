@@ -5,16 +5,15 @@
     display: grid;
     gap: 0.2em;
     grid-template:
-    "header  header"  5rem
+    "sidebar  header"  5rem
     "sidebar  main"    auto /
-    15rem    auto;
+    19rem    auto;
 }
 
 .sidebar {
     grid-area: sidebar;
     border-radius: 0 2rem 0 0;
     background-color: var(--DarkBlue);
-    margin-top: -5.2rem;
 }
 
 .header {
@@ -35,16 +34,19 @@
     .dashboard {
         gap: 0;
         grid-template:
-        "header  header"  4rem
-        "sidebar   main"  auto /
+        "sidebar  header"  4rem
+        "sidebar  main"  auto /
         14rem    auto;
-    }
-    .sidebar {
-        margin-top: -4rem;
     }
 }
 
 @media (max-width: 900px) {
+    .dashboard {
+        grid-template:
+        "header   header"  4rem
+        "sidebar  main"  auto /
+        14rem    auto;
+    }
     .sidebar {
         position: fixed;
         width: 90%;
@@ -54,7 +56,6 @@
         border-top: 0.2em solid var(--c3);
         padding: 0;
         height: calc(100% - 1em);
-        margin-top: 0rem;
     }
     .main {
         margin: 0 0 0 -14rem;
