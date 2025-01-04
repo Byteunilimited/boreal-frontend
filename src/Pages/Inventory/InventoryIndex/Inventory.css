@@ -85,6 +85,14 @@
   cursor: pointer;
 }
 
+.filterStore{
+  padding: 10px;
+  border: 1px solid #aab7da;
+  border-radius: 20px;
+  width: 20em;
+  cursor: pointer;
+}
+
 .filterSearch{
   padding: 10px;
   border: 1px solid #aab7da;
