@@ -26,6 +26,7 @@ export const Assignments = () => {
   const [itemToToggle, setItemToToggle] = useState(null);
   const [tempItemStates, setTempItemStates] = useState({});
   const [loading, setLoading] = useState(false);
+  const [selectedBodega, setSelectedBodega] = useState("");
   const translateFields = (items) => {
     return items.map((item) => {
       return {
@@ -45,7 +46,7 @@ export const Assignments = () => {
       };
     });
   };
-  
+
 
 
   const getDataAsigned = async () => {
@@ -63,7 +64,7 @@ export const Assignments = () => {
       if (itemsResponse.status === 200) {
         const data = itemsResponse.data;
 
-        if (data && data.result && Array.isArray(data.result.items )) {
+        if (data && data.result && Array.isArray(data.result.items)) {
           const translatedDataAsigned = translateFields(data.result.items || []);
           setDataAsigned(translatedDataAsigned);
         } else {
@@ -100,6 +101,9 @@ export const Assignments = () => {
     setShowModalAsignedUpdate(true);
   };
 
+  const handleFilterBodega = (value) => {
+    setSelectedBodega(value);
+  };
 
   const filteredData = dataAsigned.filter((item) => {
     const codigo = item.Código ? item.Código.toString() : "";
@@ -107,10 +111,11 @@ export const Assignments = () => {
 
     const matchesType = itemType === "" || item.Tipo === itemType;
     const matchesState = itemState === "" || item.Estado === itemState;
+    const matchesBodega = selectedBodega === "" || item.Bodega === selectedBodega;
     const matchesSearchTerm =
       codigo.includes(searchTerm) || nombre.includes(searchTerm.toLowerCase());
 
-    return matchesType && matchesState && matchesSearchTerm;
+    return matchesType && matchesState && matchesBodega && matchesSearchTerm;
   });
   const handleToggleConfirmation = (item) => {
     const action = item.Estado === "Habilitado" ? "deshabilitar" : "habilitar";
@@ -134,7 +139,7 @@ export const Assignments = () => {
       [item.Código]: newState,
     }));
 
- 
+
     const endpoint = isHabilitado
       ? `/inventory/stock/delete?id=${item.Código}`
       : `/inventory/stock/enable?id=${item.Código}`;
@@ -150,9 +155,9 @@ export const Assignments = () => {
         },
       });
 
-      // Si la respuesta es un error, revertir el estado local
+    
       if (response && response.status === 200) {
-        // Actualiza el estado en base de datos correctamente
+      
         setDataAsigned((prevData) =>
           prevData.map((prevItem) =>
             prevItem.Código === item.Código ? { ...prevItem, Estado: newState } : prevItem
@@ -198,52 +203,93 @@ export const Assignments = () => {
   }, []);
 
   return (
-        <>
-          <div className="filtersContainer">
-            <div className="filters">
+    <>
+      <div className="filtersContainer">
+        <div className="filters">
 
-              <label>Estado:</label>
-              <select
-                value={itemState}
-                onChange={(e) => setItemState(e.target.value)}
-                className="filter"
-              >
-                <option value="">Todos</option>
-                {[...new Set(dataAsigned.map((item) => item.Estado))]
-                  .filter(Boolean)
-                  .map((Estado, index) => (
-                    <option key={index} value={Estado}>
-                      {Estado}
-                    </option>
-                  ))}
-              </select>
+          <label>Estado:</label>
+          <select
+            value={itemState}
+            onChange={(e) => setItemState(e.target.value)}
+            className="filter"
+          >
+            <option value="">Todos</option>
+            {[...new Set(dataAsigned.map((item) => item.Estado))]
+              .filter(Boolean)
+              .map((Estado, index) => (
+                <option key={index} value={Estado}>
+                  {Estado}
+                </option>
+              ))}
+          </select>
 
+          <label>Bodega:</label>
+          <select
+            value={selectedBodega}
+            onChange={(e) => handleFilterBodega(e.target.value)}
+            className="filterStore"
+          >
+            <option value="">Todos</option>
+            {[...new Set(dataAsigned.map((item) => item.Bodega))].filter(Boolean).map((Bodega, index) => (
+              <option key={index} value={Bodega}>
+                {Bodega}
+              </option>
+            ))}
+          </select>
+          {/*
+          <label>Bodega:</label>
+          <select
+            value={selectedBodega}
+            onChange={(e) => handleFilterBodega(e.target.value)}
+            className="filter"
+          >
+            <option value="">Todos</option>
+            {[...new Set(dataAsigned.map((item) => item.Bodega))].filter(Boolean).map((Bodega, index) => (
+              <option key={index} value={Bodega}>
+                {Bodega}
+              </option>
+            ))}
+          </select>
+          <label>Bodega:</label>
+          <select
+            value={selectedBodega}
+            onChange={(e) => handleFilterBodega(e.target.value)}
+            className="filter"
+          >
+            <option value="">Todos</option>
+            {[...new Set(dataAsigned.map((item) => item.Bodega))].filter(Boolean).map((Bodega, index) => (
+              <option key={index} value={Bodega}>
+                {Bodega}
+              </option>
+            ))}
+          </select>
+          
+*/}
+          <label>Buscar:</label>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Código o Nombre"
+            className="filterSearch"
+          />
+        </div>
+        <div className="actions">
+          <button onClick={handleRefresh} className="iconRefresh">
+            <FaSyncAlt />
+          </button>
+          <Button onClick={() => setShowModalAsigned(true)} text="Nueva asignación" />
+          <button onClick={handleExport} className="exportButton">
+            <RiFileExcel2Line className="ExportIcon" />
+            Exportar
+          </button>
 
-              <label>Buscar:</label>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Código o Nombre"
-                className="filterSearch"
-              />
-            </div>
-            <div className="actions">
-              <button onClick={handleRefresh} className="iconRefresh">
-                <FaSyncAlt />
-              </button>
-              <Button onClick={() => setShowModalAsigned(true)} text="Nueva asignación" />
-              <button onClick={handleExport} className="exportButton">
-                <RiFileExcel2Line className="ExportIcon" />
-                Exportar
-              </button>
-
-            </div>
-          </div>
-          {loading ? ( 
+        </div>
+      </div>
+      {loading ? (
         <div className="loadingIndicator">Cargando información...</div>
       ) : (
-        <>  
+        <>
           <DynamicTable
             columns={[
               "Código",
