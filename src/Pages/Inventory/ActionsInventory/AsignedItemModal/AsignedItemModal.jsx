@@ -32,7 +32,6 @@ export const AsignedItemModal = ({ show, onClose, onSave }) => {
       fetchFilters();
     }
   }, [show]);
-
   const fetchFilters = async () => {
     try {
       const [inventoryRes, conditionRes, stateRes, storeRes, ownerRes, healthRes] = await Promise.all([
@@ -42,60 +41,63 @@ export const AsignedItemModal = ({ show, onClose, onSave }) => {
         privateFetch.get("/location/store/item/all?page=0&size=2000"),
         privateFetch.get("/location/owner/all?page=0&size=2000"),
         privateFetch.get("/lifecycle/health/all?page=0&size=2000"),
-
       ]);
+  
       const inventories = inventoryRes.data.result.items || [];
       const filteredInventories = inventories.filter(inventory => inventory.inventoryType.id !== 2);
-      
       const optionItemsInventory = filteredInventories.map((inventory) => ({
         value: inventory.id,
         label: `${inventory.id} - ${inventory.description}`
       }));
       setInventoryItems(optionItemsInventory);
-
+  
+      // Conditions
       const conditions = conditionRes.data.result.items || [];
       const optionsConditions = conditions.map((condition) => ({
         value: condition.id,
         label: condition.description,
       }));
       setConditions(optionsConditions);
-
-
+  
+      // States
       const states = stateRes.data.result.items || [];
       const optionsStates = states.map((state) => ({
         value: state.id,
         label: state.description,
       }));
-      setStates(optionsStates); 
-
-
+      setStates(optionsStates);
+  
+      // Stores (filtering out stores with storeType.id === 1)
       const stores = storeRes.data.result.items || [];
-      const optionsStores = stores.map((store) => ({
+      const filteredStores = stores.filter(store => store.storeType.id !== 1 && store.storeType.id !== 3);
+      const optionsStores = filteredStores.map((store) => ({
         value: store.id,
         label: `${store.description} - ${store.storeType.description}`,
       }));
       setStores(optionsStores);
-
-
+  
+      // Owners
       const owners = ownerRes.data.result.items || [];
       const optionsOwners = owners.map((owner) => ({
         value: owner.id,
         label: owner.name,
       }));
       setOwners(optionsOwners);
-      
+  
+      // Health Statuses
       const healthStatuses = healthRes.data.result.items || [];
       const optionsHealthStatuses = healthStatuses.map((healthStatus) => ({
         value: healthStatus.id,
         label: healthStatus.description,
       }));
       setHealthStatuses(optionsHealthStatuses);
-
+  
     } catch (error) {
       console.error("Error fetching filters:", error);
       setError("Ocurrió un error al obtener los filtros.");
     }
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;

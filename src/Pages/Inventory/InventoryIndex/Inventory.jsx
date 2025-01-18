@@ -56,7 +56,7 @@ export const Inventory = () => {
       }
     } catch (error) {
       console.error("Error fetching inventory types:", error);
-      return []; 
+      return [];
     }
   };
 
@@ -202,7 +202,7 @@ export const Inventory = () => {
                       <RiFileExcel2Line className="ExportIcon" />
                       Exportar
                     </button>
-                    {/* <Button onClick={() => setShowBulkUploadModal(true)} text={"Cargue Masivo"} /> */}
+                    <Button onClick={() => setShowBulkUploadModal(true)} text={"Cargue Masivo"} />
                   </div>
                 </div>
                 <DynamicTable
@@ -212,11 +212,8 @@ export const Inventory = () => {
                   onFilter={handleFilter}
                   hideDeleteIcon={true}
                 />
-
               </Tab>
-
               <Tab eventKey="asiganciones" title="Asignaciones y stock">
-
                 <Assignments />
               </Tab>
 
@@ -237,7 +234,14 @@ export const Inventory = () => {
         />
       )}
 
-     
+      {showBulkUploadModal && (
+        <BulkUpload
+          show={showBulkUploadModal}
+          onClose={() => setShowBulkUploadModal(false)}
+          onSave={handleUploadSuccess}
+        />
+      )}
+
       {showEditElementInventory && (
         <EditElementInventory
           show={showEditElementInventory}

@@ -25,6 +25,7 @@ export const DynamicTable = ({
   const [isLoading, setIsLoading] = useState(true);
   const pagesVisited = pageNumber * recordsPerPage;
   const pageCount = Math.ceil(data.length / recordsPerPage);
+  
 
   const changePage = (pageNumber) => {
     setPageNumber(pageNumber);

@@ -27,6 +27,7 @@ export const Assignments = () => {
   const [tempItemStates, setTempItemStates] = useState({});
   const [loading, setLoading] = useState(false);
   const [selectedBodega, setSelectedBodega] = useState("");
+  
   const translateFields = (items) => {
     return items.map((item) => {
       return {
@@ -236,35 +237,7 @@ export const Assignments = () => {
               </option>
             ))}
           </select>
-          {/*
-          <label>Bodega:</label>
-          <select
-            value={selectedBodega}
-            onChange={(e) => handleFilterBodega(e.target.value)}
-            className="filter"
-          >
-            <option value="">Todos</option>
-            {[...new Set(dataAsigned.map((item) => item.Bodega))].filter(Boolean).map((Bodega, index) => (
-              <option key={index} value={Bodega}>
-                {Bodega}
-              </option>
-            ))}
-          </select>
-          <label>Bodega:</label>
-          <select
-            value={selectedBodega}
-            onChange={(e) => handleFilterBodega(e.target.value)}
-            className="filter"
-          >
-            <option value="">Todos</option>
-            {[...new Set(dataAsigned.map((item) => item.Bodega))].filter(Boolean).map((Bodega, index) => (
-              <option key={index} value={Bodega}>
-                {Bodega}
-              </option>
-            ))}
-          </select>
-          
-*/}
+
           <label>Buscar:</label>
           <input
             type="text"
