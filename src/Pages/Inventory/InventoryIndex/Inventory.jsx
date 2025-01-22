@@ -140,11 +140,10 @@ export const Inventory = () => {
   const handleSave = (newItem) => {
     setData([...data, newItem]);
   };
-  const handleUploadSuccess = (newItems) => {
-    setData([...data, ...newItems]);
+  const handleUploadSuccess = () => {
+    console.log("Carga exitosa");
     setShowBulkUploadModal(false);
   };
-
   useEffect(() => {
     document.title = "Inventario";
   }, []);
@@ -238,7 +237,7 @@ export const Inventory = () => {
         <BulkUpload
           show={showBulkUploadModal}
           onClose={() => setShowBulkUploadModal(false)}
-          onSave={handleUploadSuccess}
+          onUploadSuccess={handleUploadSuccess}
         />
       )}
 

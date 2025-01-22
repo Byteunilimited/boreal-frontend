@@ -14,7 +14,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   const [jsonData, setJsonData] = useState([]);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
-  const { axiosInstance } = useAxios();
+  const [selectedFile, setSelectedFile] = useState(null); 
   const [error, setError] = useState(null);
   const [conditions, setConditions] = useState([]);
   const [states, setStates] = useState([]);
@@ -23,6 +23,8 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   const [healthStatuses, setHealthStatuses] = useState([]);
   const [formData, setFormData] = useState({});
   const { privateFetch } = useAxios();
+  const [fileLoaded, setFileLoaded] = useState(false);
+
 
   useEffect(() => {
     if (show) {
@@ -101,41 +103,56 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
         return;
       }
   
-      // Asegúrate de que es un archivo CSV
       if (!file.name.match(/\.csv$/)) {
         alert("Por favor selecciona un archivo válido (.csv).");
         return;
       }
-  
-      // Leer contenido del archivo
+
+      setSelectedFile(file); 
+
       const text = await file.text();
-  
-      // Validar cabeceras
       const lines = text.split("\n").filter((line) => line.trim() !== "");
+  
       if (lines.length === 0) {
         alert("El archivo está vacío.");
         return;
       }
   
-      const headers = lines[0].split(",").map((header) => header.trim());
+
+      const possibleDelimiters = [",", ";"]; 
+      let delimiter = ";";
+      for (const delim of possibleDelimiters) {
+        if (lines[0].includes(delim)) {
+          delimiter = delim;
+          break;
+        }
+      }
+  
+      // Dividir encabezados usando el delimitador detectado
+      const headers = lines[0].split(delimiter).map((header) => header.trim());
       const requiredHeaders = ["id", "description", "quantity"];
       const missingHeaders = requiredHeaders.filter((header) => !headers.includes(header));
   
       if (missingHeaders.length > 0) {
-        alert(`El archivo no contiene las cabeceras requeridas: ${missingHeaders.join(", ")}`);
+        alert(`El archivo no contiene las cabeceras requeridas: ${missingHeaders.join(";")}`);
         return;
       }
-  
-      // Procesar el archivo si las cabeceras son válidas
-      const data = lines.slice(1).map((line) => {
-        const values = line.split(",");
+
+      const data = lines.slice(1).map((line, lineIndex) => {
+        const values = line.split(delimiter);
+        if (values.length !== headers.length) {
+          console.warn(`La línea ${lineIndex + 2} no coincide con el número de columnas:`, line);
+          return null; // Ignora filas con problemas
+        }
         return headers.reduce((acc, header, index) => {
           acc[header] = values[index]?.trim() || "";
           return acc;
         }, {});
-      });
+      }).filter((row) => row !== null);
   
       setJsonData(data);
+      setFileLoaded(true); // Indicador de archivo cargado
+      console.log("Datos procesados:", data);
       alert("Archivo cargado exitosamente.");
     } catch (error) {
       console.error("Error al cargar el archivo:", error);
@@ -143,7 +160,6 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
     }
   };
   
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -161,26 +177,20 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
   };
 
   const handleDownloadTemplate = () => {
-    // Define la estructura de la plantilla
-    const templateData = [
-      { id: "", description: "", quantity: "" },
-    ];
+
+    const headers = ["id", "description", "quantity"];
+    const sampleData = ["123456", "Producto de ejemplo", "100"];
   
-    // Convierte los datos a formato CSV
-    const csv = XLSX.utils.sheet_to_csv(XLSX.utils.json_to_sheet(templateData));
+    const csvContent = [headers.join(";"), sampleData.join(";")].join("\r\n");
   
-    // Crea un Blob para generar el archivo CSV
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    
-    // Crea un enlace para descargar el archivo
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "PlantillaInventario.csv"; // Nombre del archivo CSV
+    link.download = "PlantillaInventario.csv"; 
   
-    // Simula un clic para descargar el archivo
     link.click();
   };
-  
 
   const handleDrop = (event) => {
     event.preventDefault();
@@ -194,15 +204,18 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
     event.preventDefault(); // Required to allow drop
   };
 
-  const handleUploadItems = async () => {
-    if (!fileInputRef.current?.files[0]) {
-      alert("Por favor selecciona un archivo antes de continuar.");
-      return;
-    }
+const handleUploadItems = async () => {
+  if (!selectedFile) { // Cambia a usar el estado
+    alert("Por favor selecciona un archivo antes de continuar.");
+    return;
+  }
 
     const file = fileInputRef.current.files[0];
+
+    const inventoryType = { id: 1 };
+
     const options = {
-      itemConditionId: formData.conditionId || null,
+      conditionId: formData.conditionId || null,
       stateId: formData.stateId || null,
       statusId: formData.healthId || null,
       storeId: formData.storeId || null,
@@ -210,13 +223,20 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
     };
 
     const formDataToSend = new FormData();
-    formDataToSend.append("file", file);
+    formDataToSend.append("file", selectedFile);
+    formDataToSend.append("inventoryType", new Blob([JSON.stringify(inventoryType)], { type: "application/json" }));
     formDataToSend.append("options", new Blob([JSON.stringify(options)], { type: "application/json" }));
+
+    console.log("Datos a enviar al backend:", {
+      file: selectedFile,
+      inventoryType,
+      options,
+    });
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_ENDPOINT}/inventory/item/upload/csv`, {
-        
+      const response = await fetch(`${API_ENDPOINT}/inventory/upload/csv`, {
+
         method: "POST",
         body: formDataToSend,
       });
@@ -261,34 +281,62 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
             <input
               type="file"
               accept=".csv"
+              required
               onChange={handleFileUpload}
               className="hiddenInputBulk"
               ref={fileInputRef}
             />
 
           </div>
-          {jsonData.length > 0 && (
-            <div className="tableContainerBulk">
-              <Table striped bordered hover className="dynamicTableBulk">
-                <thead>
-                  <tr>
-                    {Object.keys(jsonData[0]).map((key) => (
-                      <th key={key}>{key}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {jsonData.map((item, index) => (
-                    <tr key={index}>
-                      {Object.values(item).map((value, i) => (
-                        <td key={i}>{value}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          )}
+          <div className="fileStatusContainer">
+            {fileLoaded && (
+              <div className="fileLoadedIndicator">
+                <RiUploadCloudLine className="successIcon" />
+                <span>Archivo cargado exitosamente</span>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        <div className="formGroup">
+          <label>Estado:</label>
+          <Select
+            options={states}
+            onChange={(selectedOption) => handleSelectChange(selectedOption, "stateId")}
+            placeholder="Seleccionar elemento"
+            value={states.find(option => option.value === formData.stateId)}
+            isClearable
+            required
+            className="selects"
+            styles={{
+              control: (base) => ({
+                ...base,
+                borderRadius: "1em",
+                textAlign: "start",
+              }),
+            }}
+          />
+        </div>
+
+        <div className="formGroup">
+          <label>Condición:</label>
+          <Select
+            options={conditions}
+            onChange={(selectedOption) => handleSelectChange(selectedOption, "conditionId")}
+            placeholder="Seleccionar elemento"
+            value={conditions.find(option => option.value === formData.conditionId)}
+            isClearable
+            required
+            className="selects"
+            styles={{
+              control: (base) => ({
+                ...base,
+                borderRadius: "1em",
+                textAlign: "start",
+              }),
+            }}
+          />
         </div>
 
         <div className="formGroup">
@@ -299,6 +347,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
             placeholder="Seleccionar elemento"
             value={stores.find(option => option.value === formData.storeId)}
             isClearable
+            required
             className="selects"
             styles={{
               control: (base) => ({
@@ -318,6 +367,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
             placeholder="Seleccionar elemento"
             value={owners.find(option => option.value === formData.ownerId)}
             isClearable
+            required
             className="selects"
             styles={{
               control: (base) => ({
@@ -337,6 +387,7 @@ export const BulkUpload = ({ show, onClose, onUploadSuccess }) => {
             placeholder="Seleccionar calidad"
             value={healthStatuses.find(option => option.value === formData.healthId)}
             isClearable
+            required
             className="selects"
             styles={{
               control: (base) => ({
