@@ -19,7 +19,7 @@ export const LoginBoreal = () => {
   const { serialize } = useForm();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const {privateFetch} = useAxios();
+  const {privateFetch, privateFetchTs} = useAxios();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [error, setError] = useState(null);
@@ -73,7 +73,8 @@ export const LoginBoreal = () => {
     }
 
     try {
-        const response = await privateFetch.post("user/login", formData);
+        const response = await privateFetchTs.post("/login/login", formData);
+        console.log(response);
         if (response && response.data) {
             const data = response.data;
             if (data.status === 200) {
