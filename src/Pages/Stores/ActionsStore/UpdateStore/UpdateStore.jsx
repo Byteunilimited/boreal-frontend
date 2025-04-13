@@ -3,7 +3,7 @@ import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { API_ENDPOINT } from "../../../../util";
 import { useAxios } from "../../../../Contexts";
-
+import Select from "react-select";
 export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
     const { privateFetch } = useAxios();
     const [formData, setFormData] = useState({
@@ -13,7 +13,6 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         email: "",
         address: "",
         cityId: "",
-        ownerId: "",
         officeId: "",
         storeTypeId: "",
     });
@@ -22,13 +21,12 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [cities, setCities] = useState([]);
-    const [owners, setOwners] = useState([]);
     const [storeTypes, setStoreTypes] = useState([]);
     const [offices, setOffices] = useState([]);
 
     useEffect(() => {
         if (show && storeData?.Código) {
-            fetchOwners();
+
             fetchStoreTypes();
             fetchOffices();
             fetchCities();
@@ -36,12 +34,14 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         }
     }, [show, storeData]);
 
+    console.log(storeData);
 
     const fetchStoreData = async () => {
         try {
             const response = await privateFetch.get(`/location/store/item/id?id=${storeData.Código}`);
-            if (response.status === 200 && response.data.result.store.length > 0) {
-                const store = response.data.result.store[0];
+            if (response.status === 200 && response.data.result.items.length > 0) {
+                const store = response.data.result.items[0];
+                console.log("Store data:", store);
                 setFormData({
                     id: store.id,
                     description: store.description,
@@ -49,7 +49,6 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                     email: store.email,
                     address: store.address,
                     cityId: store.city.id,
-                    ownerId: store.owner.id,
                     officeId: store.office.id,
                     storeTypeId: store.storeType.id,
                 });
@@ -62,33 +61,36 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
         }
     };
 
-    const fetchOwners = async () => {
-        try {
-            const response = await privateFetch.get("/location/owner/all");
-            if (response.status === 200) {
-                setOwners(response.data.result.zone);
-            }
-        } catch (error) {
-            console.error("Error fetching owners:", error);
-        }
-    };
-
     const fetchStoreTypes = async () => {
         try {
-            const response = await privateFetch.get("/location/store/type/all");
+            const response = await privateFetch.get("/location/store/type/all?page=0&size=100");
             if (response.status === 200) {
-                setStoreTypes(response.data.result.item);
+                const storeTypes = response.data.result.items || [];
+                const options = storeTypes
+                    .filter(type => type.id !== 1)  
+                    .map((type) => ({
+                        value: type.id,
+                        label: type.description,
+                    }));
+    
+                setStoreTypes(options);
             }
         } catch (error) {
             console.error("Error fetching store types:", error);
         }
     };
+    
 
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all");
+            const response = await privateFetch.get("/location/city/all?page=0&size=1119");
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                const cities = response.data.result.items || [];
+                const options = cities.map((city) => ({
+                    value: city.id,
+                    label:`${city.description}, - ${city.department.description}`,
+                }));
+                setCities(options);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
@@ -97,14 +99,20 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
 
     const fetchOffices = async () => {
         try {
-            const response = await privateFetch.get("/location/office/all");
+            const response = await privateFetch.get("/location/office/all?page=0&size=2000");
             if (response.status === 200) {
-                setOffices(response.data.result.entity);
+                const offices = response.data.result.items || [];
+                const options = offices.map((office) => ({
+                    value: office.id,
+                    label:office.description,
+                }));
+                setOffices(options);
             }
         } catch (error) {
             console.error("Error fetching offices:", error);
         }
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -124,6 +132,11 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                 setConfirmationMessage("La bodega fue actualizada exitosamente.");
                 setShowConfirmationModal(true);
                 onUpdate(data);
+                setTimeout(() => {
+                    setShowConfirmationModal(false);
+                    onClose();
+                }, 1000);
+                
             } else {
                 throw new Error("Error en la actualización de la bodega.");
             }
@@ -137,14 +150,18 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
-        onClose();
     };
 
+
     const handleKeyPress = (e) => {
-        const regex = /^[a-zA-Z0-9\s]*$/;
+        const regex = /^[a-zA-Z0-9-ÑñÁÉÍÓÚáéíóú\s]*$/;
         if (!regex.test(e.key)) {
             e.preventDefault();
         }
+    };
+
+    const handleSelectChange = (selectedOption, field) => {
+        setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
     };
 
     return (
@@ -208,71 +225,59 @@ export const UpdateStore = ({ show, onClose, onUpdate, storeData }) => {
                     </div>
                     <div className="formGroup">
                         <label>Sucursal:</label>
-                        <select name="officeId" value={formData.officeId} onChange={handleChange} required className="selects">
-                            <option value="">Seleccionar sucursal</option>
-                            {offices && offices.length > 0 ? (
-                                offices.map((office) => (
-                                    <option key={office.id} value={office.id}>
-                                        {office.description}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>Cargando sucursales...</option>
-                            )}
-                        </select>
+                        <Select
+                            options={offices}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "officeId")}
+                            placeholder="Seleccionar sucursal"
+                            value={offices.find(option => option.value === formData.officeId)}
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
 
                     <div className="formGroup">
-                        <label>Propietario:</label>
-                        <select name="ownerId" value={formData.ownerId} onChange={handleChange} required className="selects">
-                            <option value="">Seleccionar propietario</option>
-                            {owners && owners.length > 0 ? (
-                                owners.map((owner) => (
-                                    <option key={owner.id} value={owner.id}>
-                                        {owner.businessName}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>Cargando propietarios...</option>
-                            )}
-                        </select>
+                        <label>Tipo de bodega:</label>
+                        <Select
+                            options={storeTypes}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "storeTypeId")}
+                            placeholder="Seleccionar tipos de bodega"
+                            value={storeTypes.find(option => option.value === formData.storeTypeId)}
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
-
                     <div className="formGroup">
-                        <label>Tipo de Bodega:</label>
-                        <select name="storeTypeId" value={formData.storeTypeId} onChange={handleChange} required className="selects">
-                            <option value="">Seleccionar tipo</option>
-                            {storeTypes && storeTypes.length > 0 ? (
-                                storeTypes.map((type) => (
-                                    <option key={type.id} value={type.id}>
-                                        {type.description}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>Cargando tipos de bodega...</option>
-                            )}
-                        </select>
+                        <label>Ciudad:</label>
+                        <Select
+                            options={cities}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "cityId")}
+                            placeholder="Seleccionar ciudad"
+                            value={cities.find(option => option.value === formData.cityId)}
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
-
-                    {cities && cities.length > 0 && (
-                        <div className="formGroup">
-                            <label>Ciudad:</label>
-                            <select
-                                name="cityId"
-                                value={formData.cityId}
-                                onChange={handleChange}
-                                required
-                                className="selects"
-                            >
-                                <option value="">Seleccionar ciudad</option>
-                                {cities.map((city) => (
-                                    <option key={city.id} value={city.id}>
-                                        {`${city.description} (${city.department.description})`}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
 
                     <div className="formActions">
                         <button type="submit">Actualizar</button>

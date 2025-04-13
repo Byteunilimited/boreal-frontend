@@ -1,0 +1,101 @@
+.logoCotainer {
+    display: flex;
+    width: 80%;
+    margin: 1.5rem auto 2rem auto;
+    justify-content: center;
+    padding: 0.5rem;
+}
+
+.logo {
+    width: 90%;
+}
+
+.menu ul {
+    list-style-type: none;
+    padding: 0;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.menu li {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    position: relative;
+    background: var(--DarkBlue);
+}
+
+.menu > ul li.relative > a {
+    font-size: 1.2rem;
+}
+
+.menu ul a {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+    padding: 0.4rem 0.6rem;
+    color: var(--MainWhite);
+    text-decoration: none;
+    transition: color 0.3s, background-color 0.3s, border-radius 0.3s;
+}
+
+.menu ul a .icon {
+    font-size: 1.8em;
+}
+
+.logoCotainer:hover,
+.menu ul a:hover,
+.menu ul a:active {
+    color: var(--DarkBlue);
+    background-color: var(--MainWhite);
+    border-radius: 1.5rem;
+    border: 5px solid var(--DarkBlue);
+}
+
+.menu ul a.active:hover {
+    border: none;
+}
+
+ul.submenu {
+    background: linear-gradient(to right, transparent 50%, white 50%);
+    max-height: 20rem;
+}
+
+.prevActive {
+    border-radius: 0 0 1.5rem 0;
+}
+
+.nextActive {
+    border-radius: 0 1.5rem 0 0;
+}
+
+.logoCotainer:hover {
+    border-radius: 1.5rem;
+}
+
+.menu ul a.active {
+    color: var(--DarkBlue);
+    background-color: var(--MainWhite); 
+    border-radius: 1.5rem 0 0 1.5rem; 
+}
+
+.submenu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.submenu::-webkit-scrollbar-track {
+    background: var(--DarkBlue);
+    border-radius: 20px;
+}
+
+.submenu::-webkit-scrollbar-thumb {
+    background-color: var(--MainHover);
+    border-radius: 20px;
+    border: 2px solid var(--DarkBlue);
+}
+
+.itemSub, .itemSub a {
+    margin-left: 0.5em;
+}
+
+.itemSub a:hover {
+    color: var(--DarkBlue);
+    background-color: var(--MainWhite);
+}

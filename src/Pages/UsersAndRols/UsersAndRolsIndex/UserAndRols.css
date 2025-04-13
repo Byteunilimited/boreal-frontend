@@ -11,13 +11,6 @@
     --AlternateDarkBlue: #5881C3;
   }
 
-
-body {
-    margin: 0;
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
-    font-weight: lighter;
-  }
-  
   .container {
     display: flex;
     margin-left: 18%;
@@ -25,13 +18,6 @@ body {
   }
   
   
-  .content {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: #f9f9f9;
-    overflow-y: auto;
-  }
-
 .iconRefresh {
   background: none;
   border: none;

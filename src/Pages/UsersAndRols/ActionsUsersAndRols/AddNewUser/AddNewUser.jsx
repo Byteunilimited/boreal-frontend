@@ -3,6 +3,7 @@ import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
 import { Eye, EyeOff } from "react-feather";
+import Select from "react-select";
 export const AddNewUserModal = ({ show, onClose, onSave }) => {
     const { privateFetch } = useAxios();
     const [formData, setFormData] = useState({
@@ -15,28 +16,35 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
         address: "",
         cityId: "",
         roleId: "",
+        officeId: "",
     });
     const [error, setError] = useState(null);
     const [isSuccessful, setIsSuccessful] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [cities, setCities] = useState([]);
+    const [offices, setOffices] = useState([]);
     const [roles, setRoles] = useState([]);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
 
     useEffect(() => {
         if (show) {
             fetchCities();
             fetchRoles();
+            fetchOffices();
         }
     }, [show]);
 
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all");
+            const response = await privateFetch.get("/location/city/all?page=0&size=2000");
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                const cities = response.data.result.items || [];
+                const options = cities.map((city) => ({
+                    value: city.id,
+                    label: `${city.description}, - ${city.department.description}`,
+                }));
+                setCities(options);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
@@ -45,12 +53,33 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
 
     const fetchRoles = async () => {
         try {
-            const response = await privateFetch.get("/role/all");
+            const response = await privateFetch.get("/role/all?page=0&size=2000");
             if (response.status === 200) {
-                setRoles(response.data.result.role);
+                const roles = response.data.result.items || [];
+                const options = roles.map((rol) => ({
+                    value: rol.id,
+                    label: rol.description
+                }));
+                setRoles(options);
             }
         } catch (error) {
             console.error("Error fetching roles:", error);
+        }
+    };
+
+    const fetchOffices = async () => {
+        try {
+            const response = await privateFetch.get("/location/office/all?page=0&size=2000");
+            if (response.status === 200) {
+                const offices = response.data.result.items || [];
+                const options = offices.map((office) => ({
+                    value: office.id,
+                    label: office.description
+                }));
+                setOffices(options);
+            }
+        } catch (error) {
+            setError("Ocurrió un error al obtener las oficinas.");
         }
     };
 
@@ -62,6 +91,10 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
         }));
     };
 
+    const handleSelectChange = (selectedOption, field) => {
+        setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
+    };
+    
     const handleSubmit = async (ev) => {
         ev.preventDefault();
         try {
@@ -72,8 +105,13 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                 setConfirmationMessage("El usuario fue añadido exitosamente.");
                 setShowConfirmationModal(true);
                 onSave(data);
-            } else {
-                throw new Error("Error en la creación del usuario.");
+                setTimeout(() => {
+                    onClose();
+                }, 1000);
+            }else if (response.status === 422) {
+                setIsSuccessful(false);
+                setError("La contraseña debe tener entre 4 a 10 caracteres.");
+                setShowConfirmationModal(true);
             }
         } catch (error) {
             console.error("Error creando el usuario:", error);
@@ -81,11 +119,10 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
             setShowConfirmationModal(true);
         }
     };
-
+    
     const closeModal = () => {
         setShowConfirmationModal(false);
         setError(null);
-        onClose();
     };
 
     const toggleShowConfirmPassword = () => {
@@ -106,6 +143,7 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                             onChange={handleChange}
                             placeholder="Documento del usuario"
                             required
+                            maxLength="12"
                         />
                     </div>
                     <div className="formGroup">
@@ -170,6 +208,8 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                                 placeholder="Contraseña"
                                 required
                                 className="passwordInput"
+                                minLength={4}
+                                maxLength={10}
                             />
                             <span
                                 className="passwordToggleUser"
@@ -197,37 +237,58 @@ export const AddNewUserModal = ({ show, onClose, onSave }) => {
                     </div>
                     <div className="formGroup">
                         <label>Ciudad:</label>
-                        <select
-                            name="cityId"
-                            value={formData.cityId}
-                            onChange={handleChange}
-                            required
+                        <Select
+                            options={cities}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "cityId")}
+                            placeholder="Seleccionar ciudad"
+                            value={cities.find(option => option.value === formData.cityId)}
+                            isClearable
                             className="selects"
-                        >
-                            <option value="">Seleccionar ciudad</option>
-                            {cities.map(city => (
-                                <option key={city.id} value={city.id}>
-                                {`${city.description} (${city.department.description})`}
-                            </option>
-                            ))}
-                        </select>
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
+                    </div>
+                    <div className="formGroup">
+                        <label>Sucursal:</label>
+                        <Select
+                            options={offices}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "officeId")}
+                            placeholder="Seleccionar sucursal"
+                            value={offices.find(option => option.value === formData.officeId)}
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
+
                     </div>
                     <div className="formGroup">
                         <label>Rol:</label>
-                        <select
-                            name="roleId"
-                            value={formData.roleId}
-                            onChange={handleChange}
-                            required
+                        <Select
+                            options={roles}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "roleId")}
+                            placeholder="Seleccionar rol"
+                            value={roles.find(option => option.value === formData.roleId)}
+                            isClearable
                             className="selects"
-                        >
-                            <option value="">Seleccionar rol</option>
-                            {roles.map((role) => (
-                                <option key={role.id} value={role.id}>
-                                    {role.description}
-                                </option>
-                            ))}
-                        </select>
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
                     </div>
                     <div className="formActions">
                         <button type="submit">Guardar</button>

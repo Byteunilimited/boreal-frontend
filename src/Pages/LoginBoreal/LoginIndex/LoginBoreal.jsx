@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Eye, EyeOff } from "react-feather";
 import "./LoginBoreal.css";
 import {
@@ -7,7 +6,7 @@ import {
   ModalIconCorrect,
   ModalIconWarning,
   BorealLogo,
-} from "../../../assets";
+} from "@/assets";
 import {  Modal } from "../../../Layouts";
 import { PasswordRecoveryModal } from "../PasswordRecoveryModal/PasswordRecoveryModal"
 import { useNavigate } from "react-router-dom";
@@ -20,7 +19,7 @@ export const LoginBoreal = () => {
   const { serialize } = useForm();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const {privateFetch} = useAxios();
+  const {privateFetch, privateFetchTs} = useAxios();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [error, setError] = useState(null);
@@ -36,16 +35,9 @@ export const LoginBoreal = () => {
       document.title = "Login";
   }, []);
 
-  const handlePasswordRecovery = () => {
-    setShowRecoveryModal(true);
-  };
 
   const handleCloseModal = () => {
     setShowRecoveryModal(false);
-  };
-
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
   };
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -54,7 +46,6 @@ export const LoginBoreal = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const [showPassword, setShowPassword] = useState(false);
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
 
@@ -82,7 +73,8 @@ export const LoginBoreal = () => {
     }
 
     try {
-        const response = await privateFetch.post("user/login", formData);
+        const response = await privateFetchTs.post("/login/login", formData);
+        console.log(response);
         if (response && response.data) {
             const data = response.data;
             if (data.status === 200) {
@@ -90,7 +82,7 @@ export const LoginBoreal = () => {
                 setShowSuccessModal(true);
                 setTimeout(() => {
                     navigate("/boreal/panel");
-                }, 3000);
+                }, 1000);
             } else {
                 setShowErrorModal(true);
             }
@@ -182,10 +174,6 @@ export const LoginBoreal = () => {
                 showCloseButton={true}
               />
             )}
-            {/* <p className="pass" onClick={handlePasswordRecovery}>
-              ¿Olvidó su contraseña?
-            </p> */}
-
             {showRecoveryModal && (
               <PasswordRecoveryModal onClose={handleCloseModal} />
             )}

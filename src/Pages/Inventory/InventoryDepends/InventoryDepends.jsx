@@ -11,8 +11,8 @@ export const InventoryDepends = () => {
 
   const fetchConditions = async () => {
     try {
-      const response = await privateFetch.get('/lifecycle/condition/all');
-      handleResponse(response, 'entity');
+      const response = await privateFetch.get('/lifecycle/condition/all?page=0&size=2000');
+      handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Condiciones:', error);
       setData([]);
@@ -21,8 +21,8 @@ export const InventoryDepends = () => {
 
   const fetchStates = async () => {
     try {
-      const response = await privateFetch.get('/lifecycle/state/all');
-      handleResponse(response, 'entity');
+      const response = await privateFetch.get('/lifecycle/state/all?page=0&size=2000');
+      handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Estados:', error);
       setData([]);
@@ -31,18 +31,18 @@ export const InventoryDepends = () => {
 
   const fetchCircumstances = async () => {
     try {
-      const response = await privateFetch.get('/lifecycle/status/all');
-      handleResponse(response, 'entity');
+      const response = await privateFetch.get('/lifecycle/health/all?page=0&size=2000');
+      handleResponse(response, 'items');
     } catch (error) {
-      console.error('Error fetching Circunstancia:', error);
+      console.error('Error fetching Calidad:', error);
       setData([]);
     }
   };
 
   const fetchTypes = async () => {
     try {
-      const response = await privateFetch.get('/inventory/type/all');
-      handleResponse(response, 'item');
+      const response = await privateFetch.get('/inventory/type/all?page=0&size=2000');
+      handleResponse(response, 'items');
     } catch (error) {
       console.error('Error fetching Tipo de elemento:', error);
       setData([]);
@@ -69,7 +69,7 @@ export const InventoryDepends = () => {
       case 'Estados':
         fetchStates();
         break;
-      case 'Circunstancia':
+      case 'Calidad':
         fetchCircumstances();
         break;
       case 'Tipo':
@@ -83,17 +83,8 @@ export const InventoryDepends = () => {
   const handleAddItem = async () => {
     let endpoint = '';
     switch (itemType) {
-      case 'Condiciones':
-        endpoint = '/lifecycle/condition/create';
-        break;
-      case 'Estados':
-        endpoint = '/lifecycle/state/create';
-        break;
-      case 'Circunstancia':
-        endpoint = '/lifecycle/status/create';
-        break;
-      case 'Tipo':
-        endpoint = '/inventory/type/create';
+      case 'Calidad':
+        endpoint = '/lifecycle/health/create';
         break;
       default:
         console.error('No valid endpoint for the selected item type.');
@@ -132,12 +123,12 @@ export const InventoryDepends = () => {
                         <option value="">Selecciona</option>
                         <option value="Condiciones">Condiciones</option>
                         <option value="Estados">Estados</option>
-                        <option value="Circunstancia">Circunstancia</option>
+                        <option value="Calidad">Calidad</option>
                         <option value="Tipo">Tipo de elemento</option>
                     </select>
                 </div>
 
-                {itemType && (
+                {itemType === 'Calidad' && (
                     <div className="actions">
                         <Button onClick={() => setShowModal(true)} text="Añadir Dependencia" />
                     </div>

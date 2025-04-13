@@ -1,14 +1,11 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import { FaSyncAlt } from "react-icons/fa";
 import { Button, DynamicTable } from "../../../Components";
 import { API_ENDPOINT, MOCK_DATA } from "../../../util";
-import { Form, FormControl, InputGroup, Modal, Row, Col, FormSelect } from "react-bootstrap";
-import { usersMock } from "../../../FalseData";
-import axios from "axios";
-import { useForm } from "../../../hooks";
 import { RiFileExcel2Line } from "react-icons/ri";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import axios from "axios";
 import { AddNewUserModal } from "../ActionsUsersAndRols/AddNewUser/AddNewUser";
 import { UpdateUserModal } from "../ActionsUsersAndRols/UpdateUser/UpdateUser";
 
@@ -16,11 +13,14 @@ export const Usuarios = () => {
     const [showAddUser, setShowAddUser] = useState(false);
     const [showEditUser, setShowEditUser] = useState(false);
     const [data, setData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]); // Estado para los datos filtrados
+    const [filteredData, setFilteredData] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [itemToEdit, setItemToEdit] = useState(null);
     const [loading, setLoading] = useState(false);
-    const { serialize } = useForm();
+    const [roles, setRoles] = useState([]);
+    const [selectedRole, setSelectedRole] = useState("");
+    const [states, setStates] = useState([]); 
+
 
     const handleExport = () => {
         const worksheet = XLSX.utils.json_to_sheet(filteredData);
@@ -30,86 +30,130 @@ export const Usuarios = () => {
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(blob, "Usuarios.xlsx");
     };
+
     const translateFields = (items) => {
-        return items.map((item) => ({
-            Cédula: item.id,
-            Nombre: item.name,
-            Apellido: item.lastName,
-            Correo: item.email,
-            Télefono: item.phone,
-            Rol: item.role?.description,
-            Dirección: item.address,
-            Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido",
-        }));
+        return items.map((item) => {
+            // Convertimos stateId a string para comparación
+            const stateIdAsString = item.stateId.toString();
+            const state = states.find(state => state.id === stateIdAsString);
+            return {
+                Cédula: item.id,
+                Nombre: item.name,
+                Apellido: item.lastName,
+                Correo: item.email,
+                Télefono: item.phone,
+                Rol: item.role?.description || "Desconocido",
+                Dirección: item.address,
+                Ciudad: `${item.city.description}, (${item.city.department.description})` || "Desconocido",
+                Oficina: item.office?.description || "Desconocida",
+                //Estado: state ? state.description : "Desconocido",
+            };
+        });
     };
-    const handleSave = (newItem) => {
-        setData((prevData) => [...prevData, newItem]);
-    };
-
-
+    
+    
+        
 
     const getData = async () => {
         setLoading(true);
-        if (MOCK_DATA === "true") {
-            setData(usersMock)
-        } else {
-            const [
-                { data: users }
-            ] = await Promise.all([
-                axios.get(`${API_ENDPOINT}/user/all`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+        try {
+            if (MOCK_DATA === "true") {
+                setData(usersMock);
+            } else {
+                const [usersRes, rolesRes,statesRes] = await Promise.all([
+                    axios.get(`${API_ENDPOINT}/user/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/role/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    axios.get(`${API_ENDPOINT}/lifecycle/state/all?page=0&size=2000`, { headers: { 'x-custom-header': 'Boreal Api' } }),
+                    
+                ]);
 
-            ])
-            const translatedData = translateFields(users?.result?.user ?? []);
-            setData(translatedData);
-            setFilteredData(translatedData);
+                const users = usersRes.data?.result?.items ?? [];
+                const translatedData = translateFields(users);
+                setData(translatedData);
+                setFilteredData(translatedData);
+
+                const rolesData = rolesRes.data?.result?.items ?? [];
+                setRoles(rolesData);
+
+                const statesData = statesRes.data?.result?.items ?? [];
+                setStates(statesData); 
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
-    }
+    };
+
 
 
     useEffect(() => {
+        let filtered = data;
+
         if (searchTerm) {
-            const filtered = data.filter((user) =>
+            filtered = filtered.filter((user) =>
                 user.Nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.Cédula.toString().includes(searchTerm)
             );
-            setFilteredData(filtered);
-        } else {
-            setFilteredData(data); 
         }
-    }, [searchTerm, data]); 
 
+        if (selectedRole) {
+            filtered = filtered.filter((user) => user.Rol === selectedRole);
+        }
+
+        setFilteredData(filtered);
+    }, [searchTerm, selectedRole, data]);
 
     const handleEdit = (item) => {
         setItemToEdit(item);
         setShowEditUser(true);
     };
+
     const handleUpdate = (updatedItem) => {
         const updatedData = data.map((item) =>
             item.Cédula === updatedItem.id ? { ...item, ...updatedItem } : item
         );
         setData(updatedData);
         setShowEditUser(false);
+        getData();
+    };
+
+    const handleSave = (newItem) => {
+        setData((prevData) => [...prevData, newItem]);
+        getData();
     };
 
     useEffect(() => {
         getData();
-    }, [handleSave]);
+    }, []);
 
-
-
+    console.log(data);
     return (
         <>
             <div className="filtersContainer">
                 <div className="filters">
+
+                    <label>Rol:</label>
+                    <select
+                        value={selectedRole}
+                        onChange={(e) => setSelectedRole(e.target.value)}
+                        placeholder="Filtrar por rol"
+                        className="filter"
+                    >
+                        <option value="">Todos</option>
+                        {roles.map((role) => (
+                            <option key={role.id} value={role.description}>
+                                {role.description}
+                            </option>
+                        ))}
+                    </select>
                     <label>Buscar:</label>
                     <input
                         type="text"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)} // Actualizamos el valor de búsqueda
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Buscar..."
                         className="filterSearch"
-
                     />
                 </div>
                 <div className="actions">
@@ -117,7 +161,6 @@ export const Usuarios = () => {
                         <FaSyncAlt />
                     </button>
                     <Button onClick={() => setShowAddUser(true)} text="Añadir" />
-
                     <button onClick={handleExport} className="exportButton">
                         <RiFileExcel2Line className="ExportIcon" />
                         Exportar
@@ -126,13 +169,12 @@ export const Usuarios = () => {
             </div>
 
             <DynamicTable
-                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad"]}
+                columns={["Cédula", "Nombre", "Apellido", "Correo", "Télefono", "Rol", "Dirección", "Ciudad", "Oficina"]}
                 data={filteredData}
                 onEdit={handleEdit}
                 showToggle={true}
                 onToggle={() => { }}
                 hideDeleteIcon={true}
-
             />
 
             {showAddUser && (
@@ -150,7 +192,6 @@ export const Usuarios = () => {
                     onSave={handleUpdate}
                 />
             )}
-
         </>
-    )
-}
+    );
+};

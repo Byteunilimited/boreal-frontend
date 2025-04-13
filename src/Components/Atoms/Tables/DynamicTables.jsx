@@ -1,25 +1,31 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { RiEdit2Line, RiCloseFill } from "react-icons/ri";
+import { RiEdit2Line, RiCloseFill, RiArrowLeftRightFill } from "react-icons/ri";
 import Pagination from "react-bootstrap/Pagination";
 import Table from "react-bootstrap/Table";
 import "./DynamicTables.css";
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+
 
 export const DynamicTable = ({
   columns,
   data,
   onEdit,
   onDelete,
-  onToggle = () => {}, 
-  showToggle = true,    
+  onToggle = () => { },
+  showToggle = true,
   hideDeleteIcon = false,
   hideEditIcon = false,
+  showExchangeIcon = false,
+  isEditable = () => true,
+  onExchange = () => { }
 }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(true);
   const pagesVisited = pageNumber * recordsPerPage;
   const pageCount = Math.ceil(data.length / recordsPerPage);
+  
 
   const changePage = (pageNumber) => {
     setPageNumber(pageNumber);
@@ -86,83 +92,112 @@ export const DynamicTable = ({
     return items;
   };
 
-useState(() => {
+  useState(() => {
 
-  const timeoutId = setTimeout(() => {
-    setIsLoading(false);
-  }, 2000);
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
 
-  return () => clearTimeout(timeoutId); 
-}, []);
+    return () => clearTimeout(timeoutId);
+  }, []);
   return (
     <div className="tableContainer">
       {isLoading ? (
         <div className="loadingMessage">Cargando información...</div>
       ) : (
         <>
-          <Table striped className="dynamicTable">
-            <thead>
-              <tr>
-                {columns?.map((column, index) => (
-                  <th key={index} className="bg-blue">
-                    {column}
-                  </th>
-                ))}
-                {showToggle && <th>Acciones</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {Array.isArray(data) && data.length === 0 ? (
+          <div class="tableWrapper">
+            <Table striped className="dynamicTable">
+              <thead>
                 <tr>
-                  <td
-                    colSpan={columns.length + (showToggle ? 1 : 0)}
-                    className="text-center"
-                  >
-                    No hay información para mostrar
-                  </td>
+                  {columns?.map((column, index) => (
+                    <th key={index} className="bg-blue">
+                      {column}
+                    </th>
+                  ))}
+                  {showToggle && <th>Acciones</th>}
                 </tr>
-              ) : (
-                data
-                  .slice(pagesVisited, pagesVisited + recordsPerPage)
-                  .map((row, rowIndex) => (
-                    <tr key={rowIndex} className="tableRow">
-                      {columns.map((column, colIndex) => (
-                        <td key={colIndex}>
-                          {column === "Estado" && showToggle ? (
-                            <label className="switch">
-                              <input
-                                type="checkbox"
-                                checked={row[column] === "Activo"}
-                                onChange={() => onToggle(row)}
-                              />
-                              <span className="slider round"></span>
-                            </label>
-                          ) : (
-                            row[column]
-                          )}
-                        </td>
-                      ))}
-                      {showToggle && (
-                        <td>
-                          {!hideEditIcon && (  
-                            <RiEdit2Line
-                              className="actionIcon editIcon"
-                              onClick={() => onEdit(row)}
-                            />
-                          )}
-                          {!hideDeleteIcon && (
-                            <RiCloseFill
-                              className="actionIcon deleteIcon"
-                              onClick={() => onDelete(row)}
-                            />
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                  ))
-              )}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {Array.isArray(data) && data.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={columns.length + (showToggle ? 1 : 0)}
+                      className="text-center"
+                    >
+                      No hay información para mostrar
+                    </td>
+                  </tr>
+                ) : (
+                  data
+                    .slice(pagesVisited, pagesVisited + recordsPerPage)
+                    .map((row, rowIndex) => (
+                      <tr key={rowIndex} className="tableRow">
+                        {columns.map((column, colIndex) => (
+                          <td key={colIndex}>
+                            {column === "Estado" && showToggle ? (
+                              <label className="switch">
+                                <input
+                                  type="checkbox"
+                                  checked={row[column] === "Habilitado"}
+                                  onChange={() => onToggle(row)}
+                                />
+                                <span className="slider round"></span>
+                              </label>
+                            ) : (
+                              row[column]
+                            )}
+                          </td>
+                        ))}
+                        {showToggle && (
+                          <td>
+                            {!hideEditIcon && isEditable(row) && ( // Verificar si es editable
+                              <OverlayTrigger
+                                placement="top"
+                                overlay={<Tooltip>Editar</Tooltip>}
+                              >
+                                <span>
+                                  <RiEdit2Line
+                                    className="actionIcon editIcon"
+                                    onClick={() => onEdit(row)}
+                                  />
+                                </span>
+                              </OverlayTrigger>
+                            )}
+                            {!hideDeleteIcon && (
+                              <OverlayTrigger
+                                placement="top"
+                                overlay={<Tooltip>Eliminar</Tooltip>}
+                              >
+                                <span>
+                                  <RiCloseFill
+                                    className="actionIcon deleteIcon"
+                                    onClick={() => onDelete(row)}
+                                  />
+                                </span>
+                              </OverlayTrigger>
+                            )}
+                            {showExchangeIcon && (
+                              <OverlayTrigger
+                                placement="top"
+                                overlay={<Tooltip>Ceder</Tooltip>}
+                              >
+                                <span>
+                                  <RiArrowLeftRightFill
+                                    className="actionIcon exchangeIcon"
+                                    onClick={() => onExchange(row)}
+                                  />
+                                </span>
+                              </OverlayTrigger>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    ))
+                )}
+              </tbody>
+            </Table>
+          </div>
           <div className="paginationContainer">
             <Pagination className="border-radius.sm">
               <Pagination.First onClick={() => changePage(0)} />
@@ -189,8 +224,9 @@ useState(() => {
             </div>
           </div>
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
@@ -199,10 +235,7 @@ DynamicTable.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  onToggle: PropTypes.func, 
+  onToggle: PropTypes.func,
   showToggle: PropTypes.bool,
   hideDeleteIcon: PropTypes.bool,
 };
-
-
-

@@ -57,7 +57,8 @@ export function AuthProvider({ children }) {
         setToken(data.token);
         setExpiration(data.expiresAt);
     }
-    const LogOut = () => {
+    
+    const logOut = () => {
         localStorage.removeItem("token");
         setToken(null);
         setExpiration(null);
@@ -70,12 +71,13 @@ export function AuthProvider({ children }) {
             validateToken,
             isAutenticated,
             Login,
-            LogOut
+            logOut
         }}>
             {children}
         </Provider>
     );
 }
+
 export function useAuth() {
     return useContext(AuthContext);
 }

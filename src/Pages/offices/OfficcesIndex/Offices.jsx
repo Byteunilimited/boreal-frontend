@@ -34,9 +34,9 @@ export const Offices = () => {
 
   const getData = async () => {
     try {
-      const response = await privateFetch.get("/location/office/all");
+      const response = await privateFetch.get("/location/office/all?page=0&size=2000");
       if (response && response.data) {
-        const translatedData = translateFields(response.data.result.entity);
+        const translatedData = translateFields(response.data.result.items);
         setData(translatedData);
         setFilteredData(translatedData);
       } else {
@@ -51,6 +51,7 @@ export const Offices = () => {
     setData([...data, newItem]);
     setFilteredData([...data, newItem]);
   };
+  
   const handleUpdate = (updatedItem) => {
     const updatedData = data.map((item) =>
       item.Código === updatedItem.id ? translateFields([updatedItem])[0] : item
@@ -69,7 +70,8 @@ export const Offices = () => {
       Teléfono: item.phone,
       Correo: item.email,
       Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido",
-      Propietario: item.owner ? item.owner.businessName : "Desconocido",
+      Propietario: item.owner ? item.owner.name : "Desconocido",
+      //Estado: item.stateId,
     }));
   };
 
@@ -127,57 +129,59 @@ export const Offices = () => {
   }, [handleSave]);
 
   return (
-    <div className="contentMainGeneral">
-      <div className="inventory">
-        <h1>Sucursales</h1>
-        <div className="filtersContainer">
-          <div className="filters">
-            <label>Buscar:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Buscar..."
-              className="filterSearch"
-            />
-          </div>
-          <div className="actions">
-            <button onClick={handleRefresh} className="iconRefresh">
-              <FaSyncAlt />
-            </button>
-            <Button onClick={() => setShowAddOfficeModal(true)} text="Añadir" />
+    <div>
+      <div>
+        <div className="inventory">
+          <h1>Sucursales</h1>
+          <div className="filtersContainer">
+            <div className="filters">
+              <label>Buscar:</label>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Buscar..."
+                className="filterSearch"
+              />
+            </div>
+            <div className="actions">
+              <button onClick={handleRefresh} className="iconRefresh">
+                <FaSyncAlt />
+              </button>
+              <Button onClick={() => setShowAddOfficeModal(true)} text="Añadir" />
 
-            <button onClick={handleExport} className="exportButton">
-              <RiFileExcel2Line className="ExportIcon" />
-              Exportar
-            </button>
+              <button onClick={handleExport} className="exportButton">
+                <RiFileExcel2Line className="ExportIcon" />
+                Exportar
+              </button>
+            </div>
           </div>
+          <DynamicTable
+            columns={["Código", "Nombre", "Dirección", "Teléfono", "Correo", "Ciudad", "Propietario"]}
+            data={filteredData}
+            onEdit={handleEdit}
+            hideDeleteIcon={true}
+            showToggle={true}
+            onToggle={() => { }}
+          />
         </div>
-        <DynamicTable
-          columns={["Código", "Nombre", "Dirección", "Teléfono", "Correo", "Ciudad", "Propietario"]}
-          data={filteredData}
-          onEdit={handleEdit}
-          hideDeleteIcon={true}
-          showToggle={true}
-          onToggle={() => { }}
-        />
-      </div>
 
-      {showAddOfficeModal && (
-        <AddOfficeModal
-          show={showAddOfficeModal}
-          onClose={handleCloseModal}
-          onSave={handleSave}
-        />
-      )}
-      {showUpdateOfficeModal && selectedOffice && (
-        <UpdateOfficeModal
-          show={showUpdateOfficeModal}
-          onClose={() => setShowUpdateOfficeModal(false)}
-          onUpdate={handleUpdate}
-          officeData={selectedOffice}
-        />
-      )}
+        {showAddOfficeModal && (
+          <AddOfficeModal
+            show={showAddOfficeModal}
+            onClose={handleCloseModal}
+            onSave={handleSave}
+          />
+        )}
+        {showUpdateOfficeModal && selectedOffice && (
+          <UpdateOfficeModal
+            show={showUpdateOfficeModal}
+            onClose={() => setShowUpdateOfficeModal(false)}
+            onUpdate={handleUpdate}
+            officeData={selectedOffice}
+          />
+        )}
+      </div>
     </div>
   );
 };

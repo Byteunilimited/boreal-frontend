@@ -11,23 +11,26 @@ export const UserAndRols = () => {
   const [key, setKey] = useState("users");
   return (
     <>
-      <div className="tittle">
-        <h1>Usuarios y roles</h1>
-        <Tabs
-          id="controlled-tab-example"
-          activeKey={key}
-          onSelect={(k) => setKey(k)}
-          className="mb-3 mt-4"
-        >
-          <Tab eventKey="users" title="Usuarios">
-            <Usuarios />
-          </Tab>
-          <Tab eventKey="roles" title="Roles">
-            <Rols/>
-          </Tab>
-        </Tabs>
+      <div>
+        <div>
+          <div className="inventory">
+            <h1>Usuarios y roles</h1>
+            <Tabs
+              id="controlled-tab-example"
+              activeKey={key}
+              onSelect={(k) => setKey(k)}
+              className="mb-3 mt-4"
+            >
+              <Tab eventKey="users" title="Usuarios">
+                <Usuarios />
+              </Tab>
+              <Tab eventKey="roles" title="Roles">
+                <Rols />
+              </Tab>
+            </Tabs>
+          </div>
+        </div>
       </div>
-          
     </>
   );
 };

@@ -21,18 +21,18 @@ export const StoreType = () => {
     const [showModalStoreType, setShowModalStoreType] = useState(false);
 
     const translateFields = (items) => {
-        return items.map((item) => ({
-            Código: item.id,
-            Nombre: item.description,
+        return items?.map((item) => ({
+            Código: item?.id,
+            Nombre: item?.description,
 
-        }));
+        })) ?? [];
     };
 
     const getData = async () => {
         try {
-            const response = await privateFetch.get("/location/store/type/all");
+            const response = await privateFetch.get("/location/store/type/all?page=0&size=2000");
             if (response && response.data) {
-                const translatedData = translateFields(response.data.result.item);
+                const translatedData = translateFields(response.data.result.items);
                 setData(translatedData);
             } else {
                 console.error("Response does not contain data:", response);

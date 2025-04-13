@@ -31,13 +31,13 @@ export const DepartmentsAndCities = () => {
 
   const getDepartments = async () => {
     try {
-      const response = await axios.get(`${API_ENDPOINT}/location/department/all`, {
+      const response = await axios.get(`${API_ENDPOINT}/location/department/all?page=0&size=2000`, {
         headers: {
           "x-custom-header": "Boreal Api",
         },
       });
       if (response.data && response.data.result) {
-        setDepartments(response.data.result.department);
+        setDepartments(response.data.result.items);
       } else {
         console.error("Error fetching departments data:", response);
       }
@@ -48,13 +48,13 @@ export const DepartmentsAndCities = () => {
 
   const getCities = async () => {
     try {
-      const response = await axios.get(`${API_ENDPOINT}/location/city/all`, {
+      const response = await axios.get(`${API_ENDPOINT}/location/city/all?page=0&size=2000`, {
         headers: {
           "x-custom-header": "Boreal Api",
         },
       });
       if (response.data && response.data.result) {
-        setCities(response.data.result.city);
+        setCities(response.data.result.items);
       } else {
         console.error("Error fetching cities data:", response);
       }
@@ -75,7 +75,7 @@ export const DepartmentsAndCities = () => {
     }
   };
 
-  
+
   const handleExport = () => {
     const dataToExport = key === "departments" ? formattedDepartments : formattedCities;
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -85,7 +85,7 @@ export const DepartmentsAndCities = () => {
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, key === "departments" ? "Departamentos.xlsx" : "Ciudades.xlsx");
   };
-  
+
 
   const filterCities = (searchTerm) => {
     if (!searchTerm) {
@@ -94,6 +94,7 @@ export const DepartmentsAndCities = () => {
       const filtered = cities.filter((city) =>
         city.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         city.id.toString().includes(searchTerm)
+        || city.department.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredCities(filtered);
     }
@@ -113,7 +114,7 @@ export const DepartmentsAndCities = () => {
   };
 
   const departmentColumns = ["Código", "Nombre"];
-  const cityColumns = ["Código", "Nombre"];
+  const cityColumns = ["Código", "Nombre", "Departamento"];
 
   const formattedDepartments = filteredDepartments.map((dept) => ({
     Código: dept.id,
@@ -123,69 +124,80 @@ export const DepartmentsAndCities = () => {
   const formattedCities = filteredCities.map((city) => ({
     Código: city.id,
     Nombre: city.description,
+    Departamento: city.department.description
   }));
 
   return (
     <>
-      <div className="departments-container">
-        <h1>Departamentos y Ciudades</h1>
-        <Tabs
-          id="controlled-tab-example"
-          activeKey={key}
-          onSelect={(k) => setKey(k)}
-          className="mb-3 mt-4"
-        >
+      <div>
+        <div>
+          <div className="inventory">
+            <h1>Departamentos y Ciudades</h1>
+            <Tabs
+              id="controlled-tab-example"
+              activeKey={key}
+              onSelect={(k) => setKey(k)}
+              className="mb-3 mt-4"
+            >
 
-          <Tab eventKey="departments" title="Departamentos">
+              <Tab eventKey="departments" title="Departamentos">
+                <div className="filtersContainer">
+                  <div className="filters">
+                    <label>Buscar:</label>
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Código o Nombre"
+                      className="filterSearchCities"
+                    />
 
-            <label>Buscar:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Código o Nombre"
-              className="filterSearchCities"
-            />
+                    <button onClick={handleExport} className="exportButton">
+                      <RiFileExcel2Line className="ExportIcon" />
+                      Exportar
+                    </button>
+                  </div>
+                </div>
+                <DynamicTable
+                  columns={departmentColumns}
+                  data={formattedDepartments}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onToggle={handleToggle}
+                  showToggle={false}
+                />
+              </Tab>
 
-            <button onClick={handleExport} className="exportButton">
-              <RiFileExcel2Line className="ExportIcon" />
-              Exportar
-            </button>
-            <DynamicTable
-              columns={departmentColumns}
-              data={formattedDepartments}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onToggle={handleToggle}
-              showToggle={false}
-            />
-          </Tab>
+              <Tab eventKey="cities" title="Ciudades">
+                <div className="filtersContainer">
+                  <div className="filters">
+                    <label>Buscar:</label>
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Código o Nombre"
+                      className="filterSearchCities"
+                    />
+                    <button onClick={handleExport} className="exportButton">
+                      <RiFileExcel2Line className="ExportIcon" />
+                      Exportar
+                    </button>
+                  </div>
+                </div>
 
-          <Tab eventKey="cities" title="Ciudades">
-
-            <label>Buscar:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Código o Nombre"
-              className="filterSearchCities"
-            />
-            <button onClick={handleExport} className="exportButton">
-              <RiFileExcel2Line className="ExportIcon" />
-              Exportar
-            </button>
-
-            <DynamicTable
-              columns={cityColumns}
-              data={formattedCities}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onToggle={handleToggle}
-              showToggle={false}
-            />
-          </Tab>
-        </Tabs>
+                <DynamicTable
+                  columns={cityColumns}
+                  data={formattedCities}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onToggle={handleToggle}
+                  showToggle={false}
+                />
+              </Tab>
+            </Tabs>
+          </div>
+        </div>
       </div>
     </>
   );

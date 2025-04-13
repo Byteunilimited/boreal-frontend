@@ -8,7 +8,7 @@ import { saveAs } from "file-saver";
 import { AddNewOwner } from '../ActionsOwners/AddNewOwner/AddNewOwner';
 import { UpdateOwner } from '../ActionsOwners/UpdateOwner/UpdateOwner';
 
-export const Owners =  () =>{
+export const Owners = () => {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { privateFetch } = useAxios();
@@ -26,20 +26,23 @@ export const Owners =  () =>{
     return items.map((item) => ({
       Código: item.id,
       NIT: item.nit,
-      Nombre: item.businessName,
+      Nombre: item.name,
       Teléfono: item.phone,
       Dirección: item.address,
       Email: item.email,
-      Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido"
+      //Estado: item.stateId,
+      Ciudad: item.city.description
+
     }));
   };
 
   const getData = async () => {
     try {
-      const response = await privateFetch.get("/location/owner/all");
+      const response = await privateFetch.get("/location/owner/all?page=0&size=2000");
       if (response && response.data) {
-        const translatedData = translateFields(response.data.result.zone);
+        const translatedData = translateFields(response.data.result.items);
         setData(translatedData);
+        setFilteredData(translatedData); 
       } else {
         console.error("Response does not contain data:", response);
       }
@@ -48,13 +51,13 @@ export const Owners =  () =>{
     }
   };
 
-  // Handle edit action
+
   const handleEdit = (owner) => {
     const ownerToEdit = data.find((item) => item.Código === owner.Código);
     if (ownerToEdit) {
       setSelectedOwner({
         id: ownerToEdit.Código,
-        businessName: ownerToEdit.Nombre,
+        name: ownerToEdit.Nombre,
         phone: ownerToEdit.Teléfono,
         email: ownerToEdit.Correo,
         address: ownerToEdit.Dirección,
@@ -102,12 +105,10 @@ export const Owners =  () =>{
     saveAs(blob, "Propietarios.xlsx");
   };
 
-  // Set the document title on component mount
   useEffect(() => {
     document.title = "Propietarios";
   }, []);
 
-  // Fetch data on component mount
   useEffect(() => {
     getData();
   }, [handleSave]);
@@ -125,62 +126,66 @@ export const Owners =  () =>{
 
   return (
     <>
-      <div className='storeMain'>
-        <h2 className='storeTitle'>Propietarios</h2>
-        <div className="filtersContainer">
-          <div className="filters">
-            <label>Buscar:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Buscar..."
-              className="filterSearch"
-            />
-          </div>
-          <div className="actions">
-            <button onClick={handleRefresh} className="iconRefresh">
-              <FaSyncAlt />
-            </button>
-            <Button onClick={() => setShowAddOwner(true)} text="Añadir" />
+      <div>
+        <div>
+          <div className="inventory">
+            <h1>Propietarios</h1>
+            <div className="filtersContainer">
+              <div className="filters">
+                <label>Buscar:</label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Buscar..."
+                  className="filterSearch"
+                />
+              </div>
+              <div className="actions">
+                <button onClick={handleRefresh} className="iconRefresh">
+                  <FaSyncAlt />
+                </button>
+                <Button onClick={() => setShowAddOwner(true)} text="Añadir" />
 
-            <button onClick={handleExport} className="exportButton">
-              <RiFileExcel2Line className="ExportIcon" />
-              Exportar
-            </button>
-          </div>
+                <button onClick={handleExport} className="exportButton">
+                  <RiFileExcel2Line className="ExportIcon" />
+                  Exportar
+                </button>
+              </div>
+            </div>
+            <DynamicTable
+              columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Ciudad"]}
+              data={filterData}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              hideDeleteIcon={true}
+            />
+          </div >
+          {showAddOwner && (
+            <AddNewOwner
+              show={showAddOwner}
+              onClose={() => setShowAddOwner(false)}
+              onSave={handleSave}
+            />
+          )}
+          {showEditOwner && itemToEdit && (
+            <UpdateNewOwner
+              show={showEditOwner}
+              onClose={() => setShowEditOwner(false)}
+              user={itemToEdit}
+              onSave={handleUpdate}
+            />
+          )}
+          {showUpdateOwner && selectedOwner && (
+            <UpdateOwner
+              show={showUpdateOwner}
+              onClose={() => setShowUpdateOwner(false)}
+              onUpdate={handleUpdate}
+              ownerData={selectedOwner}
+            />
+          )}
         </div>
-        <DynamicTable
-          columns={["Código", "NIT", "Nombre", "Teléfono", "Dirección", "Email", "Ciudad"]}
-          data={filterData}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          hideDeleteIcon={true}
-        />
-      </div >
-      {showAddOwner && (
-        <AddNewOwner
-          show={showAddOwner}
-          onClose={() => setShowAddOwner(false)}
-          onSave={handleSave}
-        />
-      )}
-      {showEditOwner && itemToEdit && (
-        <UpdateNewOwner
-          show={showEditOwner}
-          onClose={() => setShowEditOwner(false)}
-          user={itemToEdit}
-          onSave={handleUpdate}
-        />
-      )}
-      {showUpdateOwner && selectedOwner && (
-        <UpdateOwner
-          show={showUpdateOwner}
-          onClose={() => setShowUpdateOwner(false)}
-          onUpdate={handleUpdate}
-          ownerData={selectedOwner}
-        />
-      )}
+      </div>
     </>
   );
 }

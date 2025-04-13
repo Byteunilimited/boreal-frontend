@@ -1,0 +1,73 @@
+.header {
+    padding: 0 2rem;
+}
+
+.menuImage {
+    width: 2rem;
+}
+
+.menuButton {
+    display: none;
+    background: var(--MainBlue);
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.profileContainer {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.profileIcon {
+    font-size: 2em;
+    color: var(--MainBlue);
+}
+
+.logOutMenu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000; 
+    right: 0;
+    margin: 7rem 2rem 0 0;
+}
+
+.logOutMenu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.logOutMenu li {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.logOutMenu li:hover {
+    background-color: #f0f0f0;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: black;
+    gap: 1rem;
+}
+
+.menuIcon {
+    font-size: 2em;
+}
+
+@media (max-width: 900px) {
+    .menuButton {
+        display: block;
+    }
+}

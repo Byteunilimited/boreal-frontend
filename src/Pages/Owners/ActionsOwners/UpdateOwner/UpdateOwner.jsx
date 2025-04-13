@@ -3,23 +3,25 @@ import { Modal } from "../../../../Layouts";
 import { ModalIconCorrect, ModalIconMistake } from "../../../../assets";
 import { useAxios } from "../../../../Contexts";
 import { API_ENDPOINT } from "../../../../util";
-
+import Select from "react-select";
 export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
     const { privateFetch } = useAxios();
     const [formData, setFormData] = useState({
         id: ownerData.id,
-        businessName: "",
         nit: "",
+        name: "",
         address: "",
         phone: "",
         email: "",
         cityId: "",
+        //stateId: "",
     });
     const [error, setError] = useState(null);
     const [isSuccessful, setIsSuccessful] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [cities, setCities] = useState([]);
+    const [states, setStates] = useState([]);
 
     useEffect(() => {
         if (show && ownerData?.id) {
@@ -27,22 +29,22 @@ export const UpdateOwner = ({ show, onClose, ownerData, onUpdate }) => {
             fetchStoreData();
         }
     }, [show, ownerData]);
-console.log(ownerData);
-
 
     const fetchStoreData = async () => {
         try {
             const response = await privateFetch.get(`/location/owner/id?id=${ownerData.id}`);
-            if (response.status === 200 && response.data.result.zone.length > 0) {
-                const owner = response.data.result.zone[0];
+            if (response.status === 200 && response.data.result.items.length > 0) {
+                const owner = response.data.result.items[0];
                 setFormData({
                     id: owner.id,
                     nit: owner.nit,
-                    businessName: owner.businessName,
+                    name: owner.name,
                     phone: owner.phone,
                     email: owner.email,
                     address: owner.address,
-                    cityId: owner.city.id
+                    cityId: owner.city.id,
+                    //stateId: owner.stateId,
+
                 });
             } else {
                 setError("No se encontraron datos para la bodega.");
@@ -54,9 +56,14 @@ console.log(ownerData);
     };
     const fetchCities = async () => {
         try {
-            const response = await privateFetch.get("/location/city/all");
+            const response = await privateFetch.get("/location/city/all?page=0&size=2000");
             if (response.status === 200) {
-                setCities(response.data.result.city);
+                const cities = response.data.result.items || [];
+                const options = cities.map((city) => ({
+                    value: city.id,
+                    label:`${city.description}, - ${city.department.description}`,
+                }));
+                setCities(options);
             }
         } catch (error) {
             setError("Ocurrió un error al obtener las ciudades.");
@@ -84,13 +91,17 @@ console.log(ownerData);
                 setConfirmationMessage("El dueño fue actualizado exitosamente.");
                 setShowConfirmationModal(true);
                 onUpdate(data); 
+                setTimeout(() => {
+                    setShowConfirmationModal(false);
+                    onClose();
+                }, 1000);
             } else if (response.status === 422) {
                 setIsSuccessful(false);
                 setError("El Nombre del negocio y el NIT debe tener al menos 3 caracteres.");
                 setShowConfirmationModal(true);
             } else if (response.status === 409) {
                 setIsSuccessful(false);
-                setError("El Nombre del negocio y el NIT ya existen. Por favor, elija otro.");
+                setError("El Nombre del negocio y/o el NIT ya existen. Por favor, elija otro.");
                 setShowConfirmationModal(true);
             } else {
                 throw new Error("Error en la actualización del dueño.");
@@ -107,9 +118,11 @@ console.log(ownerData);
         setShowConfirmationModal(false); 
         setError(null); 
         setConfirmationMessage(""); 
-        onClose(); 
     };
 
+    const handleSelectChange = (selectedOption, field) => {
+        setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : null }));
+    };
     return (
         <div className="modalOverlay">
             <div className="modalContent">
@@ -119,8 +132,8 @@ console.log(ownerData);
                         <label>Nombre del Negocio:</label>
                         <input
                             type="text"
-                            name="businessName"
-                            value={formData.businessName}
+                            name="name"
+                            value={formData.name}
                             onChange={handleChange}
                             placeholder="Nombre del negocio"
                             required
@@ -179,21 +192,39 @@ console.log(ownerData);
                     </div>
                     <div className="formGroup">
                         <label>Ciudad:</label>
+                        <Select
+                            options={cities}
+                            onChange={(selectedOption) => handleSelectChange(selectedOption, "cityId")}
+                            placeholder="Seleccionar ciudad"
+                            value={cities.find(option => option.value === formData.cityId)}
+                            isClearable
+                            className="selects"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderRadius: "1em",
+                                    textAlign: "start",
+                                }),
+                            }}
+                        />
+                    </div>
+                    {/* <div className="formGroup">
+                        <label>Estado:</label>
                         <select
-                            name="cityId"
-                            value={formData.cityId}
+                            name="stateId"
+                            value={formData.stateId}
                             onChange={handleChange}
                             required
                             className="selects"
                         >
-                            <option value="">Seleccionar ciudad</option>
-                            {cities.map((city) => (
-                                <option key={city.id} value={city.id}>
-                                    {`${city.description} (${city.department.description})`}
+                            <option value="">Seleccionar estado</option>
+                            {states.map((state) => (
+                                <option key={state.id} value={state.id}>
+                                    {`${state.description} (${state.department.description})`}
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </div> */}
                     <div className="formActions">
                         <button type="submit">Guardar</button>
                         <button type="button" onClick={onClose}>

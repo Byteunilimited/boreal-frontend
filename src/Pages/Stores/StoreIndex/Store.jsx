@@ -33,16 +33,19 @@ export const Store = () => {
       Email: item.email,
       Tipo: item.storeType ? item.storeType.description : "Desconocido",
       Ciudad: item.city ? `${item.city.description}, ${item.city.department.description}` : "Desconocido",
-      Propietario: item.owner ? item.owner.businessName : "Desconocido",
       Oficina: item.office ? item.office.description : "Sin oficina",
+      TipoUno: item.storeType? item.storeType.id : "Desconocido",
     }));
   };
 
+  const isEditable = (item) => {
+    return item.TipoUno !== 1; 
+  };
   const getData = async () => {
     try {
-      const response = await privateFetch.get("/location/store/item/all");
+      const response = await privateFetch.get("/location/store/item/all?page=0&size=2000");
       if (response && response.data) {
-        const translatedData = translateFields(response.data.result.store);
+        const translatedData = translateFields(response.data.result.items);
         setData(translatedData);
       } else {
         console.error("Response does not contain data:", response);
@@ -52,7 +55,6 @@ export const Store = () => {
     }
   };
 
-  // Handle edit action
   const handleEdit = (store) => {
     const storeToEdit = data.find((item) => item.Código === store.Código);
     if (storeToEdit) {
@@ -61,19 +63,17 @@ export const Store = () => {
     }
   };
 
-
   const handleUpdate = (updatedItem) => {
     const updatedData = data.map((item) =>
       item.Código === updatedItem.id ? translateFields([updatedItem])[0] : item
     );
-    setData(updatedData); 
+    setData(updatedData);
   };
   
 
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
-
 
   const handleRefresh = () => {
     getData();
@@ -84,17 +84,14 @@ export const Store = () => {
     setData((prevData) => [...prevData, newItem]);
   };
 
-  // Set the document title on component mount
   useEffect(() => {
     document.title = "Bodegas";
   }, []);
 
-  // Fetch data on component mount
   useEffect(() => {
     getData();
   }, [handleSave]);
 
-  // Filter data based on search term
   const filteredData = data.filter((item) => {
     const codigo = item.Código ? item.Código.toString() : "";
     const nombre = item.Nombre ? item.Nombre.toLowerCase() : "";
@@ -119,66 +116,71 @@ export const Store = () => {
 
   return (
     <>
-      <div className='storeMain'>
-        <h2 className='storeTitle'>Bodegas</h2>
-        <Tabs
-          id="controlled-tab-example"
-          activeKey={key}
-          onSelect={(k) => setKey(k)}
-          className="mb-3 mt-4">
-          <Tab eventKey="store" title="Bodegas">
-            <div className="filtersStore">
-              <label>Buscar:</label>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Código o Nombre"
-                className="filterSearch"
-              />
-            </div>
-            <div className="actions">
-              <button onClick={handleRefresh} className="iconRefresh">
-                <FaSyncAlt />
-              </button>
-              <Button onClick={() => setShowModal(true)} text="Añadir" />
+      <div>
+        <div>
+          <div className="inventory">
+            <h1>Bodegas</h1>
+            <Tabs
+              id="controlled-tab-example"
+              activeKey={key}
+              onSelect={(k) => setKey(k)}
+              className="mb-3 mt-4">
+              <Tab eventKey="store" title="Bodegas">
+                <div className="filtersStore">
+                  <label>Buscar:</label>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder="Código o Nombre"
+                    className="filterSearch"
+                  />
+                </div>
+                <div className="actions">
+                  <button onClick={handleRefresh} className="iconRefresh">
+                    <FaSyncAlt />
+                  </button>
+                  <Button onClick={() => setShowModal(true)} text="Añadir" />
 
-              <button onClick={handleExport} className="exportButton">
-                <RiFileExcel2Line className="ExportIcon" />
-                Exportar
-              </button>
+                  <button onClick={handleExport} className="exportButton">
+                    <RiFileExcel2Line className="ExportIcon" />
+                    Exportar
+                  </button>
 
-            </div>
-            <DynamicTable
-              columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Ciudad", "Propietario", "Oficina"]}
-              data={filteredData}
-              onEdit={handleEdit}
-              showToggle={true}
-              onToggle={() => { }}
-              hideDeleteIcon={true}
+                </div>
+                <DynamicTable
+                  columns={["Código", "Nombre", "Teléfono", "Dirección", "Email", "Tipo", "Ciudad", "Oficina"]}
+                  data={filteredData}
+                  onEdit={handleEdit}
+                  isEditable={isEditable} 
+                  showToggle={true}
+                  onToggle={() => { }}
+                  hideDeleteIcon={true}
+                />
+              </Tab>
+              <Tab eventKey="storeType" title="Tipos de Bodega">
+                <StoreType />
+              </Tab>
+            </Tabs>
+          </div>
+          {showModal && (
+            <AddNewStoreModal
+              show={showModal}
+              onClose={handleCloseModal}
+              onSave={handleSave}
             />
-          </Tab>
-          <Tab eventKey="storeType" title="Tipos de Bodega">
-            <StoreType />
-          </Tab>
-        </Tabs>
-      </div>
-      {showModal && (
-        <AddNewStoreModal
-          show={showModal}
-          onClose={handleCloseModal}
-          onSave={handleSave}
-        />
-      )}
+          )}
 
-      {showEditStore && (
-        <UpdateStore
-          show={showEditStore}
-          onClose={() => setShowEditStore(false)}
-          storeData={selectedStore} // Pass the selectedStore object
-          onUpdate={handleUpdate}
-        />
-      )}
+          {showEditStore && (
+            <UpdateStore
+              show={showEditStore}
+              onClose={() => setShowEditStore(false)}
+              storeData={selectedStore}
+              onUpdate={handleUpdate}
+            />
+          )}
+        </div>
+      </div>
     </>
   );
 };

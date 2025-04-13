@@ -6,25 +6,24 @@ import "./Inventory.css";
 import { FaSyncAlt } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { AddItemModal } from "../ActionsInventory/AddItemModal/AddItemModal";
-import { BulkUpload } from "../../../Layouts/BulkUpload/BulkUpload";
 import { useAxios } from "../../../Contexts";
 import { createSearchParams } from "react-router-dom";
 import { Tab, Tabs } from "react-bootstrap";
 import { ModalIconCorrect, ModalIconMistake } from "../../../assets";
 import { API_ENDPOINT } from "../../../util";
-import { ConfirmationModal, Modal } from "../../../Layouts";
+import { BulkUpload, ConfirmationModal, Modal } from "../../../Layouts";
 import { EditElementInventory } from "../ActionsInventory/EditElementInventory/EditElementInventory";
 import { InventoryDepends } from "../InventoryDepends/InventoryDepends";
-import { Assignments } from "../Assignments/Assignments";
+import { AsignedItemModal } from "../ActionsInventory/AsignedItemModal/AsignedItemModal";
+import { Assignments } from "../assignments/Assignments";
 
 export const Inventory = () => {
-  const [key, setKey] = useState("items");
+  const [key, setKey] = useState("inventario");
   const [error, setError] = useState(null);
   const { privateFetch } = useAxios();
   const [dateTo, setDateTo] = useState(new Date().toISOString().split("T")[0]);
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemType, setItemType] = useState("Repuesto");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [itemToEdit, setItemToEdit] = useState(null);
@@ -38,44 +37,67 @@ export const Inventory = () => {
   const [confirmationAction, setConfirmationAction] = useState(null);
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
+  const [itemType, setItemType] = useState("Repuesto");
 
-  const translateFields = (items) => {
-    return items.map((item) => ({
-      Código: item.inventory.id,
-      Nombre: item.inventory.description,
-      Tipo: item.inventory.inventoryType.description,
-      Propietario: item.owner.businessName,
-      Bodega: item.store.description,
-      Estado: item.state.description,
-      Condición: item.itemCondition.description,
-      Cantidad: item.quantity,
-      Circunstancia: item.status.description,
-    }));
-  };
-
-  const getData = async () => {
+  const getInventoryTypes = async () => {
     try {
-      const response = await privateFetch.get("/inventory/item/all", {
+      const response = await privateFetch.get("/inventory/type/all?page=0&size=2000", {
         headers: {
           "x-custom-header": "Boreal Api",
         },
       });
 
       if (response.status === 200) {
-        const data = response.data;
+        const inventoryTypes = response.data.result.items;
+        return inventoryTypes;
+      } else {
+        console.error("Error en la solicitud de tipos de inventario:", response.statusText);
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching inventory types:", error);
+      return [];
+    }
+  };
 
-        if (data && data.result && Array.isArray(data.result.inventory)) {
-          const translatedData = translateFields(data.result.inventory);
+  const getData = async () => {
+    try {
+      const [itemsResponse, types] = await Promise.all([
+        privateFetch.get("/inventory/item/all?page=0&size=2000", {
+          headers: {
+            "x-custom-header": "Boreal Api",
+          },
+        }),
+        getInventoryTypes(),
+      ]);
+
+      if (itemsResponse.status === 200) {
+        const data = itemsResponse.data;
+
+        if (data && data.result && Array.isArray(data.result.items)) {
+          // Si no hay tipos, pasamos un array vacío
+          const translatedData = translateFields(data.result.items, types || []);
           setData(translatedData);
         } else {
           console.error("No se encontraron datos de inventario.");
         }
       } else {
-        console.error("Error en la solicitud de inventario:", response.statusText);
+        console.error("Error en la solicitud de inventario:", itemsResponse.statusText);
       }
     } catch (error) {
       console.error("Error fetching inventory data:", error);
     }
+  };
+
+  const translateFields = (items, types) => {
+    return items.map((item) => {
+
+      return {
+        Código: item.id,
+        Nombre: item.description,
+        Tipo: item.inventoryType.description || "Desconocido",
+      };
+    });
   };
 
   const handleRefresh = () => {
@@ -92,25 +114,15 @@ export const Inventory = () => {
     saveAs(blob, "Inventario.xlsx");
   };
 
-
   const handleEdit = (item) => {
-    console.log(item);
     setItemToEdit(item);
     setShowEditElementInventory(true);
   };
-
-  const handleDelete = (item) => {
-    setItemToDelete(item);
-    setShowConfirmationModal(true);
-  };
-
-
 
   const filteredData = data.filter((item) => {
     const codigo = item.Código ? item.Código.toString() : "";
     const nombre = item.Nombre ? item.Nombre.toLowerCase() : "";
 
-    // Filtra por tipo y luego por el término de búsqueda
     const matchesType = itemType === "" || item.Tipo === itemType;
     const matchesSearchTerm =
       codigo.includes(searchTerm) || nombre.includes(searchTerm.toLowerCase());
@@ -125,18 +137,13 @@ export const Inventory = () => {
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
-
   const handleSave = (newItem) => {
     setData([...data, newItem]);
-    setFilteredData([...data, newItem]);
   };
-
-  const handleBulkUploadSuccess = (newData) => {
-    setData([...data, ...newData]);
-    setFilteredData([...data, ...newData]);
+  const handleUploadSuccess = () => {
+    console.log("Carga exitosa");
+    setShowBulkUploadModal(false);
   };
-
-
   useEffect(() => {
     document.title = "Inventario";
   }, []);
@@ -144,7 +151,6 @@ export const Inventory = () => {
   useEffect(() => {
     getData();
   }, [handleSave]);
-
 
   return (
     <>
@@ -156,8 +162,9 @@ export const Inventory = () => {
               id="controlled-tab-example"
               activeKey={key}
               onSelect={(k) => setKey(k)}
-              className="mb-3 mt-4">
-              <Tab eventKey="items" title="Inventario">
+              className="mb-3 mt-4"
+            >
+              <Tab eventKey="inventario" title="Elementos">
                 <div className="filtersContainer">
                   <div className="filters">
                     <label>Tipo:</label>
@@ -166,7 +173,7 @@ export const Inventory = () => {
                       onChange={(e) => setItemType(e.target.value)}
                       className="filter"
                     >
-                      <option value="">Todos</option> 
+                      <option value="">Todos</option>
                       {[...new Set(data.map((item) => item.Tipo))]
                         .filter(Boolean)
                         .map((Tipo, index) => (
@@ -194,36 +201,22 @@ export const Inventory = () => {
                       <RiFileExcel2Line className="ExportIcon" />
                       Exportar
                     </button>
-                    {/*<button
-                      onClick={() => setShowBulkUploadModal(true)}
-                      className="exportButton">
-                      Cargue masivo
-                    </button>*/}
+                    <Button onClick={() => setShowBulkUploadModal(true)} text={"Cargue Masivo"} />
                   </div>
                 </div>
                 <DynamicTable
-                  columns={[
-                    "Código",
-                    "Nombre",
-                    "Tipo",
-                    "Propietario",
-                    "Bodega",
-                    "Estado",
-                    "Condición",
-                    "Cantidad",
-                    "Circunstancia",
-                  ]}
+                  columns={["Código", "Nombre", "Tipo"]}
                   data={filteredData}
                   onEdit={handleEdit}
                   onFilter={handleFilter}
                   hideDeleteIcon={true}
                 />
-
               </Tab>
-              {/*               <Tab eventKey="asignaciones" title="Asignaciones">
+              <Tab eventKey="asiganciones" title="Asignaciones y stock">
                 <Assignments />
-              </Tab> */}
-              <Tab eventKey="dependencias" title="Dependencias">
+              </Tab>
+
+              <Tab eventKey="vinculaciones" title="Vinculaciones">
                 <InventoryDepends />
               </Tab>
             </Tabs>
@@ -231,7 +224,7 @@ export const Inventory = () => {
         </div>
       </div>
 
-      {/* Modals */}
+
       {showModal && (
         <AddItemModal
           show={showModal}
@@ -239,13 +232,15 @@ export const Inventory = () => {
           onSave={handleSave}
         />
       )}
+
       {showBulkUploadModal && (
         <BulkUpload
           show={showBulkUploadModal}
           onClose={() => setShowBulkUploadModal(false)}
-          onSuccess={handleBulkUploadSuccess}
+          onUploadSuccess={handleUploadSuccess}
         />
       )}
+
       {showEditElementInventory && (
         <EditElementInventory
           show={showEditElementInventory}
@@ -264,10 +259,11 @@ export const Inventory = () => {
       )}
       {showResultModal && (
         <Modal
-          show={showResultModal}
+          title={isSuccessful ? "Éxito" : "Error"}
+          text={isSuccessful ? confirmationMessage : error}
           onClose={() => setShowResultModal(false)}
-          icon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
-          message={confirmationMessage}
+          modalIcon={isSuccessful ? ModalIconCorrect : ModalIconMistake}
+          showCloseButton
         />
       )}
     </>
